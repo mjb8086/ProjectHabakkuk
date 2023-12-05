@@ -1,0 +1,9 @@
+mci.db*
+wwwroot/img/samples/*
+tailwind
+*.swp
+
+wwwroot/css/contrib/*.css
+wwwroot/css/jquery*
+wwwroot/js/contrib/*
+wwwroot/lib/*

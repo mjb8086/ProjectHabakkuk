@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NowDoctor @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/mci-fonts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui.structure.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui.theme.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/contrib/uikit.min.css" asp-append-version="true" />
+    <script src="~/js/contrib/uikit.min.js"></script>
+    <script src="~/js/contrib/uikit-icons.min.js"></script>
+    <link rel="stylesheet" href="~/css/inhouse.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav id="mciNavBar" class="uk-navbar-container uk-navbar tm-navbar-container uk-sticky uk-sticky-fixed">
+            <div class="uk-navbar-left">
+                <a class="uk-logo navbar-light" id="mciName" asp-area="" asp-controller="Home" asp-action="Index">NowDoctor</a>
+            </div>
+			<div class="uk-navbar-right">
+			    <ul class="uk-navbar-nav">
+				<li class="">
+				    <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+				</li>
+				<li class="nav-item">
+				    <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+				</li>
+				<li class="">
+				    <a class="navbar-light" asp-area="" asp-controller="" asp-action="">Admin</a>
+				</li>
+			    </ul>
+			</div>
+        </nav>
+    </header>
+    <div id="mainPageBody" class="uk-container">
+         @RenderBody()
+    </div>
+
+    <footer class="">
+        <div class="uk-container">
+            &copy; 2023 - NowDoctor Ltd. HBK Platform "Rough Cut" - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/contrib/underscore-umd.js" defer></script>
+    <script src="~/js/contrib/backbone-full-1.4.1.js" defer></script>
+    <script src="~/js/contrib/jquery-ui.js"></script>
+    <script src="@Url.Content("~/js/site.js")" asp-append-version="true" defer></script>
+    @if (ViewData["scripts"] != null)
+        {
+            // TODO: Work with many scripts....
+        <script src ="@Url.Content("~/js/" + ViewData["scripts"])" asp-append-version="true" defer></script>
+    }
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

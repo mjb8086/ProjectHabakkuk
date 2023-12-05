@@ -1,0 +1,17 @@
+[Unit]
+Description=MCI Platform v1
+
+[Service]
+WorkingDirectory=/var/www/mci-platform
+ExecStart=/usr/bin/dotnet /var/www/mci-platform/mci_main.dll
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=mci-platform
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Enviornment=DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+[Install]
+WantedBy=multi-user.target
