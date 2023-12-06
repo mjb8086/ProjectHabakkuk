@@ -1,5 +1,5 @@
 ﻿/******************************
-* MCI Practitioner Helper
+* HBK Practitioner Helper
 * Helper methods for practitioner classes
 *
 * Author: Mark Brown
@@ -17,13 +17,13 @@ namespace HBKPlatform.Helpers
         {
             return new PractitionerViewModel()
             {
-                Idx = dbPrac.Idx,
+                Idx = dbPrac.Id,
                 Name = dbPrac.Name,
                 DOB = dbPrac.DOB,
                 Title = dbPrac.Title,
                 Location = dbPrac.Location,
                 Bio = dbPrac.Bio,
-                Img = dbPrac.Img
+                Img = dbPrac.Img.ToString()
             };
         }
 

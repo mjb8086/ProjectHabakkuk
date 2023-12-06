@@ -6,4 +6,3 @@ tailwind
 wwwroot/css/contrib/*.css
 wwwroot/css/jquery*
 wwwroot/js/contrib/*
-wwwroot/lib/*

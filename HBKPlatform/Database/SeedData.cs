@@ -9,7 +9,7 @@ namespace HBKPlatform.Database
             using (var ctx = new HbkContext(
                provider.GetRequiredService<DbContextOptions<HbkContext>>()))
             {
-                if (!ctx.Practitioner.Any())
+                if (!ctx.Practitioners.Any())
                 {
                     ctx.AddRange(
                         new Practitioner
@@ -19,7 +19,7 @@ namespace HBKPlatform.Database
                             Bio = "flux capacator",
                             Location = "hill valley",
                             DOB = new DateTime(1932, 07, 08),
-                            Img = "samples/brown.jpg"
+                            Img = new Uri("samples/brown.jpg")
                         },
                         new Practitioner
                         {
@@ -28,7 +28,7 @@ namespace HBKPlatform.Database
                             Bio = "not forgotten",
                             Location = "east side",
                             DOB = new DateTime(1972, 06, 19),
-                            Img = "samples/dre.jpg"
+                            Img = new Uri("samples/dre.jpg")
                         },
                         new Practitioner
                         {
@@ -37,7 +37,7 @@ namespace HBKPlatform.Database
                             Location = "bar",
                             Bio = "baz",
                             DOB = new DateTime(2030, 12, 12),
-                            Img = "samples/foo.jpg"
+                            Img = new Uri("samples/foo.jpg")
                         },
                         new Practitioner
                         {
@@ -46,7 +46,7 @@ namespace HBKPlatform.Database
                             Location = "calcutta",
                             Bio = "rice and curry in a hurry",
                             DOB = new DateTime(1979, 09, 23),
-                            Img = "samples/bombay.jpg"
+                            Img = new Uri("samples/bombay.jpg")
                         },
                         new Practitioner
                         {
@@ -55,7 +55,7 @@ namespace HBKPlatform.Database
                             Location = "space",
                             Bio = "I work for One Million Dollars, but you get the world",
                             DOB = new DateTime(1945, 08, 01),
-                            Img = "samples/evil.jpg"
+                            Img = new Uri("samples/evil.jpg")
                         },
                         new Practitioner
                         {
@@ -64,7 +64,7 @@ namespace HBKPlatform.Database
                             Location = "magherafelt",
                             Bio = "the true gosepl says buy my albums (kjv only)++",
                             DOB = new DateTime(1901, 01, 07),
-                            Img = "samples/mccrea.jpg"
+                            Img = new Uri("samples/mccrea.jpg")
                         },
                         new Practitioner
                         {
@@ -73,7 +73,7 @@ namespace HBKPlatform.Database
                             Location = "america",
                             Bio = "I have watched many hours of instructional anatomic videos. You are safe alone with me.",
                             DOB = new DateTime(1961, 01, 17),
-                            Img = "samples/pills.jpg"
+                            Img = new Uri("samples/pills.jpg")
                         },
                         new Practitioner
                         {
@@ -82,7 +82,7 @@ namespace HBKPlatform.Database
                             Location = "america",
                             Bio = "doesn't know anything about medicine but talks to animals",
                             DOB = new DateTime(1961, 01, 17),
-                            Img = "samples/doolittle.jpg"
+                            Img = new Uri("samples/doolittle.jpg")
                         },
                         new Practitioner
                         {
@@ -91,7 +91,7 @@ namespace HBKPlatform.Database
                             Location = "Ancient Greece",
                             Bio = "I invented this. Ask me anything and I will know.",
                             DOB = new DateTime(1961, 01, 17),
-                            Img = "samples/hippo.jpg"
+                            Img = new Uri("samples/hippo.jpg")
                         }
                     );
                 }

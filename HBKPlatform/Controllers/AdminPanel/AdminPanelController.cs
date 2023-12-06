@@ -37,7 +37,7 @@ namespace HBKPlatform.Controllers.AdminPanel
             }
 
             var practitioner = await _context.Practitioner
-                .FirstOrDefaultAsync(m => m.Idx == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (practitioner == null)
             {
                 return NotFound();
@@ -93,9 +93,9 @@ namespace HBKPlatform.Controllers.AdminPanel
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("edit/{:id}")]
-        public async Task<IActionResult> Edit(int id, [Bind("Idx,Name,Title,Location,Bio,DOB,DateCreated")] Practitioner practitioner)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Title,Location,Bio,DOB,DateCreated")] Practitioner practitioner)
         {
-            if (id != practitioner.Idx)
+            if (id != practitioner.Id)
             {
                 return NotFound();
             }
@@ -109,7 +109,7 @@ namespace HBKPlatform.Controllers.AdminPanel
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PractitionerExists(practitioner.Idx))
+                    if (!PractitionerExists(practitioner.Id))
                     {
                         return NotFound();
                     }
@@ -133,7 +133,7 @@ namespace HBKPlatform.Controllers.AdminPanel
             }
 
             var practitioner = await _context.Practitioner
-                .FirstOrDefaultAsync(m => m.Idx == id);
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (practitioner == null)
             {
                 return NotFound();
@@ -164,7 +164,7 @@ namespace HBKPlatform.Controllers.AdminPanel
 
         private bool PractitionerExists(int id)
         {
-          return (_context.Practitioner?.Any(e => e.Idx == id)).GetValueOrDefault();
+          return (_context.Practitioner?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
     */

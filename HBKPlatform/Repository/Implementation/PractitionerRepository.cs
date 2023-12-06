@@ -9,7 +9,7 @@ namespace HBKPlatform.Repository.Implementation
     {
         public Practitioner GetPractitioner(int mciIdx)
         {
-            var practitioner =  hbkContext.Practitioner.First(x => x.Idx.Equals(mciIdx));
+            var practitioner =  hbkContext.Practitioners.First(x => x.Id.Equals(mciIdx));
             return practitioner;
         }
 

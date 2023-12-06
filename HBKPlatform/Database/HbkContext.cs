@@ -17,7 +17,11 @@ public class HbkContext : DbContext
     {
     }
 
-    public DbSet<Practitioner> Practitioner { get; set; } = default!;
+    public DbSet<Practitioner> Practitioners { get; set; } = default!;
+    public DbSet<Client> Clients { get; set; } = default!;
+    public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
+    public DbSet<Clinic> Clinics { get; set; } = default!;
+    public DbSet<ClinicHomepage> ClinicHomepages { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

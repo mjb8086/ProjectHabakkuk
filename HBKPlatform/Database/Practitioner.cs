@@ -16,18 +16,25 @@ namespace HBKPlatform.Database
         public string Name { get; set; }
         [Required]
         public Title Title { get; set; }
-        public string Location { get; set; }
-        public string Bio { get; set; }
+        public string? Location { get; set; }
+        public string? Bio { get; set; }
         [DataType(DataType.Date)]
         public DateTime DOB { get; set; }
-        public string? Img { get; set; }
+        public virtual Uri? Img { get; set; }
+        public Sex Sex { get; set; }
 
-//        public virtual ICollection<Review> Reviews { get; set; }
+        public int ClinicId { get; set; }
+        public virtual Clinic Clinic { get; set; }
     }
 
     public enum Title
     {
         Dr, Mr, Mrs, Miss, Ms, Lord, Cpl, Pope
+    }
+
+    public enum Sex
+    {
+        Male, Female, Other, NotSaying
     }
 }
 

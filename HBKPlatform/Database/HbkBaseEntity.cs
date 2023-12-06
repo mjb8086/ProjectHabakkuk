@@ -7,9 +7,10 @@ namespace HBKPlatform.Database
     {
         [Key]
         [Column(Order = 1)]
-        public int Idx { get; set; }
+        public int Id { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime DateCreated { get; set; }
+        [DataType(DataType.DateTime)]
         public DateTime DateModified { get; set; }
     }
 }
