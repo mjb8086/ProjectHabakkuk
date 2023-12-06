@@ -1,18 +1,17 @@
-using System.Configuration;
 using HBKPlatform.Database;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting.Internal;
 
-string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+//string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
 
 // BEGIN Builder.
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HbkContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("HbkContext") ??
-                      throw new InvalidOperationException("Connection string 'HbkContext' not found.")) 
+    options.UseNpgsql(
+                builder.Configuration.GetConnectionString("HbkContext") ?? 
+                throw new InvalidOperationException("Connection string 'HbkContext' not found.")
+            ).UseSnakeCaseNamingConvention()
     );
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);

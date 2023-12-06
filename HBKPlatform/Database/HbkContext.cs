@@ -17,6 +17,7 @@ public class HbkContext : DbContext
     {
     }
 
+    // Define tables
     public DbSet<Practitioner> Practitioners { get; set; } = default!;
     public DbSet<Client> Clients { get; set; } = default!;
     public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
@@ -47,5 +48,29 @@ public class HbkContext : DbContext
             .Property(b => b.DateCreated)
             .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+        // Make Id columns auto increment.
+        modelBuilder.UseIdentityAlwaysColumns();
+
+    }
+    
+    /// <summary>
+    /// Automatically update DateModified for all entities that inherit from BaseEntity.
+    /// </summary>
+    public override int SaveChanges()
+    {
+        ChangeTracker.DetectChanges();
+
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Modified);
+
+        foreach (var entry in entries)
+        {
+            if (entry.Entity is HbkBaseEntity entity)
+            {
+                entity.DateModified = DateTime.UtcNow;
+            }
+        }
+
+        return base.SaveChanges();
     }
 }
