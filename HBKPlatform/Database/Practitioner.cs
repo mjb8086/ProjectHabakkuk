@@ -24,17 +24,19 @@ namespace HBKPlatform.Database
         public Sex Sex { get; set; }
 
         public int ClinicId { get; set; }
-        public virtual Clinic Clinic { get; set; }
+        public Clinic Clinic { get; set; }
+        
+        public virtual ICollection<ClientMessage> ClientMessages { get; set; }
     }
 
     public enum Title
     {
-        Dr, Mr, Mrs, Miss, Ms, Lord, Cpl, Pope
+        Dr, Mr, Mrs, Miss, Ms, Lord, Cpl, Pope, Rev, RtHon
     }
 
     public enum Sex
     {
-        Male, Female, Other, NotSaying
+        Male, Female, Other, NotSpecified
     }
 }
 

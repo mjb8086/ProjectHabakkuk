@@ -8,7 +8,6 @@ namespace HBKPlatform.Database;
 /// </summary>
 public class Clinic : HbkBaseEntity
 {
-    public int PractitionerId { get; set; }
     public string OrgName { get; set; }
     public string? OrgTagline { get; set; }
     [DataType(DataType.MultilineText)]
@@ -18,8 +17,9 @@ public class Clinic : HbkBaseEntity
     public string EmailAddress { get; set; }
     public LicenceStatus LicenceStatus { get; set; }
     
-    public virtual ICollection<Practitioner> Practitioners { get; set; }
+    public Practitioner Practitioner { get; set; }
     public virtual ICollection<Client> Clients { get; set; }
+    public ClinicHomepage ClinicHomepage { get; set; }
 }
 
 public enum LicenceStatus

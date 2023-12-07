@@ -9,11 +9,13 @@ public class Client : HbkBaseEntity
     [DataType(DataType.Date)]
     public DateTime DateOfBirth { get; set; }
     public virtual Uri? Img { get; set; }
-    public int ClinicId { get; set; }
     public int UserId { get; set; }
     public string Telephone { get; set; }
     [DataType(DataType.MultilineText)]
     public string Address { get; set; }
 
-    public virtual Clinic Clinic { get; set; }
+    public int ClinicId { get; set; }
+    public Clinic Clinic { get; set; }
+    
+    public virtual ICollection<ClientMessage> ClientMessages { get; set; }
 }

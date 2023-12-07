@@ -15,9 +15,9 @@ public class ClientMessage : HbkBaseEntity
      public MessageOrigin MessageOrigin { get; set; }
 
      // EF Navigations
-     public virtual ClientMessage PreviousMessage { get; set; }
-     public virtual Client Client { get; set; }
-     public virtual Practitioner Practitioner { get; set; }
+     public ClientMessage PreviousMessage { get; set; }
+     public Client Client { get; set; }
+     public Practitioner Practitioner { get; set; }
 }
 
 public enum MessageStatus

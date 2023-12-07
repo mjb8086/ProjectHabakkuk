@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<HbkContext>(options =>
     options.UseNpgsql(
-                builder.Configuration.GetConnectionString("HbkContext") ?? 
+                builder.Configuration.GetConnectionString("HbkContext") ??
                 throw new InvalidOperationException("Connection string 'HbkContext' not found.")
-            ).UseSnakeCaseNamingConvention()
+            )
     );
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);

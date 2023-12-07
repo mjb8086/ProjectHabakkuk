@@ -43,6 +43,9 @@ public class HbkContext : DbContext
             .WithMany(b => b.Reviews);
 
 */
+        // Ensure inherited entities are flattened into one table.
+        modelBuilder.Entity<HbkBaseEntity>().UseTpcMappingStrategy();
+
         // All models will have the date created ts.
         modelBuilder.Entity<HbkBaseEntity>()
             .Property(b => b.DateCreated)
@@ -50,9 +53,11 @@ public class HbkContext : DbContext
 
         // Make Id columns auto increment.
         modelBuilder.UseIdentityAlwaysColumns();
-
     }
-    
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+        optionsBuilder.UseSnakeCaseNamingConvention();
+
     /// <summary>
     /// Automatically update DateModified for all entities that inherit from BaseEntity.
     /// </summary>
