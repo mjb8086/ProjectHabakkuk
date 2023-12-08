@@ -33,7 +33,6 @@
     <Folder Include="Repository\Implementation\" />
     <Folder Include="Views\Practitioner\" />
     <Folder Include="Models\View\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Views\Search\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>
