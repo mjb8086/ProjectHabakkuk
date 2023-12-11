@@ -6,8 +6,7 @@
 * Authored: 10/09/2022
 ******************************/
 
-using System.Text.RegularExpressions;
-using HBKPlatform.Helpers;
+using HBKPlatform.Database.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Database;
@@ -58,42 +57,13 @@ public class HbkContext : DbContext
         modelBuilder.UseIdentityAlwaysColumns();
         
         // Name tables in snake case.
-        // modelBuilder.Entity<Client>().ToTable("clients");
-        // modelBuilder.Entity<ClientMessage>().ToTable("client_messages");
-        // modelBuilder.Entity<Clinic>().ToTable("clinics");
-        // modelBuilder.Entity<ClinicHomepage>().ToTable("clinic_homepage");
-        // modelBuilder.Entity<Practitioner>().ToTable("practitioner");
-        
-        foreach(var entity in modelBuilder.Model.GetEntityTypes())
-        {
-            // Replace table names
-            entity.SetTableName(entity.GetTableName().ToSnakeCase());
-
-            // Replace column names            
-            foreach(var property in entity.GetProperties())
-            {
-                property.SetColumnName(property.GetColumnName().ToSnakeCase());
-            }
-
-            foreach(var key in entity.GetKeys())
-            {
-                key.SetName(key.GetName().ToSnakeCase());
-            }
-
-            foreach(var key in entity.GetForeignKeys())
-            {
-                key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
-            }
-
-            foreach(var index in entity.GetIndexes())
-            {
-                index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
-            }
-        }
+        modelBuilder.NameModelEntitiesInSnakeCase();
+         
     }
     
-    
-
+    /// <summary>
+    /// Set snake case on other entities.
+    /// </summary>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
         optionsBuilder.UseSnakeCaseNamingConvention();
 
