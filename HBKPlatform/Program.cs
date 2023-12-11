@@ -2,6 +2,8 @@ using HBKPlatform.Database;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using HBKPlatform.Areas.Identity.Data;
 
 //string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
 
@@ -13,6 +15,8 @@ builder.Services.AddDbContext<HbkContext>(options =>
                 throw new InvalidOperationException("Connection string 'HbkContext' not found.")
             )
     );
+
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<IdCtx>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
