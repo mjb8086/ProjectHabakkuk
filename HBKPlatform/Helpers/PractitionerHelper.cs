@@ -23,7 +23,7 @@ namespace HBKPlatform.Helpers
                 Title = dbPrac.Title,
                 Location = dbPrac.Location,
                 Bio = dbPrac.Bio,
-                Img = dbPrac.Img.ToString()
+                Img = dbPrac.Img
             };
         }
 

@@ -1,3 +1,4 @@
+using System.Text;
 using HBKPlatform.Database;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
@@ -7,19 +8,21 @@ using Microsoft.EntityFrameworkCore;
 
 // BEGIN Builder.
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<HbkContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
                 builder.Configuration.GetConnectionString("HbkContext") ??
-                throw new InvalidOperationException("Connection string 'HbkContext' not found.")
+                throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.")
             )
     );
+
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-//builder.Services.AddScoped<IHbkContext, HbkContext>();
+//builder.Services.AddScoped<IHbkContext, ApplicationDbContext>();
 builder.Services.AddTransient<IPractitionerRepository, PractitionerRepository>();
 
 var mvcBuilder = builder.Services.AddRazorPages();
@@ -46,10 +49,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     builder.WebHost.UseUrls("http://*:80", "https://*.443");
+    app.UseHttpsRedirection();
 }
 
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -58,6 +60,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
+        string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
+}
 
 app.Run();
 

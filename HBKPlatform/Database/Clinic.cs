@@ -16,7 +16,7 @@ public class Clinic : HbkBaseEntity
     [DataType(DataType.EmailAddress)] 
     public string EmailAddress { get; set; }
     public LicenceStatus LicenceStatus { get; set; }
-    
+
     public Practitioner Practitioner { get; set; }
     public virtual ICollection<Client> Clients { get; set; }
     public ClinicHomepage ClinicHomepage { get; set; }
