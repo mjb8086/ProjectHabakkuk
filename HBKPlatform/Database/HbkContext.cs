@@ -6,7 +6,7 @@
 * Authored: 10/09/2022
 ******************************/
 
-//using HBKPlatform.Database.Helpers;
+using HBKPlatform.Database.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Database;
@@ -57,7 +57,7 @@ public class HbkContext : DbContext
         modelBuilder.UseIdentityAlwaysColumns();
         
         // Name tables in snake case.
-//        modelBuilder.NameModelEntitiesInSnakeCase();
+        modelBuilder.NameModelEntitiesInSnakeCase();
          
     }
     
