@@ -6,8 +6,8 @@ namespace HBKPlatform.Database
     {
         public static void Initialise(IServiceProvider provider)
         {
-            using (var ctx = new HbkContext(
-               provider.GetRequiredService<DbContextOptions<HbkContext>>()))
+            using (var ctx = new ApplicationDbContext(
+               provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
                 if (!ctx.Practitioners.Any())
                 {

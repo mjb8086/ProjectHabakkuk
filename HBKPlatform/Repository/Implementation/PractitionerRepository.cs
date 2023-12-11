@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Repository.Implementation
 {
-    public class PractitionerRepository(HbkContext hbkContext) : IPractitionerRepository
+    public class PractitionerRepository(ApplicationDbContext applicationDbContext) : IPractitionerRepository
     {
         public Practitioner GetPractitioner(int mciIdx)
         {
-            var practitioner =  hbkContext.Practitioners.First(x => x.Id.Equals(mciIdx));
+            var practitioner =  applicationDbContext.Practitioners.First(x => x.Id.Equals(mciIdx));
             return practitioner;
         }
 

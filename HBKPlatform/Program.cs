@@ -2,24 +2,28 @@ using HBKPlatform.Database;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using HBKPlatform.Areas.Identity.Data;
 
 //string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
 
 // BEGIN Builder.
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<HbkContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
-                builder.Configuration.GetConnectionString("HbkContext") ??
-                throw new InvalidOperationException("Connection string 'HbkContext' not found.")
+                builder.Configuration.GetConnectionString("ApplicationDbContext") ??
+                throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.")
             )
     );
+
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-//builder.Services.AddScoped<IHbkContext, HbkContext>();
+//builder.Services.AddScoped<IHbkContext, ApplicationDbContext>();
 builder.Services.AddTransient<IPractitionerRepository, PractitionerRepository>();
 
 var mvcBuilder = builder.Services.AddRazorPages();

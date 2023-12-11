@@ -12,9 +12,9 @@ namespace HBKPlatform.Controllers.AdminPanel
     [Route("adminpanel")]
     public class AdminPanelController : Controller
     {
-        private readonly HbkContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public AdminPanelController(HbkContext context)
+        public AdminPanelController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -24,7 +24,7 @@ namespace HBKPlatform.Controllers.AdminPanel
         {
               return _context.Practitioner != null ? 
                           View(await _context.Practitioner.ToListAsync()) :
-                          Problem("Entity set 'HbkContext.Practitioner'  is null.");
+                          Problem("Entity set 'ApplicationDbContext.Practitioner'  is null.");
         }
 
         // GET: Practitioner/Details/5
@@ -150,7 +150,7 @@ namespace HBKPlatform.Controllers.AdminPanel
         {
             if (_context.Practitioner == null)
             {
-                return Problem("Entity set 'HbkContext.Practitioner'  is null.");
+                return Problem("Entity set 'ApplicationDbContext.Practitioner'  is null.");
             }
             var practitioner = await _context.Practitioner.FindAsync(id);
             if (practitioner != null)
