@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HBKPlatform.Areas.Identity.Data;
 
 // TODO: Remove this
+/*
 public class IdCtx : IdentityDbContext<User>
 {
     public IdCtx(DbContextOptions<IdCtx> options)
@@ -22,3 +23,4 @@ public class IdCtx : IdentityDbContext<User>
         // Add your customizations after calling base.OnModelCreating(builder);
     }
 }
+*/

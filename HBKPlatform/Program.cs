@@ -1,9 +1,8 @@
+using System.Text;
 using HBKPlatform.Database;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using HBKPlatform.Areas.Identity.Data;
 
 //string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
 
@@ -11,12 +10,12 @@ using HBKPlatform.Areas.Identity.Data;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
-                builder.Configuration.GetConnectionString("ApplicationDbContext") ??
+                builder.Configuration.GetConnectionString("HbkContext") ??
                 throw new InvalidOperationException("Connection string 'ApplicationDbContext' not found.")
             )
     );
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -50,10 +49,9 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     builder.WebHost.UseUrls("http://*:80", "https://*.443");
+    app.UseHttpsRedirection();
 }
 
-
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
@@ -62,6 +60,13 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapRazorPages();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
+        string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
+}
 
 app.Run();
 

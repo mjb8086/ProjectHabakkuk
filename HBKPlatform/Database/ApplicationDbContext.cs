@@ -8,6 +8,7 @@
 
 using HBKPlatform.Areas.Identity.Data;
 using HBKPlatform.Database.Helpers;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -61,6 +62,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
         
         // Name tables in snake case.
         modelBuilder.NameModelEntitiesInSnakeCase();
+        
+//        modelBuilder.Entity<IdentityUser>().ToTable("users");
+        modelBuilder.Entity<IdentityUserToken<string>>().ToTable("user_tokens");
+        modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("user_logins");
+        modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("user_claims");
+        modelBuilder.Entity<IdentityRole>().ToTable("application_roles");
+        modelBuilder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
+        modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
          
     }
     

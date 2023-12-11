@@ -1,4 +1,6 @@
 @using HBKPlatform.Database
+@using HBKPlatform.Views.Identity.Account.Manage
+
 @inject SignInManager<User> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();

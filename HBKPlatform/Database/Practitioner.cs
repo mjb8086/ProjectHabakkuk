@@ -20,7 +20,7 @@ namespace HBKPlatform.Database
         public string? Bio { get; set; }
         [DataType(DataType.Date)]
         public DateTime DOB { get; set; }
-        public virtual Uri? Img { get; set; }
+        public string? Img { get; set; }
         public Sex Sex { get; set; }
 
         public int ClinicId { get; set; }
