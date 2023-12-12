@@ -25,15 +25,32 @@
     <None Remove="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="Areas\Account\AccessDenied.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ConfirmEmail.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ConfirmEmailChange.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ExternalLogin.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ForgotPassword.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ForgotPasswordConfirmation.cshtml" />
+    <AdditionalFiles Include="Areas\Account\Lockout.cshtml" />
+    <AdditionalFiles Include="Areas\Account\Login.cshtml" />
+    <AdditionalFiles Include="Areas\Account\LoginWith2fa.cshtml" />
+    <AdditionalFiles Include="Areas\Account\LoginWithRecoveryCode.cshtml" />
+    <AdditionalFiles Include="Areas\Account\Logout.cshtml" />
+    <AdditionalFiles Include="Areas\Account\Register.cshtml" />
+    <AdditionalFiles Include="Areas\Account\RegisterConfirmation.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ResendEmailConfirmation.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ResetPassword.cshtml" />
+    <AdditionalFiles Include="Areas\Account\ResetPasswordConfirmation.cshtml" />
+    <AdditionalFiles Include="Areas\Account\_StatusMessage.cshtml" />
+    <AdditionalFiles Include="Areas\Account\_ViewImports.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas\Home\Controllers\" />
     <Folder Include="Controllers\AdminPanel\" />
     <Folder Include="Migrations\" />
     <Folder Include="Repository\" />
     <Folder Include="Repository\Implementation\" />
-    <Folder Include="Views\Practitioner\" />
     <Folder Include="Models\View\" />
-    <Folder Include="Views\Search\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>
   <ItemGroup>
@@ -60,5 +77,8 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Shared\Account\_ViewImports.cshtml" />
   </ItemGroup>
 </Project>
