@@ -2,6 +2,7 @@ using System.Text;
 using HBKPlatform.Database;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 //string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
@@ -39,7 +40,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    SeedData.Initialise(services);
+    SeedData.Initialise(services, new PasswordHasher<User>());
 }
 
 // Configure the HTTP request pipeline.

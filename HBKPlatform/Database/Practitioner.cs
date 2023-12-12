@@ -25,6 +25,8 @@ namespace HBKPlatform.Database
 
         public int ClinicId { get; set; }
         public Clinic Clinic { get; set; }
+        public string? UserId { get; set; }
+        public User User { get; set; }
         
         public virtual ICollection<ClientMessage> ClientMessages { get; set; }
     }

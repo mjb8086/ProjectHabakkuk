@@ -3,6 +3,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Database.Helpers;
 
+/// <summary>
+/// HBKPlatform Model Builder Extensions.
+/// Overrides for database construction.
+/// Author: MJB
+/// Authored: 10/12/2023
+/// </summary>
 public static class ModelBuilderExtensions
 {
     public static void NameModelEntitiesInSnakeCase(this ModelBuilder modelBuilder)

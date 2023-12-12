@@ -1,23 +1,50 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Database
 {
     public static class SeedData //Formerly Chuck's
     {
-        public static void Initialise(IServiceProvider provider)
+        public static void Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             using (var ctx = new ApplicationDbContext(
                provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
                 if (!ctx.Practitioners.Any() && !ctx.Clinics.Any()) {
+                    
+                    var roleStore = new RoleStore<IdentityRole>(ctx);
+                    IdentityRole<string> sysOp;
+
+                    if (false && !ctx.Roles.Any(r => r.Name == "SysOp"))
+                    {
+                        // Todo: Make Async.
+                        roleStore.CreateAsync(new IdentityRole()
+                        {
+                            Name = "SysOp", NormalizedName = "SysOp".ToUpper()
+                        });
+                    }
+                    var user1 = new User()
+                    {
+                        Email = "outoftime@hillvalley.com",
+                        NormalizedEmail = "outoftime@hillvalley.com".ToUpper(),
+                        NormalizedUserName = "outoftime@hillvalley.com".ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = false,
+                        PhoneNumber = "0898 333 201",
+                        PhoneNumberConfirmed = true,
+                    };
+                    user1.PasswordHash = passwordHasher.HashPassword(user1, "88milesperhour");
+                    
                     var prac1 = new Practitioner()
                     {
                         Name = "Emmert Brown",
                         Title = Title.Dr,
-                        Bio = "flux capacator",
+                        Bio = "inventor of the flux capacator",
                         Location = "hill valley",
                         DOB = new DateTime(1932, 07, 08).ToUniversalTime(),
-                        Img = new string("samples/brown.jpg")
+                        Img = new string("samples/brown.jpg"),
+                        User = user1
                     };
                 
                     ctx.AddRange(
@@ -25,13 +52,12 @@ namespace HBKPlatform.Database
                         {
                             EmailAddress = "foo@bar.com",
                             LicenceStatus = LicenceStatus.Active,
-                            OrgName = "Sample Clinic",
-                            OrgTagline = "Doing the best we can.",
+                            OrgName = "Hill Valley Clinic",
+                            OrgTagline = "Timely treatment or your time back.",
                             Telephone = "0898 333 201",
                             Practitioner = prac1
                         }
                     );
-                
                 }
 
                 if (false && !ctx.Practitioners.Any())
