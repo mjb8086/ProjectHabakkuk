@@ -43,10 +43,10 @@
     <AdditionalFiles Include="Areas\Account\ResetPasswordConfirmation.cshtml" />
     <AdditionalFiles Include="Areas\Account\_StatusMessage.cshtml" />
     <AdditionalFiles Include="Areas\Account\_ViewImports.cshtml" />
+    <AdditionalFiles Include="Views\Home\Index.cshtml" />
+    <AdditionalFiles Include="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Home\Controllers\" />
-    <Folder Include="Controllers\AdminPanel\" />
     <Folder Include="Migrations\" />
     <Folder Include="Repository\" />
     <Folder Include="Repository\Implementation\" />
