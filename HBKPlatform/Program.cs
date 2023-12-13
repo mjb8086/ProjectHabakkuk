@@ -1,7 +1,10 @@
 using System.Text;
 using HBKPlatform.Database;
+using HBKPlatform.Database.Helpers;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
+using HBKPlatform.Services;
+using HBKPlatform.Services.Implementation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +28,9 @@ builder.Services.AddControllersWithViews();
 
 //builder.Services.AddScoped<IHbkContext, ApplicationDbContext>();
 builder.Services.AddTransient<IPractitionerRepository, PractitionerRepository>();
+builder.Services.AddTransient<IClinicRepository, ClinicRepository>();
+builder.Services.AddTransient<IClientMessageRepository, ClientMessageRepository>();
+builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
 
 var mvcBuilder = builder.Services.AddRazorPages();
 

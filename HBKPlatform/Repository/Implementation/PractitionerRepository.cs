@@ -1,7 +1,6 @@
 ﻿using HBKPlatform.Database;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.View;
-using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Repository.Implementation
 {

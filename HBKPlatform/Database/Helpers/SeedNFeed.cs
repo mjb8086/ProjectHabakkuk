@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace HBKPlatform.Database
+namespace HBKPlatform.Database.Helpers
 {
     // Sneed's
     public static class SeedNFeed //Formerly Chuck's

@@ -25,31 +25,15 @@
     <None Remove="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
   </ItemGroup>
   <ItemGroup>
-    <AdditionalFiles Include="Areas\Account\AccessDenied.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ConfirmEmail.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ConfirmEmailChange.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ExternalLogin.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ForgotPassword.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ForgotPasswordConfirmation.cshtml" />
-    <AdditionalFiles Include="Areas\Account\Lockout.cshtml" />
-    <AdditionalFiles Include="Areas\Account\Login.cshtml" />
-    <AdditionalFiles Include="Areas\Account\LoginWith2fa.cshtml" />
-    <AdditionalFiles Include="Areas\Account\LoginWithRecoveryCode.cshtml" />
-    <AdditionalFiles Include="Areas\Account\Logout.cshtml" />
-    <AdditionalFiles Include="Areas\Account\Register.cshtml" />
-    <AdditionalFiles Include="Areas\Account\RegisterConfirmation.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ResendEmailConfirmation.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ResetPassword.cshtml" />
-    <AdditionalFiles Include="Areas\Account\ResetPasswordConfirmation.cshtml" />
-    <AdditionalFiles Include="Areas\Account\_StatusMessage.cshtml" />
-    <AdditionalFiles Include="Areas\Account\_ViewImports.cshtml" />
     <AdditionalFiles Include="Views\Home\Index.cshtml" />
     <AdditionalFiles Include="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Areas\Client\Controllers\" />
+    <Folder Include="Areas\Client\Views\Appointments\" />
+    <Folder Include="Areas\Client\Views\Messaging\" />
+    <Folder Include="Areas\MyND\Views\Appointments\" />
     <Folder Include="Migrations\" />
-    <Folder Include="Repository\" />
-    <Folder Include="Repository\Implementation\" />
     <Folder Include="Models\View\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>

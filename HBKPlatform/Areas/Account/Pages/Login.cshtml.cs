@@ -3,6 +3,7 @@
 #nullable disable
 
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using HBKPlatform.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -95,6 +96,11 @@ namespace HBKPlatform.Areas.Account.Pages
             ReturnUrl = returnUrl;
         }
 
+        /// <summary>
+        /// Sign in method, adapted from ASP.NET Identity.
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <returns></returns>
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
@@ -103,11 +109,24 @@ namespace HBKPlatform.Areas.Account.Pages
 
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "User doesn't exist.");
+                    return Page();
+                }
+                // TODO: enable lockout?
+                var result = await _signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    // TODO Get these details for the user! Will help with conversation view... OR could cache...
+                    var customClaims = new[]
+                    {
+                        new Claim("ClinicId", ""), 
+                        new Claim("PractitionerId", ""),
+                        new Claim("ClientId", "")
+                    };
+                    await _signInManager.SignInWithClaimsAsync(user, Input.RememberMe, customClaims);
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
