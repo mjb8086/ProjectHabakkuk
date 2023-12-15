@@ -1,4 +1,3 @@
-using System.Text;
 using HBKPlatform.Database;
 using HBKPlatform.Database.Helpers;
 using HBKPlatform.Repository;
@@ -21,16 +20,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
+builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
+builder.Services.AddScoped<IClientMessageRepository, ClientMessageRepository>();
+
+builder.Services.AddTransient<IClinicService, ClinicService>();
+builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
+
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-//builder.Services.AddScoped<IHbkContext, ApplicationDbContext>();
-builder.Services.AddTransient<IPractitionerRepository, PractitionerRepository>();
-builder.Services.AddTransient<IClinicRepository, ClinicRepository>();
-builder.Services.AddTransient<IClientMessageRepository, ClientMessageRepository>();
-builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
 
 var mvcBuilder = builder.Services.AddRazorPages();
 
@@ -46,7 +47,7 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
 
-    SeedNFeed.Initialise(services, new PasswordHasher<User>());
+    await SeedNFeed.Initialise(services, new PasswordHasher<User>());
 }
 
 // Configure the HTTP request pipeline.

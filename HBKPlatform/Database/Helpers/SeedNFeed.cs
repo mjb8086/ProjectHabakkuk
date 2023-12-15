@@ -7,24 +7,33 @@ namespace HBKPlatform.Database.Helpers
     // Sneed's
     public static class SeedNFeed //Formerly Chuck's
     {
-        public static void Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
+        public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             using (var ctx = new ApplicationDbContext(
                provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
+                var roleStore = new RoleStore<IdentityRole>(ctx);
+                IdentityRole sysOp, pracRole, clientRole;
+
+                if ((sysOp = ctx.Roles.FirstOrDefault(r => r.Name == "SysOp")) == null)
+                {
+                    sysOp = new IdentityRole() { Name = "SysOp", NormalizedName = "SysOp".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString()};
+                    await roleStore.CreateAsync(sysOp);
+                }
+                
+                if ((pracRole = ctx.Roles.FirstOrDefault(r => r.Name == "Practitioner")) == null)
+                {
+                    pracRole = new IdentityRole() { Name = "Practitioner", NormalizedName = "Practitioner".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
+                    await roleStore.CreateAsync(pracRole);
+                }
+                if ((clientRole = ctx.Roles.FirstOrDefault(r => r.Name == "Client")) == null)
+                {
+                    clientRole = new IdentityRole() { Name = "Client", NormalizedName = "Client".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
+                    await roleStore.CreateAsync(clientRole);
+                }
+                    
                 if (!ctx.Practitioners.Any() && !ctx.Clinics.Any()) {
                     
-                    var roleStore = new RoleStore<IdentityRole>(ctx);
-                    IdentityRole<string> sysOp;
-
-                    if (false && !ctx.Roles.Any(r => r.Name == "SysOp"))
-                    {
-                        // Todo: Make Async.
-                        roleStore.CreateAsync(new IdentityRole()
-                        {
-                            Name = "SysOp", NormalizedName = "SysOp".ToUpper()
-                        });
-                    }
                     var user1 = new User()
                     {
                         Email = "outoftime@hillvalley.com",
@@ -40,15 +49,42 @@ namespace HBKPlatform.Database.Helpers
                     
                     var prac1 = new Practitioner()
                     {
-                        Name = "Emmert Brown",
+                        Forename = "Emmett",
+                        Surname = "Brown",
                         Title = Title.Dr,
-                        Bio = "inventor of the flux capacator",
+                        Bio = "inventor of the flux capacitor",
                         Location = "hill valley",
-                        DOB = new DateTime(1932, 07, 08).ToUniversalTime(),
+                        DateOfBirth = new DateTime(1932, 07, 08).ToUniversalTime(),
                         Img = new string("samples/brown.jpg"),
                         User = user1
                     };
-                
+
+                    var user2Email = "mmf@hillvalleyhigh.com";
+                    var user2 = new User()
+                    {
+                        Email = user2Email,
+                        NormalizedEmail = user2Email.ToUpper(),
+                        UserName = user2Email,
+                        NormalizedUserName = user2Email.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = false,
+                        PhoneNumber = "0898 333 201",
+                        PhoneNumberConfirmed = true,
+                    };
+                    user2.PasswordHash = passwordHasher.HashPassword(user2, "toodamnloud");
+                    
+                    var client1 = new Client()
+                    {
+                        Forename = "Marty",
+                        Surname = "McFly",
+                        Title = Title.Mr,
+                        Address = "Unknown",
+                        DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
+                        Img = new string("samples/brown.jpg"),
+                        Telephone = "999",
+                        User = user2
+                    };
+                    
                     ctx.AddRange(
                         new Clinic()
                         {
@@ -57,97 +93,18 @@ namespace HBKPlatform.Database.Helpers
                             OrgName = "Hill Valley Clinic",
                             OrgTagline = "Timely treatment or your time back.",
                             Telephone = "0898 333 201",
-                            Practitioner = prac1
+                            Practitioner = prac1,
+                            Clients = new List<Client>() {client1}
                         }
                     );
+                    ctx.SaveChanges();
+                    
+                    var pracUserRole = new IdentityUserRole<string>() { UserId = user1.Id, RoleId = pracRole.Id };
+                    var clientUserRole = new IdentityUserRole<string>() { UserId = user2.Id, RoleId = clientRole.Id };
+                    ctx.Add(pracUserRole);
+                    ctx.Add(clientUserRole);
                 }
 
-                if (false && !ctx.Practitioners.Any())
-                {
-                    ctx.AddRange(
-                        new Practitioner
-                        {
-                            Name = "Emmert Brown",
-                            Title = Title.Dr,
-                            Bio = "flux capacator",
-                            Location = "hill valley",
-                            DOB = new DateTime(1932, 07, 08).ToUniversalTime(),
-                            Img = new string("samples/brown.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Dre",
-                            Title = Title.Dr,
-                            Bio = "not forgotten",
-                            Location = "east side",
-                            DOB = new DateTime(1972, 06, 19).ToUniversalTime(),
-                            Img = new string("samples/dre.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Foo",
-                            Title = Title.Dr,
-                            Location = "bar",
-                            Bio = "baz",
-                            DOB = new DateTime(2030, 12, 12).ToUniversalTime(),
-                            Img = new string("samples/foo.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Bombay",
-                            Title = Title.Dr,
-                            Location = "calcutta",
-                            Bio = "rice and curry in a hurry",
-                            DOB = new DateTime(1979, 09, 23).ToUniversalTime(),
-                            Img = new string("samples/bombay.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Evil",
-                            Title = Title.Dr,
-                            Location = "space",
-                            Bio = "I work for One Million Dollars, but you get the world",
-                            DOB = new DateTime(1945, 08, 01).ToUniversalTime(),
-                            Img = new string("samples/evil.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "william mccrea",
-                            Title = Title.Dr,
-                            Location = "magherafelt",
-                            Bio = "the true gosepl says buy my albums (kjv only)++",
-                            DOB = new DateTime(1901, 01, 07).ToUniversalTime(),
-                            Img = new string("samples/mccrea.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Moley",
-                            Title = Title.Dr,
-                            Location = "america",
-                            Bio = "I have watched many hours of instructional anatomic videos. You are safe alone with me.",
-                            DOB = new DateTime(1961, 01, 17).ToUniversalTime(),
-                            Img = new string("samples/pills.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Doolittle",
-                            Title = Title.Dr,
-                            Location = "america",
-                            Bio = "doesn't know anything about medicine but talks to animals",
-                            DOB = new DateTime(1961, 01, 17).ToUniversalTime(),
-                            Img = new string("samples/doolittle.jpg")
-                        },
-                        new Practitioner
-                        {
-                            Name = "Hippocrates",
-                            Title = Title.Dr,
-                            Location = "Ancient Greece",
-                            Bio = "I invented this. Ask me anything and I will know.",
-                            DOB = new DateTime(1961, 01, 17).ToUniversalTime(),
-                            Img = new string("samples/hippo.jpg")
-                        }
-                    );
-                }
                 ctx.SaveChanges();
             }
         }

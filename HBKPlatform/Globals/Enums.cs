@@ -12,7 +12,7 @@ public static class Enums
 
      public enum MessageOrigin
      {
-          Sender,
-          Recipient
+          Practitioner,
+          Client
      }
 }

@@ -13,13 +13,15 @@ namespace HBKPlatform.Database
     public class Practitioner : HbkBaseEntity
     {
         [Required]
-        public string Name { get; set; }
+        public string Forename { get; set; }
+        [Required]
+        public string Surname { get; set; }
         [Required]
         public Title Title { get; set; }
         public string? Location { get; set; }
         public string? Bio { get; set; }
         [DataType(DataType.Date)]
-        public DateTime DOB { get; set; }
+        public DateTime DateOfBirth { get; set; }
         public string? Img { get; set; }
         public Sex Sex { get; set; }
 

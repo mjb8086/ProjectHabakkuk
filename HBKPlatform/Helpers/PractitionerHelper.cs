@@ -18,8 +18,8 @@ namespace HBKPlatform.Helpers
             return new PractitionerViewModel()
             {
                 Idx = dbPrac.Id,
-                Name = dbPrac.Name,
-                DOB = dbPrac.DOB,
+                Name = dbPrac.Forename + dbPrac.Surname,
+                DOB = dbPrac.DateOfBirth,
                 Title = dbPrac.Title,
                 Location = dbPrac.Location,
                 Bio = dbPrac.Bio,

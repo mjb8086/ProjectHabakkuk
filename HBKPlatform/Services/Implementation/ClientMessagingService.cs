@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Identity;
-
-using HBKPlatform.Database;
 using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Repository;
@@ -8,25 +5,67 @@ using HBKPlatform.Repository.Implementation;
 
 namespace HBKPlatform.Services.Implementation;
 
-public class ClientMessagingService(IHttpContextAccessor httpContextAccessor, ClientMessageRepository _clientMessageRepository, IClinicRepository _clinicRepository) : IClientMessagingService
+public class ClientMessagingService(IHttpContextAccessor httpContextAccessor, IClientMessageRepository _clientMessageRepository, IClinicService _clinicService) : IClientMessagingService
 {
-     public async Task SendMessage(ClientMessage message)
+     public async Task SendMessage(string messageBody, int recipientId)
      {
-          // Security - check that the current user is the same as the sender in the body
+          var clientIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClientId");
+          var pracIdClaim = httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
+          var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
+          int clientId, pracId, clinicId;
+          Enums.MessageOrigin messageOrigin;
+
+          if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out clientId))
+          {
+               pracId = recipientId;
+               messageOrigin = Enums.MessageOrigin.Client;
+          }
+          else if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out pracId))
+          {
+               clientId = recipientId;
+               messageOrigin = Enums.MessageOrigin.Practitioner;
+          }
+          else
+          {
+               throw new InvalidOperationException("Message data is incomplete.");
+          }
+
+          if (!(clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out clinicId)))
+          {
+               throw new InvalidOperationException("Clinic ID is required.");
+          }
 
           // Check that the users are part of the same clinic
-          
-          // Set values for unread messages
-          message.DateOpened = null;
-          message.MessageStatus = Enums.MessageStatus.Unread;
-          
-          _clientMessageRepository.SaveMessage(message);
+          if (!(await _clinicService.VerifyClientAndPracClinicMembership(clientId, pracId)))
+          {
+               throw new InvalidOperationException("Client and practitioner are not members of the same clinic.");
+          }
+
+          // if that's okay, save it.
+          await _clientMessageRepository.SaveMessage(pracId, clientId, clinicId, messageBody, messageOrigin);
      }
 
-     public async Task<ClientMessageConversationModel> GetConversation(string sender, string recipient, int max)
+     public async Task<ClientMessageConversationModel> GetConversationClient(int pracId, int max)
      {
-          // Assume sender and recipient are in the same clinic, so only one conversation
-          // TODO: Security and access checks
-          return await _clientMessageRepository.GetConversation(sender, recipient, max);
+          // Get logged in user and find his clientId 
+          var clientIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClientId");
+          if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
+          {
+               // TODO: Security and access checks
+               return await _clientMessageRepository.GetConversation(pracId, clientId, max);
+          }
+          return null;
+     }
+     
+     public async Task<ClientMessageConversationModel> GetConversationPractitioner(int clientId, int max)
+     {
+          // Get logged in user and find his pracId 
+          var pracIdClaim = httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
+          if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
+          {
+               // TODO: Security and access checks
+               return await _clientMessageRepository.GetConversation(pracId, clientId, max);
+          }
+          return null;
      }
 }

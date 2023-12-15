@@ -8,9 +8,6 @@
     <link rel="stylesheet" href="~/css/jquery-ui.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/jquery-ui.structure.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/jquery-ui.theme.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/contrib/uikit.min.css" asp-append-version="true" />
-    <script src="~/js/contrib/uikit.min.js"></script>
-    <script src="~/js/contrib/uikit-icons.min.js"></script>
     <link rel="stylesheet" href="~/css/inhouse.css" asp-append-version="true" />
 </head>
 <body>
@@ -20,20 +17,32 @@
                 <a class="uk-logo navbar-light" id="mciName" asp-area="" asp-controller="Home" asp-action="Index">NowDoctor</a>
             </div>
 			<div class="uk-navbar-right">
-			    <ul class="uk-navbar-nav">
-				<li class="">
-				    <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-				</li>
-				<li class="nav-item">
-				    <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-				</li>
-				<li class="nav-item">
-				    <a class="navbar-light" asp-area="Account"  asp-page="/Login">Login</a>
-				</li>
-				<li class="">
-				    <a class="navbar-light" asp-area="MasterControlPanel" asp-controller="MCP" asp-action="Index">Admin</a>
-				</li>
-			    </ul>
+                <ul class="uk-navbar-nav">
+                    <li class="">
+                        <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Account" asp-page="/Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Account"  asp-page="/Login">Login</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("SysOp"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="MasterControlPanel" asp-controller="MCP" asp-action="Index">Admin</a>
+                            </li>
+                        }
+                </ul>
 			</div>
         </nav>
     </header>
@@ -49,7 +58,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/contrib/underscore-umd.js" defer></script>
-    <script src="~/js/contrib/backbone-full-1.4.1.js" defer></script>
     <script src="~/js/contrib/jquery-ui.js"></script>
     <script src="@Url.Content("~/js/site.js")" asp-append-version="true" defer></script>
     @if (ViewData["scripts"] != null)

@@ -5,6 +5,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using HBKPlatform.Database;
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,16 +13,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace HBKPlatform.Areas.Account.Pages
 {
-    public class LoginModel : PageModel
+    public class LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger, IUserService userService)
+        : PageModel
     {
-        private readonly SignInManager<User> _signInManager;
-        private readonly ILogger<LoginModel> _logger;
-
-        public LoginModel(SignInManager<User> signInManager, ILogger<LoginModel> logger)
-        {
-            _signInManager = signInManager;
-            _logger = logger;
-        }
 
         [BindProperty]
         public InputModel Input { get; set; }
@@ -59,7 +53,7 @@ namespace HBKPlatform.Areas.Account.Pages
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             ReturnUrl = returnUrl;
         }
@@ -73,29 +67,30 @@ namespace HBKPlatform.Areas.Account.Pages
         {
             returnUrl ??= Url.Content("~/");
 
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+            ExternalLogins = (await signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
             if (ModelState.IsValid)
             {
-                var user = await _signInManager.UserManager.FindByEmailAsync(Input.Email);
+                var user = await signInManager.UserManager.FindByEmailAsync(Input.Email);
                 if (user == null)
                 {
                     ModelState.AddModelError(string.Empty, "User doesn't exist.");
                     return Page();
                 }
                 // TODO: enable lockout?
-                var result = await _signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
+                var result = await signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     // TODO Get these details for the user! Will help with conversation view... OR could cache...
+                    var userDto = await userService.GetClientOrPracIdForUserId(user.Id);
                     var customClaims = new[]
                     {
-                        new Claim("ClinicId", ""), 
-                        new Claim("PractitionerId", ""),
-                        new Claim("ClientId", "")
+                        new Claim("ClinicId", userDto.ClinicId.ToString()), 
+                        new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
+                        new Claim("ClientId", userDto.ClientId?.ToString() ?? "")
                     };
-                    await _signInManager.SignInWithClaimsAsync(user, Input.RememberMe, customClaims);
-                    _logger.LogInformation("User logged in.");
+                    await signInManager.SignInWithClaimsAsync(user, Input.RememberMe, customClaims);
+                    logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -104,7 +99,7 @@ namespace HBKPlatform.Areas.Account.Pages
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning("User account locked out.");
+                    logger.LogWarning("User account locked out.");
                     return RedirectToPage("./Lockout");
                 }
                 else
