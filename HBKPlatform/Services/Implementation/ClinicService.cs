@@ -1,14 +1,44 @@
 using HBKPlatform.Database;
+using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View;
+using HBKPlatform.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Services.Implementation;
 
-public class ClinicService(ApplicationDbContext _db) : IClinicService
+/// <summary>
+/// HBKPlatform Client messaging service.
+/// Middleware for controller and database functionality.
+/// 
+/// Author: Mark Brown
+/// Authored: 13/12/2023
+/// 
+/// © 2023 NowDoctor Ltd.
+/// </summary>
+public class ClinicService(ApplicationDbContext _db, IClinicRepository _clinicRepository, IHttpContextAccessor httpContextAccessor) : IClinicService
 {
     public async Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId)
     {
         var client = await _db.Clients.FirstAsync(x => x.Id == clientId);
         var prac = await _db.Practitioners.FirstAsync(x => x.Id == pracId);
         return client.ClinicId == prac.ClinicId;
+    }
+
+    public async Task<MyNDInboxModel> GetInboxModel()
+    {
+        var inboxModel = new MyNDInboxModel();
+        inboxModel.ClientDetails = new List<ClientDetailsLite>();
+        
+        var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
+        if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
+        {
+            var clinicDetails = await _clinicRepository.GetCompleteClinic(clinicId);
+            foreach (var client in clinicDetails.Clients)
+            {
+                inboxModel.ClientDetails.Add(new ClientDetailsLite() { Name = $"{client.Forename} {client.Surname}", Id = client.Id });
+            }
+        }
+
+        return inboxModel;
     }
 }

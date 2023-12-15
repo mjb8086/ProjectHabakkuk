@@ -13,6 +13,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
 
+/// <summary>
+/// HBKPlatform Home Controller.
+/// 
+/// Author: Mark Brown
+/// Authored: 10/09/2022
+/// 
+/// © 2022 NowDoctor Ltd.
+/// </summary>
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;

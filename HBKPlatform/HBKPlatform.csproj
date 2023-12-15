@@ -34,7 +34,6 @@
     <Folder Include="Areas\Client\Views\Messaging\" />
     <Folder Include="Areas\MyND\Views\Appointments\" />
     <Folder Include="Migrations\" />
-    <Folder Include="Models\View\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>
   <ItemGroup>

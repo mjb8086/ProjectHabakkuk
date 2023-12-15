@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -40,6 +42,12 @@
                         {
                             <li class="nav-item">
                                 <a class="navbar-light" asp-area="MasterControlPanel" asp-controller="MCP" asp-action="Index">Admin</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Practitioner"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="MyND" asp-controller="Reception" asp-action="Index">MyND</a>
                             </li>
                         }
                 </ul>

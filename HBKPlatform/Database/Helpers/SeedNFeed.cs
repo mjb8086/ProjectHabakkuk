@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using HBKPlatform.Globals;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,7 +33,7 @@ namespace HBKPlatform.Database.Helpers
                     await roleStore.CreateAsync(clientRole);
                 }
                     
-                if (!ctx.Practitioners.Any() && !ctx.Clinics.Any()) {
+                if (!ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Clinics.Any()) {
                     
                     var user1 = new User()
                     {
@@ -85,17 +86,19 @@ namespace HBKPlatform.Database.Helpers
                         User = user2
                     };
                     
-                    ctx.AddRange(
-                        new Clinic()
-                        {
-                            EmailAddress = "foo@bar.com",
-                            LicenceStatus = LicenceStatus.Active,
-                            OrgName = "Hill Valley Clinic",
-                            OrgTagline = "Timely treatment or your time back.",
-                            Telephone = "0898 333 201",
-                            Practitioner = prac1,
-                            Clients = new List<Client>() {client1}
-                        }
+                    var clinic = new Clinic()
+                    {
+                        EmailAddress = "foo@bar.com",
+                        LicenceStatus = LicenceStatus.Active,
+                        OrgName = "Hill Valley Clinic",
+                        OrgTagline = "Timely treatment or your time back.",
+                        Telephone = "0898 333 201",
+                        Practitioner = prac1,
+                        Clients = new List<Client>() {client1}
+                    };
+                    
+                    ctx.Add(
+                        clinic
                     );
                     ctx.SaveChanges();
                     
@@ -103,9 +106,22 @@ namespace HBKPlatform.Database.Helpers
                     var clientUserRole = new IdentityUserRole<string>() { UserId = user2.Id, RoleId = clientRole.Id };
                     ctx.Add(pracUserRole);
                     ctx.Add(clientUserRole);
+
+                    var conversation = new List<ClientMessage>();
+                    conversation.Add(new ClientMessage()
+                    {
+                        ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Client,
+                        MessageBody = "lost the plutonium sorry"
+                    });
+                    conversation.Add(new ClientMessage()
+                    {
+                        ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
+                        MessageBody = "ah bollocks"
+                    });
+                    ctx.AddRange(conversation);
+                    ctx.SaveChanges();
                 }
 
-                ctx.SaveChanges();
             }
         }
     }

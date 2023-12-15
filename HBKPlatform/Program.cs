@@ -18,10 +18,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
             )
     );
 
-builder.Services.AddDefaultIdentity<User>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoleManager<RoleManager<IdentityRole>>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultUI()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
 builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IClientMessageRepository, ClientMessageRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
@@ -68,6 +73,10 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "MasterControlPanel",
     pattern: "{area:exists}/{controller=MCP}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
+    name: "MyND",
+    pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
