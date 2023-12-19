@@ -16,9 +16,9 @@ namespace HBKPlatform.Database.Helpers
                 var roleStore = new RoleStore<IdentityRole>(ctx);
                 IdentityRole sysOp, pracRole, clientRole;
 
-                if ((sysOp = ctx.Roles.FirstOrDefault(r => r.Name == "SysOp")) == null)
+                if ((sysOp = ctx.Roles.FirstOrDefault(r => r.Name == "SuperAdmin")) == null)
                 {
-                    sysOp = new IdentityRole() { Name = "SysOp", NormalizedName = "SysOp".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString()};
+                    sysOp = new IdentityRole() { Name = "SuperAdmin", NormalizedName = "SuperAdmin".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString()};
                     await roleStore.CreateAsync(sysOp);
                 }
                 

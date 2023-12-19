@@ -1,0 +1,23 @@
+using HBKPlatform.Services;
+using Microsoft.AspNetCore.Mvc;
+
+namespace HBKPlatform.Client.Controllers;
+
+/// <summary>
+/// HBKPlatform Client Reception Controller.
+/// Default landing page and other related views.
+/// 
+/// Author: Mark Brown
+/// Authored: 19/12/2023
+/// 
+/// © 2023 NowDoctor Ltd.
+/// </summary>
+[Area("Client")]
+public class ReceptionController(IClinicService _clinicService): Controller
+{
+    public async Task <IActionResult> Index()
+    {
+        var data = await _clinicService.GetClientClinicData();
+        return View(data);
+    }
+}

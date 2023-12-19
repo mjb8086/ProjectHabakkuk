@@ -54,14 +54,17 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           await _clientMessageRepository.SaveMessage(pracId, clientId, clinicId, messageBody, messageOrigin);
      }
 
+     // TODO: merge these into one method like above
      public async Task<ClientMessageConversationModel> GetConversationClient(int pracId, int max)
      {
           // Get logged in user and find his clientId 
           var clientIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClientId");
+          // TODO: Security and access checks
           if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
           {
-               // TODO: Security and access checks
-               return await _clientMessageRepository.GetConversation(pracId, clientId, max);
+               var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
+               model.PractitionerId = pracId;
+               return model;
           }
           return null;
      }

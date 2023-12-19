@@ -38,7 +38,7 @@
                                 <a class="navbar-light" asp-area="Account"  asp-page="/Login">Login</a>
                             </li>
                         }
-                        @if (User.IsInRole("SysOp"))
+                        @if (User.IsInRole("SuperAdmin"))
                         {
                             <li class="nav-item">
                                 <a class="navbar-light" asp-area="MasterControlPanel" asp-controller="MCP" asp-action="Index">Admin</a>
@@ -48,6 +48,12 @@
                         {
                             <li class="nav-item">
                                 <a class="navbar-light" asp-area="MyND" asp-controller="Reception" asp-action="Index">MyND</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Client"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Client" asp-controller="Reception" asp-action="Index">Clinic Reception</a>
                             </li>
                         }
                 </ul>

@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
 using HBKPlatform.Repository;
@@ -40,5 +41,17 @@ public class ClinicService(ApplicationDbContext _db, IClinicRepository _clinicRe
         }
 
         return inboxModel;
+    }
+
+    public async Task<ClientClinicData> GetClientClinicData()
+    {
+        var data = new ClientClinicData(); 
+        var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
+        if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
+        {
+            data.PracId = _db.Practitioners.First(x => x.ClinicId == clinicId).Id;
+        }
+
+        return data;
     }
 }

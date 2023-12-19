@@ -29,9 +29,7 @@
     <AdditionalFiles Include="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Areas\Client\Controllers\" />
     <Folder Include="Areas\Client\Views\Appointments\" />
-    <Folder Include="Areas\Client\Views\Messaging\" />
     <Folder Include="Areas\MyND\Views\Appointments\" />
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\css\contrib\" />

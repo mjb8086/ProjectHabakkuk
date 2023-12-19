@@ -1,0 +1,9 @@
+@model HBKPlatform.Models.ClientClinicData
+
+@{
+    ViewBag.Title = "title";
+    Layout = "_Client";
+}
+
+<h2>Reception, i.e. dashboard. Client view.</h2>
+<p><a asp-area="Client" asp-controller="Messaging" asp-action="Conversation" asp-route-pracId="@Model.PracId">Messaging with $NAME</a> (x unread)</p>
