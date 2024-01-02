@@ -91,98 +91,23 @@ div.list-body {
     padding-bottom: 10px;
 }
 
-/* Practitioner Views */
-
-div#pracDetailsWrapper {
-    min-height: 320px;
-}
-
-p#pracName {
-    font-size: 1.5em;
-    font-style: italic;
-}
-
-div#pracImgWrap {
-    display: inline;
-}
-
-img#pracImg {
-    float:left;
-    max-height: 320px;
-    max-width: 220px;
-    max-height: 300px;
-}
-
-div#pracDetails {
-    margin-left: 20px;
-    display: inline-block;
-}
-
-div#pracReviewSummary {
-}
-
-div.review-item {
-    border-bottom: 1px solid black;
-    padding-bottom: 10px;
-}
-
-p.review-item-title {
-    font-weight: bold;
-    text-decoration-line: underline;
-}
-
-div#pracReviewSection {
-    margin-top: 30px;
-}
-
-textarea#commentArea {
-    height: 150px;
-}
-
-/* Search View */
-img.pracSml {
-    width: 50px;
-    height: 50px;
-}
-
-td.pracImg {
-    width: 70px;
-}
-
-a.pracLink { }
-
-tr.pracListingRow {
-    font-size: 30px;
-}
-
 /* Home  - TODO breakout! */
-
-input#mainSearchBox {
-    max-width: 450px;
-    height: 3em;
-    font-size: 1.0em;
-    border-radius: 10px;
-    width: 100%;
-}
-
-button#mainSearchButton {
-    border-radius: 5px;
-    background-color: #b9b7b7;
-    border: 1px solid #939393;
-}
-
-img#homeBkgImg {
-    width: 100%;
-}
-
-div#searchBody {
-}
 
 div#homeContainer {
     text-align: center;
     margin-top: 0px;
     min-height: 500px;
 }
+
+footer {
+    margin: 30px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+div.footer-item {}
 
 /* CONVENIENCES */
 .no-margins {

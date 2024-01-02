@@ -43,7 +43,7 @@ input#btnSend {
     border-radius: 5px;
 }
 
-input#messageBody {
-    max-width: 450px;
+textarea#messageBody {
+    width: 400px;
 }
 
