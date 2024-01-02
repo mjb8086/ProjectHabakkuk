@@ -23,7 +23,7 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
         var message = new ClientMessage()
         {
             DateOpened = null,
-            MessageStatus = Enums.MessageStatus.Unread,
+            MessageStatusPractitioner = Enums.MessageStatus.Unread,
             PreviousMessageId = null,
             PractitionerId = practitionerId,
             ClientId = clientId,
@@ -39,7 +39,7 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
     public async Task<ClientMessageConversationModel> GetConversation(int practitionerId, int clientId, int clinicId, int next = 10)
     {
         var convo = new ClientMessageConversationModel();
-        var messages = await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == practitionerId && clinicId == clinicId && x.MessageStatus != Enums.MessageStatus.Deleted)
+        var messages = await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == practitionerId && clinicId == clinicId && x.MessageStatusPractitioner != Enums.MessageStatus.Deleted)
             .OrderBy(x => x.Id).Take(next).ToListAsync();
 
         // TODO: reconsider use of previous and next message Id... may not be needed
@@ -56,10 +56,30 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
             {
                 MessageOrigin = message.MessageOrigin,
                 MessageBody = message.MessageBody,
-                MessageStatus = message.MessageStatus
+                MessageStatus = message.MessageStatusPractitioner
             });
         }
         
         return convo;
+    }
+
+    /// <summary>
+    /// Crude method to set all messages as 'Read'.
+    /// </summary>
+    public async Task UpdateReadReceiptsClient(int clientId, int pracId)
+    {
+        await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == pracId && x.MessageStatusClient == Enums.MessageStatus.Unread)
+            .ForEachAsync(x => x.MessageStatusClient = Enums.MessageStatus.Read);
+        await _db.SaveChangesAsync();
+    }
+    
+    /// <summary>
+    /// Crude method to set all messages as 'Read'.
+    /// </summary>
+    public async Task UpdateReadReceiptsPractitioner(int clientId, int pracId)
+    {
+        await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == pracId && x.MessageStatusPractitioner == Enums.MessageStatus.Unread)
+            .ForEachAsync(x => x.MessageStatusPractitioner = Enums.MessageStatus.Read);
+        await _db.SaveChangesAsync();
     }
 }

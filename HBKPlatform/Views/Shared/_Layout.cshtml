@@ -11,20 +11,22 @@
     <link rel="stylesheet" href="~/css/jquery-ui.structure.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/jquery-ui.theme.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/inhouse.css" asp-append-version="true" />
+    @if (ViewData["css"] != null)
+        {
+            // TODO: Work with many scripts....
+        <link rel="stylesheet" href="@Url.Content("~/css/" + ViewData["css"])" asp-append-version="true" />
+    }
 </head>
 <body>
     <header>
-        <nav id="mciNavBar" class="uk-navbar-container uk-navbar tm-navbar-container uk-sticky uk-sticky-fixed">
-            <div class="uk-navbar-left">
-                <a class="uk-logo navbar-light" id="mciName" asp-area="" asp-controller="Home" asp-action="Index">NowDoctor</a>
+        <nav id="mciNavBar" class="">
+            <div class="hbk-navbar-left">
+                <a class="navbar-light" id="mciName" asp-area="" asp-controller="Home" asp-action="Index">NowDoctor</a>
             </div>
-			<div class="uk-navbar-right">
-                <ul class="uk-navbar-nav">
-                    <li class="">
-                        <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
+			<div class="hbk-navbar-right">
+                <ul class="hbk-navbar-nav">
                     <li class="nav-item">
-                        <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="navbar-light" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                         @if (User.Identity.IsAuthenticated)
                         {
@@ -60,12 +62,12 @@
 			</div>
         </nav>
     </header>
-    <div id="mainPageBody" class="uk-container">
+    <div id="mainPageBody" class="hbk-container">
          @RenderBody()
     </div>
 
     <footer class="">
-        <div class="uk-container">
+        <div class="hbk-container">
             &copy; 2023 - NowDoctor Ltd. HBK Platform "Rough Cut" - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>

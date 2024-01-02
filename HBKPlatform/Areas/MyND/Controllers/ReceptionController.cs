@@ -1,3 +1,4 @@
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -12,10 +13,10 @@ namespace HBKPlatform.Controllers;
 /// © 2023 NowDoctor Ltd.
 /// </summary>
 [Area("MyND")]
-public class ReceptionController: Controller
+public class ReceptionController(IClinicService _clinicService): Controller
 {
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        return View(await _clinicService.GetReceptionModel());
     }
 }

@@ -12,11 +12,16 @@
     }
 }
 body {
+    margin:0;
 }
 
 div#mainPageBody {
-    padding: 20px 0 20px 0;
+    margin: 20px;
     min-height: 500px;
+    background: #ececec;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 4px #686868;
 }
 h1, h2, h3, mci-body-font {
     font-family: cabin, Verdana, Geneva, Tahoma, sans-serif !important;
@@ -25,19 +30,42 @@ h1, h2, h3, mci-body-font {
 /* Global Header */
 
 nav#mciNavBar {
-    background-color: #284d22;
+    background: linear-gradient(70deg, #0083bf, #eb018c);
     font-weight: 400;
     color: white;
     padding: 0 20px 0 20px;
+    min-height: 90px;
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
 }
 
 a#mciName {
     font-weight: bold;
     font-family: barlow-med, Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 2em;
+    text-decoration: none;
 }
 
 .navbar-dark .navbar-nav .nav-link, .navbar-brand, .navbar-light {
     color: #ffffff !important;
+}
+
+li.nav-item {
+    display: inline;
+    font-size:1.2em;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+li.nav-item a {
+   text-decoration: none; 
+}
+li.nav-item a:hover {
+    color: #eb018c;
+    text-decoration: underline;
 }
 
 /* Reusable Components */

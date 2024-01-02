@@ -60,19 +60,19 @@ namespace HBKPlatform.Database.Helpers
                         User = user1
                     };
 
-                    var user2Email = "mmf@hillvalleyhigh.com";
-                    var user2 = new User()
+                    var client1Email = "mmf@hillvalleyhigh.com";
+                    var client1User = new User()
                     {
-                        Email = user2Email,
-                        NormalizedEmail = user2Email.ToUpper(),
-                        UserName = user2Email,
-                        NormalizedUserName = user2Email.ToUpper(),
+                        Email = client1Email,
+                        NormalizedEmail = client1Email.ToUpper(),
+                        UserName = client1Email,
+                        NormalizedUserName = client1Email.ToUpper(),
                         EmailConfirmed = true,
                         LockoutEnabled = false,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
                     };
-                    user2.PasswordHash = passwordHasher.HashPassword(user2, "toodamnloud");
+                    client1User.PasswordHash = passwordHasher.HashPassword(client1User, "toodamnloud");
                     
                     var client1 = new Client()
                     {
@@ -81,9 +81,35 @@ namespace HBKPlatform.Database.Helpers
                         Title = Title.Mr,
                         Address = "Unknown",
                         DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
-                        Img = new string("samples/brown.jpg"),
+                        Img = new string("samples/marty.jpg"),
                         Telephone = "999",
-                        User = user2
+                        User = client1User
+                    };
+                    
+                    var client2Email = "biff@hillvalleyhigh.com";
+                    var client2User = new User()
+                    {
+                        Email = client2Email,
+                        NormalizedEmail = client2Email.ToUpper(),
+                        UserName = client2Email,
+                        NormalizedUserName = client2Email.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = false,
+                        PhoneNumber = "0898 333 201",
+                        PhoneNumberConfirmed = true,
+                    };
+                    client2User.PasswordHash = passwordHasher.HashPassword(client1User, "ihatemanure");
+                    
+                    var client2 = new Client()
+                    {
+                        Forename = "Biff",
+                        Surname = "Tenant",
+                        Title = Title.Mr,
+                        Address = "Unknown",
+                        DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
+                        Img = "samples/biff.jpg",
+                        Telephone = "299",
+                        User = client2User
                     };
                     
                     var clinic = new Clinic()
@@ -94,18 +120,18 @@ namespace HBKPlatform.Database.Helpers
                         OrgTagline = "Timely treatment or your time back.",
                         Telephone = "0898 333 201",
                         Practitioner = prac1,
-                        Clients = new List<Client>() {client1}
+                        Clients = new List<Client>() {client1, client2}
                     };
                     
-                    ctx.Add(
-                        clinic
-                    );
+                    ctx.Add(clinic);
                     ctx.SaveChanges();
                     
                     var pracUserRole = new IdentityUserRole<string>() { UserId = user1.Id, RoleId = pracRole.Id };
-                    var clientUserRole = new IdentityUserRole<string>() { UserId = user2.Id, RoleId = clientRole.Id };
+                    var client1UserRole = new IdentityUserRole<string>() { UserId = client1User.Id, RoleId = clientRole.Id };
+                    var client2UserRole = new IdentityUserRole<string>() { UserId = client2User.Id, RoleId = clientRole.Id };
                     ctx.Add(pracUserRole);
-                    ctx.Add(clientUserRole);
+                    ctx.Add(client1UserRole);
+                    ctx.Add(client2UserRole);
 
                     var conversation = new List<ClientMessage>();
                     conversation.Add(new ClientMessage()
@@ -117,6 +143,11 @@ namespace HBKPlatform.Database.Helpers
                     {
                         ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "ah bollocks"
+                    });
+                    conversation.Add(new ClientMessage()
+                    {
+                        ClientId = client2.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
+                        MessageBody = "don't steal that almanac you tool"
                     });
                     ctx.AddRange(conversation);
                     ctx.SaveChanges();

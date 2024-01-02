@@ -11,4 +11,7 @@ public interface IClientMessageRepository
 
     public Task SaveMessage(int practitionerId, int clientId, int clinicId, string messageBody,
         Enums.MessageOrigin messageOrigin);
+
+    public Task UpdateReadReceiptsPractitioner(int clientId, int pracId);
+    public Task UpdateReadReceiptsClient(int clientId, int pracId);
 }

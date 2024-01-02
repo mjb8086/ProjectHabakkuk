@@ -52,6 +52,8 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           // if that's okay, clean it and then save it.
           messageBody = messageBody.Trim();
           await _clientMessageRepository.SaveMessage(pracId, clientId, clinicId, messageBody, messageOrigin);
+          
+          // TODO: Send email and update total unread
      }
 
      // TODO: merge these into one method like above
@@ -62,8 +64,10 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           // TODO: Security and access checks
           if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
           {
+               // FIXME: clinicId is max????
                var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
                model.PractitionerId = pracId;
+               await _clientMessageRepository.UpdateReadReceiptsClient(pracId, clientId);
                return model;
           }
           return null;
@@ -81,6 +85,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
                var model = await _clientMessageRepository.GetConversation(pracId, clientId, clinicId, max);
                model.ClientId = clientId;
                model.Recipient = _clientRepository.GetLiteDetails(clientId).Name;
+               await _clientMessageRepository.UpdateReadReceiptsPractitioner(pracId, clientId);
                return model;
           }
           return null;

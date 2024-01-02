@@ -2,16 +2,12 @@
 @{
     Layout = "_Client";
     ViewData["Title"] = $"Conversation with {Model.Recipient}";
+    ViewData["css"] = "messaging.css";
 }
 
-<h2>Conversation with @Model.Recipient</h2>
-<p>messages</p>
-@foreach (var message in Model.Messages)
-{
-    <p>@message.MessageOrigin : @message.MessageBody</p>
-}
+@await Html.PartialAsync("Components/_Messaging")
 <form asp-area="Client" asp-controller="Messaging" asp-action="SendMessage" asp-route-pracId="@Model.PractitionerId" method="post">
     <textarea name="messageBody" id="messageBody" style="width:450px;"></textarea>
-    <input type="submit" value="Send" />
+    <input type="submit" value="Send" id="btnSend" />
 </form>
 

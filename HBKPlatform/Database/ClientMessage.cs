@@ -14,7 +14,8 @@ public class ClientMessage : HbkBaseEntity
      [DataType(DataType.MultilineText)]
      public string MessageBody { get; set; }
      public DateTime? DateOpened { get; set; }
-     public Enums.MessageStatus MessageStatus { get; set; }
+     public Enums.MessageStatus MessageStatusPractitioner { get; set; }
+     public Enums.MessageStatus MessageStatusClient { get; set; }
      public Enums.MessageOrigin MessageOrigin { get; set; }
 
      // EF Navigations

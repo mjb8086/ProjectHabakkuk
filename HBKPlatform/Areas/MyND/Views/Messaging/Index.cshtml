@@ -8,5 +8,5 @@
 <p>My Clients</p>
 @foreach (var client in Model.ClientDetails)
 {
-    <a asp-area="MyND" asp-controller="Messaging" asp-action="Conversation" asp-route-clientId="@client.Id">@client.Name</a>
+    <p><a asp-area="MyND" asp-controller="Messaging" asp-action="Conversation" asp-route-clientId="@client.Id">@client.Name</a></p>
 }

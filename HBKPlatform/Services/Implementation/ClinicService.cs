@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace HBKPlatform.Services.Implementation;
 
 /// <summary>
-/// HBKPlatform Client messaging service.
+/// HBKPlatform Clinic service.
 /// Middleware for controller and database functionality.
 /// 
 /// Author: Mark Brown
@@ -50,6 +51,18 @@ public class ClinicService(ApplicationDbContext _db, IClinicRepository _clinicRe
         if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
         {
             data.PracId = _db.Practitioners.First(x => x.ClinicId == clinicId).Id;
+        }
+
+        return data;
+    }
+
+    public async Task<MyNDReceptionModel> GetReceptionModel()
+    {
+        var data = new MyNDReceptionModel();
+        var pracIdClaim = httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
+        if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
+        {
+            data.NumUnreadMessages = await _db.ClientMessages.CountAsync(x => x.PractitionerId == pracId && x.MessageOrigin == Enums.MessageOrigin.Client && x.MessageStatusPractitioner == Enums.MessageStatus.Unread);
         }
 
         return data;

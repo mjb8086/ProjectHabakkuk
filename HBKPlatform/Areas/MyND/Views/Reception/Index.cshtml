@@ -1,7 +1,8 @@
+@model HBKPlatform.Models.View.MyNDReceptionModel
 @{
     ViewBag.Title = "title";
     Layout = "_MyND";
 }
 
-<h2>Reception, i.e. dashboard</h2>
-<p><a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a> (x unread)</p>
+<h2>MyND: Reception</h2>
+<p><a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a> (@Model.NumUnreadMessages unread)</p>
