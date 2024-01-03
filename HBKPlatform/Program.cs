@@ -1,3 +1,4 @@
+using HBKPlatform.Areas.Account;
 using HBKPlatform.Database;
 using HBKPlatform.Database.Helpers;
 using HBKPlatform.Repository;
@@ -23,6 +24,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()
     .AddDefaultTokenProviders();
+
+// To ensure custom claims are added to new identity when principal is refreshed.
+builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
 builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
 builder.Services.AddScoped<IClinicRepository, ClinicRepository>();

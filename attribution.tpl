@@ -3,8 +3,8 @@
 /// Middleware for user controller and database functionality.
 /// 
 /// Author: Mark Brown
-/// Authored: 15/12/2023
+/// Authored: 15/12/2024
 /// 
-/// © 2023 NowDoctor Ltd.
+/// © 2024 NowDoctor Ltd.
 /// </summary>
 

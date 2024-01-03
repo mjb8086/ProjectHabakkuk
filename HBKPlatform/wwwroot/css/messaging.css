@@ -12,23 +12,20 @@ div.conversation-message {
     margin-bottom:5px;
     border-radius: 5px;
     display: block;
-}
-
-div.conversation-message-recipient {
-    background-color: #81ff81;
+    background-color: #9a9a9a;
 }
 
 div.conversation-message-sender {
-    background-color: #5b5b5b;
+    background-color: #8bc98b;
 }
 
 div#messageInputWrap {
    padding: 10px; 
 }
 form#messageInput {
-   height: 100px;     
+    height: 100px;     
     max-width: 600px;
-   padding-top:10px;
+    padding-top:10px;
     display:flex;
     flex-direction: row;
     flex-float: center;
@@ -39,7 +36,7 @@ form#messageInput {
 input#btnSend {
     height: 50px;
     width: 80px;
-    background-color: #81ff81;
+    background-color: #8bc98b;
     border-radius: 5px;
 }
 

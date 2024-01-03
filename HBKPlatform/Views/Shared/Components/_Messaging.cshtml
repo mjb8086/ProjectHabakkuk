@@ -1,10 +1,11 @@
+@model HBKPlatform.Models.ClientMessageConversationModel
 
 <h2>Conversation with @Model.Recipient</h2>
 <div id="conversationBody">
 @foreach (var message in Model.Messages)
 {
-    <div class="conversation-message conversation-message-recipient">
-        <span class="message-origin">@message.MessageOrigin</span> :
+    <div class="conversation-message @(Model.CurrentConverser == message.MessageOrigin ? "conversation-message-sender" : "") }">
+        <span class="message-origin">@message.MessageOrigin</span>:
         <span class="message-body">@message.MessageBody</span>
     </div>
 }

@@ -22,11 +22,16 @@ public class ApplicationDbContext : IdentityDbContext<User>
     }
 
     // Define tables
-    public DbSet<Practitioner> Practitioners { get; set; } = default!;
+    public DbSet<Appointment> Appointments { get; set; } = default!;
     public DbSet<Client> Clients { get; set; } = default!;
     public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
+    public DbSet<ClientRecord> ClientRecords { get; set; } = default!;
     public DbSet<Clinic> Clinics { get; set; } = default!;
     public DbSet<ClinicHomepage> ClinicHomepages { get; set; } = default!;
+    public DbSet<Practitioner> Practitioners { get; set; } = default!;
+    public DbSet<Timeslot> Timeslots { get; set; } = default!;
+    public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
+    public DbSet<Treatment> Treatments { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

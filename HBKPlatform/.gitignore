@@ -6,3 +6,6 @@ tailwind
 wwwroot/css/contrib/*.css
 wwwroot/css/jquery*
 wwwroot/js/contrib/*
+
+# TEMPORARY!!! Remove when DB is finalised
+Migrations/

@@ -67,6 +67,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
                // FIXME: clinicId is max????
                var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
                model.PractitionerId = pracId;
+               model.CurrentConverser = Enums.MessageOrigin.Client;
                await _clientMessageRepository.UpdateReadReceiptsClient(pracId, clientId);
                return model;
           }
@@ -84,6 +85,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           {
                var model = await _clientMessageRepository.GetConversation(pracId, clientId, clinicId, max);
                model.ClientId = clientId;
+               model.CurrentConverser = Enums.MessageOrigin.Practitioner;
                model.Recipient = _clientRepository.GetLiteDetails(clientId).Name;
                await _clientMessageRepository.UpdateReadReceiptsPractitioner(pracId, clientId);
                return model;

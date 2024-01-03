@@ -3,9 +3,10 @@
     Layout = "_myND";
     ViewData["Title"] = $"Conversation with {Model.Recipient}";
     ViewData["css"] = "messaging.css";
+    ViewData["scripts"] = "messaging.js";
 }
-@await Html.PartialAsync("Components/_Messaging")
-<div id="messageImputWrap">
+@await Html.PartialAsync("Components/_Messaging", Model)
+<div id="messageInputWrap">
     <form id="messageInput" asp-area="MyND" asp-controller="Messaging" asp-action="SendMessage" asp-route-clientId="@Model.ClientId" method="post">
         <textarea name="messageBody" id="messageBody"></textarea>
         <input type="submit" value="Send" id="btnSend" />

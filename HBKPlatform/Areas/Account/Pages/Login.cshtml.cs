@@ -5,6 +5,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using HBKPlatform.Database;
+using HBKPlatform.Helpers;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -37,7 +38,7 @@ namespace HBKPlatform.Areas.Account.Pages
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            [Display(Name = "Remember me?")]
+            [Display(Name = "Remember me?")] // I'm the one who stole your baby - Tame Impala
             public bool RememberMe { get; set; }
         }
 
@@ -81,15 +82,8 @@ namespace HBKPlatform.Areas.Account.Pages
                 var result = await signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    // TODO Get these details for the user! Will help with conversation view... OR could cache...
                     var userDto = await userService.GetClientOrPracIdForUserId(user.Id);
-                    var customClaims = new[]
-                    {
-                        new Claim("ClinicId", userDto.ClinicId.ToString()), 
-                        new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
-                        new Claim("ClientId", userDto.ClientId?.ToString() ?? "")
-                    };
-                    await signInManager.SignInWithClaimsAsync(user, Input.RememberMe, customClaims);
+                    await signInManager.SignInWithClaimsAsync(user, Input.RememberMe, AuthenticationHelper.GetClaimsForUser(userDto));
                     logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);
                 }
