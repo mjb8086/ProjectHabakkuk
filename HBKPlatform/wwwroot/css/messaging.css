@@ -6,12 +6,22 @@ div#conversationBody {
     max-width:600px;
 }
 
+/* Ensure conversation bubbles are appropriately aligned */
+div.conversation-row {
+    display: flex;
+    flex-direction: row;
+}
+
+div.conversation-row-sender {
+    flex-direction: row-reverse;
+}
+
 div.conversation-message {
     padding: 10px;
     margin-top:5px;
     margin-bottom:5px;
     border-radius: 5px;
-    display: block;
+    display: inline-block;
     background-color: #9a9a9a;
 }
 

@@ -4,6 +4,7 @@ namespace HBKPlatform.Database;
 
 /// <summary>
 /// HBKPlatform treatment entity.
+/// Any billable service will be represented in this table.
 /// 
 /// Author: Mark Brown
 /// Authored: 03/01/2024

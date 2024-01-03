@@ -10,6 +10,10 @@ delete from clinics;
 delete from user_roles;
 delete from users;
 delete from user_claims;
+delete from appointments;
+delete from client_records;
+delete from timeslot_availabilities;
+delete from timeslots;
 
 EOF
 

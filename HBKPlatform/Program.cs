@@ -10,8 +10,15 @@ using Microsoft.EntityFrameworkCore;
 
 //string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
 
+const string hbkName =
+    "    __  ______  __ __    ____  __      __  ____                   \n   / / / / __ )/ //_/   / __ \\/ /___ _/ /_/ __/___  _________ ___ \n  / /_/ / __  / ,<     / /_/ / / __ `/ __/ /_/ __ \\/ ___/ __ `__ \\\n / __  / /_/ / /| |   / ____/ / /_/ / /_/ __/ /_/ / /  / / / / / /\n/_/ /_/_____/_/ |_|  /_/   /_/\\__,_/\\__/_/  \\____/_/  /_/ /_/ /_/ \n";
+
 // BEGIN Builder.
 var builder = WebApplication.CreateBuilder(args);
+var version = builder.Configuration.GetValue<double>("Version");
+
+Console.WriteLine($"NowDoctor Ltd. Presents...\n{hbkName}\nVersion {version}. Starting up...");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
                 builder.Configuration.GetConnectionString("HbkContext") ??
@@ -99,4 +106,3 @@ if (app.Environment.IsDevelopment())
 }
 
 app.Run();
-

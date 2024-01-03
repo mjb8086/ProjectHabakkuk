@@ -17,6 +17,8 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
 {
      public async Task SendMessage(string messageBody, int recipientId)
      {
+          if (string.IsNullOrWhiteSpace(messageBody)) return;
+          
           var clientIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClientId");
           var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
           var clinicIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClinicId");

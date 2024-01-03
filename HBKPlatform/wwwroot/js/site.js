@@ -4,6 +4,6 @@
 // Write your JavaScript code.
 
 $(document).ready(function () {
-    console.log("Hello!");
+    console.log("Global Hello World!");
 
 })

@@ -7,5 +7,11 @@ $(document).ready(function () {
             $("#messageInput").submit();
         }
     });
+    
+    $("#btnSend").on('click', function (e) {
+        if ($.trim($("#messageBody").val()) == "") { 
+            e.preventDefault();
+        }
+    });
 });
 

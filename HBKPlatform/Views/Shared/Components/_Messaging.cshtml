@@ -4,9 +4,11 @@
 <div id="conversationBody">
 @foreach (var message in Model.Messages)
 {
-    <div class="conversation-message @(Model.CurrentConverser == message.MessageOrigin ? "conversation-message-sender" : "") }">
-        <span class="message-origin">@message.MessageOrigin</span>:
-        <span class="message-body">@message.MessageBody</span>
+    <div class="conversation-row @(Model.CurrentConverser == message.MessageOrigin ? "conversation-row-sender" : "")">
+        <div class="conversation-message @(Model.CurrentConverser == message.MessageOrigin ? "conversation-message-sender" : "")">
+            <span class="message-origin">@message.MessageOrigin</span>:
+            <span class="message-body">@message.MessageBody</span>
+        </div>
     </div>
 }
 </div>

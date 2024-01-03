@@ -1,0 +1,11 @@
+@model HBKPlatform.Models.View.MyNDClientRecordsIndex
+@{
+    ViewBag.Title = "My Client Records";
+    Layout = "_MyND";
+}
+
+<h2>My Client Records</h2>
+@foreach (var client in Model.ClientDetails)
+{
+    <p><a asp-area="MyND" asp-controller="Record" asp-action="Client" asp-route-clientId="@client.Id">@client.Name</a></p>
+}
