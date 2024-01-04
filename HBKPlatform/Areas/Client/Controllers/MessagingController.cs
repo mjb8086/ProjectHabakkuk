@@ -14,8 +14,20 @@ namespace HBKPlatform.Client.Controllers;
 /// </summary>
 [Area("Client")]
 public class MessagingController
-    (IClientMessagingService _clientMessagingService) : Controller
+    (IClientMessagingService _clientMessagingService, ICacheService _cache, IHttpContextAccessor _httpContextAccessor) : Controller
 {
+    [HttpGet]
+    public async Task<IActionResult> Index()
+    {
+        var clinicIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
+        if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
+        {
+            // TODO crude - fix later when we have a direct client-prac relationship
+            var pracs = await _cache.GetClinicPracDetailsLite(clinicId);
+            return Redirect($"/client/messaging/conversation?pracId={pracs.First().Id}"); // also replace with controller-based routing when understood
+        }
+        return NotFound("No conversation exists");
+    }
 
     [HttpGet]
     public async Task<IActionResult> Conversation(int pracId)

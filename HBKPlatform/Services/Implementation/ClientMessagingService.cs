@@ -75,7 +75,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor,
                model.CurrentConverser = Enums.MessageOrigin.Client;
                model.Recipient = _cache.GetPracName(pracId);
                model.Sender = clientDetailsLite.Name;
-               await _clientMessageRepository.UpdateReadReceiptsClient(pracId, clientId);
+               await _clientMessageRepository.UpdateReadReceiptsClient(clientId, pracId);
                return model;
           }
           return null;
@@ -95,7 +95,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor,
                model.CurrentConverser = Enums.MessageOrigin.Practitioner;
                model.Sender = pracDetailsLite.Name;
                model.Recipient = _cache.GetClientName(clientId);
-               await _clientMessageRepository.UpdateReadReceiptsPractitioner(pracId, clientId);
+               await _clientMessageRepository.UpdateReadReceiptsPractitioner(clientId, pracId);
                return model;
           }
           return null;
