@@ -17,7 +17,7 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClinicService(ApplicationDbContext _db, IClinicRepository _clinicRepository, IHttpContextAccessor httpContextAccessor) : IClinicService
+public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor) : IClinicService
 {
     public async Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId)
     {
@@ -34,11 +34,7 @@ public class ClinicService(ApplicationDbContext _db, IClinicRepository _clinicRe
         var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
         if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
         {
-            var clinicDetails = await _clinicRepository.GetCompleteClinic(clinicId);
-            foreach (var client in clinicDetails.Clients)
-            {
-                inboxModel.ClientDetails.Add(new ClientDetailsLite() { Name = $"{client.Forename} {client.Surname}", Id = client.Id });
-            }
+            inboxModel.ClientDetails = await _cache.GetClinicClientDetailsLite(clinicId);
         }
 
         return inboxModel;
@@ -47,10 +43,15 @@ public class ClinicService(ApplicationDbContext _db, IClinicRepository _clinicRe
     public async Task<ClientClinicData> GetClientClinicData()
     {
         var data = new ClientClinicData(); 
-        var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
-        if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
+        var clientIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClientId");
+        if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
         {
-            data.PracId = _db.Practitioners.First(x => x.ClinicId == clinicId).Id;
+            // Currently assumes 1 prac per clinic
+            var clientDetailsLite = _cache.GetClientDetailsLite(clientId);
+            var pracDetails = await _cache.GetClinicPracDetailsLite(clientDetailsLite.ClinicId);
+            data.PracId = pracDetails.First().Id;
+            data.MyPracName = pracDetails.First().Name;
+            data.NumUnreadMessages = await _db.ClientMessages.CountAsync(x => x.PractitionerId == data.PracId && x.ClientId == clientId && x.MessageOrigin == Enums.MessageOrigin.Practitioner && x.MessageStatusClient == Enums.MessageStatus.Unread);
         }
 
         return data;

@@ -23,7 +23,8 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
         var message = new ClientMessage()
         {
             DateOpened = null,
-            MessageStatusPractitioner = Enums.MessageStatus.Unread,
+            MessageStatusPractitioner = messageOrigin == Enums.MessageOrigin.Practitioner ? Enums.MessageStatus.Read : Enums.MessageStatus.Unread,
+            MessageStatusClient = messageOrigin == Enums.MessageOrigin.Client ? Enums.MessageStatus.Read : Enums.MessageStatus.Unread,
             PreviousMessageId = null,
             PractitionerId = practitionerId,
             ClientId = clientId,
@@ -69,8 +70,7 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
     public async Task UpdateReadReceiptsClient(int clientId, int pracId)
     {
         await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == pracId && x.MessageStatusClient == Enums.MessageStatus.Unread)
-            .ForEachAsync(x => x.MessageStatusClient = Enums.MessageStatus.Read);
-        await _db.SaveChangesAsync();
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.MessageStatusClient, Enums.MessageStatus.Read));
     }
     
     /// <summary>
@@ -79,7 +79,6 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
     public async Task UpdateReadReceiptsPractitioner(int clientId, int pracId)
     {
         await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == pracId && x.MessageStatusPractitioner == Enums.MessageStatus.Unread)
-            .ForEachAsync(x => x.MessageStatusPractitioner = Enums.MessageStatus.Read);
-        await _db.SaveChangesAsync();
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.MessageStatusPractitioner, Enums.MessageStatus.Read));
     }
 }

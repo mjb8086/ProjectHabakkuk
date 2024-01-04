@@ -18,7 +18,8 @@ public class ClientRecord : HbkBaseEntity
     public Enums.RecordVisibility RecordVisibility { get; set; }
     public string Title { get; set; }
     public string NoteBody { get; set; }
-    
+    public bool IsPriority { get; set; }
+
     // EF Navigations
     public virtual Clinic Clinic { get; set; }
     public virtual Client Client { get; set; }

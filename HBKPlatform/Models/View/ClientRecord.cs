@@ -9,4 +9,5 @@ public class ClientRecord
     public Enums.RecordVisibility Visibility { get; set; }
     public string Title { get; set; }
     public string NoteBody { get; set; }
+    public bool IsPriority { get; set; }
 }

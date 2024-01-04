@@ -13,7 +13,9 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, IClientMessageRepository _clientMessageRepository, IClinicService _clinicService, IClientRepository _clientRepository) : IClientMessagingService
+public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, 
+     IClientMessageRepository _clientMessageRepository, IClinicService _clinicService, IClientRepository _clientRepository, 
+     ICacheService _cache) : IClientMessagingService
 {
      public async Task SendMessage(string messageBody, int recipientId)
      {
@@ -66,10 +68,13 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           // TODO: Security and access checks
           if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
           {
-               // FIXME: clinicId is max????
-               var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
+               var clientDetailsLite = _cache.GetClientDetailsLite(clientId);
+               var model = await _clientMessageRepository.GetConversation(pracId, clientId, clientDetailsLite.ClinicId, max);
+               
                model.PractitionerId = pracId;
                model.CurrentConverser = Enums.MessageOrigin.Client;
+               model.Recipient = _cache.GetPracName(pracId);
+               model.Sender = clientDetailsLite.Name;
                await _clientMessageRepository.UpdateReadReceiptsClient(pracId, clientId);
                return model;
           }
@@ -80,15 +85,16 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
      {
           // Get logged in user and find his pracId ... TODO: Make this uniform or have a user cache!
           var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
-          var clinicIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
           
           // TODO: Security and access checks
-          if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId) && clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
+          if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
           {
-               var model = await _clientMessageRepository.GetConversation(pracId, clientId, clinicId, max);
+               var pracDetailsLite = _cache.GetPracDetailsLite(pracId);
+               var model = await _clientMessageRepository.GetConversation(pracId, clientId, pracDetailsLite.ClinicId, max);
                model.ClientId = clientId;
                model.CurrentConverser = Enums.MessageOrigin.Practitioner;
-               model.Recipient = _clientRepository.GetLiteDetails(clientId).Name;
+               model.Sender = pracDetailsLite.Name;
+               model.Recipient = _cache.GetClientName(clientId);
                await _clientMessageRepository.UpdateReadReceiptsPractitioner(pracId, clientId);
                return model;
           }

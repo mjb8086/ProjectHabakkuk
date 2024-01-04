@@ -13,13 +13,13 @@
     <link rel="stylesheet" href="~/css/inhouse.css" asp-append-version="true" />
     @if (ViewData["css"] != null)
         {
-            // TODO: Work with many scripts....
+            // FIXME: Work with many stylesheets....
         <link rel="stylesheet" href="@Url.Content("~/css/" + ViewData["css"])" asp-append-version="true" />
     }
 </head>
 <body>
     <header>
-        <nav id="mciNavBar" class="">
+        <nav id="mciNavBar">
             <div class="hbk-navbar-left">
                 <a class="navbar-light" id="mciName" asp-area="" asp-controller="Home" asp-action="Index">NowDoctor</a>
             </div>
@@ -63,7 +63,7 @@
          @RenderBody()
     </div>
 
-    <footer class="">
+    <footer>
         <div class="footer-item">
             &copy; 2024 - NowDoctor Ltd. HBK Platform "Rough Cut" 
         </div>
@@ -77,8 +77,8 @@
     <script src="~/js/contrib/jquery-ui.js"></script>
     <script src="@Url.Content("~/js/site.js")" asp-append-version="true" defer></script>
     @if (ViewData["scripts"] != null)
-        {
-            // TODO: Work with many scripts....
+    {
+        // FIXME: Work with many scripts....
         <script src ="@Url.Content("~/js/" + ViewData["scripts"])" asp-append-version="true" defer></script>
     }
     @await RenderSectionAsync("Scripts", required: false)

@@ -6,7 +6,7 @@
 {
     <div class="conversation-row @(Model.CurrentConverser == message.MessageOrigin ? "conversation-row-sender" : "")">
         <div class="conversation-message @(Model.CurrentConverser == message.MessageOrigin ? "conversation-message-sender" : "")">
-            <span class="message-origin">@message.MessageOrigin</span>:
+            <span class="message-origin">@(Model.CurrentConverser == message.MessageOrigin ? Model.Sender : Model.Recipient)</span>: 
             <span class="message-body">@message.MessageBody</span>
         </div>
     </div>

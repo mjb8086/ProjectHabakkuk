@@ -17,7 +17,7 @@ const string hbkName =
 var builder = WebApplication.CreateBuilder(args);
 var version = builder.Configuration.GetValue<double>("Version");
 
-Console.WriteLine($"NowDoctor Ltd. Presents...\n{hbkName}\nVersion {version}. Starting up...");
+Console.WriteLine($"NowDoctor Ltd. Presents:\n{hbkName}\nVersion {version}. Starting up...");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
@@ -43,6 +43,7 @@ builder.Services.AddScoped<IClientMessageRepository, ClientMessageRepository>();
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
+builder.Services.AddTransient<ICacheService, CacheService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

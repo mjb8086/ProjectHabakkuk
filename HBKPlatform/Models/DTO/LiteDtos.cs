@@ -6,6 +6,14 @@ public class ClientDetailsLite
 {
     public string Name { get; set; }
     public int Id { get; set; }
+    public int ClinicId { get; set; }
+}
+
+public class PracDetailsLite
+{
+    public string Name { get; set; }
+    public int Id { get; set; }
+    public int ClinicId { get; set; }
 }
 
 public class ClientRecordLite

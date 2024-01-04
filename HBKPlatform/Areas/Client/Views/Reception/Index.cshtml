@@ -6,4 +6,4 @@
 }
 
 <h2>Welcome to Reception.</h2>
-<p><a asp-area="Client" asp-controller="Messaging" asp-action="Conversation" asp-route-pracId="@Model.PracId">Messaging with $NAME</a> (x unread)</p>
+<p><a asp-area="Client" asp-controller="Messaging" asp-action="Conversation" asp-route-pracId="@Model.PracId">Messaging with @Model.MyPracName</a> (@Model.NumUnreadMessages unread)</p>
