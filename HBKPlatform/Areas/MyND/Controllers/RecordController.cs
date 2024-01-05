@@ -1,3 +1,6 @@
+using HBKPlatform.Models.DTO;
+using HBKPlatform.Repository;
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -12,7 +15,7 @@ namespace HBKPlatform.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 [Area("MyND")]
-public class RecordController: Controller
+public class RecordController(IClientRecordService _recordService, IRecordRepository _recordRepo): Controller
 {
     /// <summary>
     /// Get a list of clients to read their records
@@ -20,16 +23,16 @@ public class RecordController: Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        return View();
+        return View(await _recordService.GetClientRecordsIndex());
     }
     
     /// <summary>
     /// Get all records summarised for the client
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Client()
+    public async Task<IActionResult> ClientRecords(int clientId)
     {
-        return View();
+        return View(await _recordService.GetClientRecords(clientId));
     }
     
     /// <summary>
@@ -37,8 +40,29 @@ public class RecordController: Controller
     /// Check that the record belongs to the client.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> ClientRecord()
+    public async Task<IActionResult> ClientRecord(int recordId)
     {
-        return View();
+        return View(await _recordService.GetClientRecord(recordId));
     }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateRecordBody(int recordId, [FromForm] string noteBody)
+    {
+        return Ok(await _recordRepo.UpdateRecordBody(recordId, noteBody));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> SetRecordPriority(int recordId, bool isPriority)
+    {
+        await _recordRepo.SetRecordPriority(recordId, isPriority);
+        return Ok();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateRecord([FromBody] ClientRecordDto recordDto)
+    {
+        await _recordRepo.CreateRecord(recordDto);
+        return Ok();
+    }
+    
 }

@@ -1,11 +1,34 @@
-@model HBKPlatform.Models.View.ClientRecord
+@model HBKPlatform.Models.DTO.ClientRecordDto
 @{
-    ViewBag.Title = "Client Record";
+    ViewBag.Title = $"{Model.ClientName}'s Record, {Model.DateCreated}";
+    ViewBag.Scripts = "clientrecord.js";
     Layout = "_MyND";
 }
 
 <h2>Client Record</h2>
+<p>@Model.ClientName</p>
 <p>@Model.Title</p>
-<p>@Model.NoteBody</p>
+
+<form id="messageInput" asp-area="MyND" asp-controller="Record" asp-action="UpdateRecordBody" asp-route-recordId="@Model.Id" method="post">
+    <textarea id="noteBody" name="noteBody">
+@Model.NoteBody
+    </textarea>
+    <input type="submit" value="Save" id="btnSave" />
+</form>
+
 <p>@Model.Visibility</p>
 <p>@Model.IsPriority</p>
+
+TODO: Make async
+
+<form id="messageInput" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
+    <input type="submit" value="SetIsPriority" id="btnTogglePriority" />
+</form>
+
+
+@if (Model.AppointmentId != null)
+{
+    <p>Appointment details</p>
+    <p>@Model.AppointmentDetails</p>
+    <p>View Appointment Details @Model.AppointmentId</p>
+}

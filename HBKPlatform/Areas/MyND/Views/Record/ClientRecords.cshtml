@@ -1,11 +1,12 @@
 @model HBKPlatform.Models.View.MyNDClientRecords
 @{
-    ViewBag.Title = "This Client's Records";
+    ViewBag.Title = $"{Model.ClientName}'s Records";
     Layout = "_MyND";
 }
 
-<h2>Client's Records</h2>
+<h2>@Model.ClientName's Records</h2>
 @foreach (var record in Model.ClientRecords)
 {
-    <p><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-clientId="@record.Id">@record.Title</a> @record.Date @record.Visibility</p>
+    <p><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> @record.Date @record.Visibility</p>
 }
+<button>Add New</button>

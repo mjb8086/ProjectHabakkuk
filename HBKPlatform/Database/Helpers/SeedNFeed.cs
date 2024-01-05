@@ -151,6 +151,14 @@ namespace HBKPlatform.Database.Helpers
                     });
                     ctx.AddRange(conversation);
                     ctx.SaveChanges();
+
+                    var clientRecord1 = new ClientRecord()
+                    {
+                        Clinic = clinic, Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
+                        Title = "Bad news for the bowels", NoteBody = "bother shifting the goods"
+                    };
+                    ctx.Add(clientRecord1);
+                    ctx.SaveChanges();
                 }
 
             }

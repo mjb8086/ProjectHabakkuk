@@ -8,8 +8,6 @@ using HBKPlatform.Services.Implementation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-//string webRoot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
-
 const string hbkName =
     "    __  ______  __ __    ____  __      __  ____                   \n   / / / / __ )/ //_/   / __ \\/ /___ _/ /_/ __/___  _________ ___ \n  / /_/ / __  / ,<     / /_/ / / __ `/ __/ /_/ __ \\/ ___/ __ `__ \\\n / __  / /_/ / /| |   / ____/ / /_/ / /_/ __/ /_/ / /  / / / / / /\n/_/ /_/_____/_/ |_|  /_/   /_/\\__,_/\\__/_/  \\____/_/  /_/ /_/ /_/ \n";
 
@@ -39,11 +37,13 @@ builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
 builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IClientMessageRepository, ClientMessageRepository>();
+builder.Services.AddScoped<IRecordRepository, RecordRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
 builder.Services.AddTransient<ICacheService, CacheService>();
+builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -82,21 +82,10 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "MasterControlPanel",
-    pattern: "{area:exists}/{controller=MCP}/{action=Index}/{id?}");
-
-app.MapControllerRoute(
-    name: "MyND",
-    pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
-
-app.MapControllerRoute(
-    name: "Client",
-    pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute( name: "MasterControlPanel", pattern: "{area:exists}/{controller=MCP}/{action=Index}/{id?}");
+app.MapControllerRoute( name: "MyND", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
+app.MapControllerRoute( name: "Client", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
+app.MapControllerRoute( name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 

@@ -19,6 +19,7 @@ public class PracDetailsLite
 public class ClientRecordLite
 {
     public int Id { get; set; }
+    public string ClientName { get; set; }
     public string Title { get; set; }
     public DateTime Date { get; set; }
     public Enums.RecordVisibility Visibility { get; set; }
