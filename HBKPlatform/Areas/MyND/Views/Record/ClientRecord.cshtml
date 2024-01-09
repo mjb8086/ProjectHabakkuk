@@ -8,7 +8,7 @@
 
 <h2>Client Record</h2>
 <p>@Model.ClientName</p>
-<p>@Model.Title</p>
+<input type="text" id="noteTitle" name="noteTitle" value="@Model.Title"></input>
 
 <!--
 <form id="messageInput" asp-area="MyND" asp-controller="Record" asp-action="UpdateRecordBody" asp-route-recordId="@Model.Id" method="post">
@@ -16,7 +16,7 @@
     <textarea id="noteBody" name="noteBody">
 @Model.NoteBody
     </textarea>
-    <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" />
+    <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" data-clientId="@Model.ClientId" />
 <!--
 </form>
 -->
@@ -27,7 +27,6 @@
 <form id="clientRecord" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
     <input type="submit" value="SetIsPriority" id="btnTogglePriority" />
 </form>
-
 
 @if (Model.AppointmentId != null)
 {

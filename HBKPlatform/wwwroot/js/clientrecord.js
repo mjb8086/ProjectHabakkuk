@@ -16,18 +16,36 @@ const quill = new Quill('#clientRecord', {
 function updateNote(id) {
     $.ajax({
         url: `${Globals.BaseUrl}/mynd/record/updaterecordbody?recordId=${id}`,
-        dataType: "text",
         contentType: "application/json",
         method: "PUT",
         data: JSON.stringify({noteBody: $("#noteBody").val()}),
         success: function (data) { $("#noteBody").val(data); }
     });
 };
+    function createNote(clientId) {
+        $.ajax({
+            url: `${Globals.BaseUrl}/mynd/record/createrecord`,
+            contentType: "application/json",
+            method: "POST",
+            data: JSON.stringify({
+                title: $("#noteTitle").val(),
+                noteBody: $("#noteBody").val(),
+                visibility: 0,
+                isPriority: false,
+                clientId: clientId
+            }),
+            success: function (data) { $("#noteBody").val(data); }
+        });
+    };
 
 // Listeners
     $("#btnSave").on('click', function (e) {
         console.log("click");
         e.preventDefault();
-        updateNote(e.target.dataset.id);
+        if (e.target.dataset.id > 0) {
+            updateNote(e.target.dataset.id);
+        } else {
+            createNote(e.target.dataset.clientid)
+        }
     });
 });

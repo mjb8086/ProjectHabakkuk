@@ -7,5 +7,6 @@ public interface IClientRecordService
 {
     public Task<MyNDClientRecordsIndex> GetClientRecordsIndex();
     public Task<MyNDClientRecords> GetClientRecords(int clientId);
-    public Task<ClientRecordDto> GetClientRecord(int recordId);
+    public Task<ClientRecordDto> GetClientRecord(int? recordId, int? clientId);
+    public Task CreateRecord(ClientRecordDto recordDto);
 }

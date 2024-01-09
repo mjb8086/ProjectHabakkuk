@@ -40,9 +40,9 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
     /// Check that the record belongs to the client.
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> ClientRecord(int recordId)
+    public async Task<IActionResult> ClientRecord(int? recordId, int? clientId)
     {
-        return View(await _recordService.GetClientRecord(recordId));
+        return View(await _recordService.GetClientRecord(recordId : recordId, clientId : clientId));
     }
 
     [HttpPut]
@@ -61,7 +61,7 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
     [HttpPost]
     public async Task<IActionResult> CreateRecord([FromBody] ClientRecordDto recordDto)
     {
-        await _recordRepo.CreateRecord(recordDto);
+        await _recordService.CreateRecord(recordDto);
         return Ok();
     }
     

@@ -18,14 +18,34 @@ public class ClientRecordService(IUserService _userService, ICacheService _cache
         return new MyNDClientRecords
         {
             ClientName = _cache.GetClientName(clientId),
+            ClientId = clientId,
             ClientRecords = await _recordRepo.GetClientRecordsLite(clientId)
         };
     }
 
-    public async Task<ClientRecordDto> GetClientRecord(int recordId)
+    public async Task<ClientRecordDto> GetClientRecord(int? recordId, int? clientId)
     {
-        var clientRecord = await _recordRepo.GetRecord(recordId);
-        clientRecord.ClientName = _cache.GetClientName(clientRecord.ClientId);
-        return clientRecord;
+        if (recordId.HasValue)
+        {
+            var clientRecord = await _recordRepo.GetRecord(recordId.Value);
+            clientRecord.ClientName = _cache.GetClientName(clientRecord.ClientId);
+            return clientRecord;
+        }
+        if (clientId.HasValue)// is create mode, return blank model.
+        {
+            return new ClientRecordDto()
+            {
+                ClientId = clientId.Value, 
+                ClientName = _cache.GetClientName(clientId.Value)
+            };
+        }
+
+        throw new InvalidOperationException("Missing data");
+    }
+
+    public async Task CreateRecord(ClientRecordDto recordDto)
+    {
+        recordDto.ClinicId = _userService.GetClaimFromCookie("ClinicId");
+        await _recordRepo.CreateRecord(recordDto);
     }
 }
