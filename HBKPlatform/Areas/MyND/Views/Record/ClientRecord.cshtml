@@ -8,25 +8,24 @@
 
 <h2>Client Record</h2>
 <p>@Model.ClientName</p>
-<input type="text" id="noteTitle" name="noteTitle" value="@Model.Title"></input>
-
-<!--
-<form id="messageInput" asp-area="MyND" asp-controller="Record" asp-action="UpdateRecordBody" asp-route-recordId="@Model.Id" method="post">
--->
+<div id="clientRecordWrap" class="clientRecordView">
+    <div class="clientRecordItem">
+        <input type="text" id="noteTitle" name="noteTitle" value="@Model.Title"/>
+        <span>@Model.DateCreated</span>
+        <span>@Model.Visibility</span>
+        <span>@Model.IsPriority</span>
+    </div>
+    
+    <form id="clientRecord" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
+        <input type="submit" value="SetIsPriority" id="btnTogglePriority"/>
+    </form>
+    
     <textarea id="noteBody" name="noteBody">
-@Model.NoteBody
+    @Model.NoteBody
     </textarea>
-    <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" data-clientId="@Model.ClientId" />
-<!--
-</form>
--->
-
-<p>@Model.Visibility</p>
-<p>@Model.IsPriority</p>
-
-<form id="clientRecord" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
-    <input type="submit" value="SetIsPriority" id="btnTogglePriority" />
-</form>
+    
+    <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" data-clientId="@Model.ClientId"/>
+</div>
 
 @if (Model.AppointmentId != null)
 {

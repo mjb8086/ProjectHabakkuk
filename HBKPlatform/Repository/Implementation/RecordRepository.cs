@@ -29,7 +29,7 @@ public class RecordRepository(ApplicationDbContext _db) : IRecordRepository
     {
         return await _db.ClientRecords.Where(x => x.ClientId == clientId).Select(x => new ClientRecordLite()
         {
-            Id = x.Id, Date = x.DateCreated, Title = x.Title, Visibility = x.RecordVisibility
+            Id = x.Id, Date = x.DateCreated, Title = x.Title, Visibility = x.RecordVisibility, IsPriority = x.IsPriority
         }).AsNoTracking().ToListAsync();
     }
 

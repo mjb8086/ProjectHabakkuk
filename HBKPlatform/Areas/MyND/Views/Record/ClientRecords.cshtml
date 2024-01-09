@@ -1,14 +1,17 @@
 @model HBKPlatform.Models.View.MyNDClientRecords
 @{
     ViewBag.Title = $"{Model.ClientName}'s Records";
+    ViewBag.Modules = "clientrecords.js";
+    ViewBag.css = "clientrecord.css";
     Layout = "_MyND";
 }
 
 <h2>@Model.ClientName's Records</h2>
+<div id="clientRecordWrap">
 @foreach (var record in Model.ClientRecords)
 {
-    <p><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> @record.Date @record.Visibility</p>
+    <div class="clientRecordItem"><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> <span>@record.Date @record.Visibility</span> <span>@record.IsPriority</span></div>
 }
-<form id="addNewForm" asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-clientId="@Model.ClientId" method="GET">
-    <input type="submit" value="Add New" id="btnSave" data-clientId="@Model.ClientId" />
-</form>
+<div id="clientRecordStuffing"></div>
+</div>
+<input type="submit" value="Add New" id="btnAdd" data-clientId="@Model.ClientId" />

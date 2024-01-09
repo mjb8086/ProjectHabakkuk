@@ -34,7 +34,7 @@ function updateNote(id) {
                 isPriority: false,
                 clientId: clientId
             }),
-            success: function (data) { $("#noteBody").val(data); }
+            success: function (data) {  }
         });
     };
 
