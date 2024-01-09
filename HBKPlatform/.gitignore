@@ -6,6 +6,7 @@ tailwind
 wwwroot/css/contrib/*.css
 wwwroot/css/jquery*
 wwwroot/js/contrib/*
+wwwroot/node_modules/
 
 # TEMPORARY!!! Remove when DB is finalised
 Migrations/

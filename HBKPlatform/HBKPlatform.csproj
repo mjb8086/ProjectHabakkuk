@@ -30,8 +30,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Client\Views\Appointments\" />
-    <Folder Include="Areas\MyND\Views\Appointments\" />
-    <Folder Include="Areas\MyND\Views\Clients\" />
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>

@@ -45,13 +45,13 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
         return View(await _recordService.GetClientRecord(recordId));
     }
 
-    [HttpPost]
-    public async Task<IActionResult> UpdateRecordBody(int recordId, [FromForm] string noteBody)
+    [HttpPut]
+    public async Task<IActionResult> UpdateRecordBody(int recordId, [FromBody] ClientRecordDto record)
     {
-        return Ok(await _recordRepo.UpdateRecordBody(recordId, noteBody));
+        return Ok(await _recordRepo.UpdateRecordBody(recordId, record.NoteBody));
     }
 
-    [HttpPost]
+    [HttpPut]
     public async Task<IActionResult> SetRecordPriority(int recordId, bool isPriority)
     {
         await _recordRepo.SetRecordPriority(recordId, isPriority);

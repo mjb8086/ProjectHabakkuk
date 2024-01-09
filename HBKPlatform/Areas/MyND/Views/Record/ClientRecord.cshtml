@@ -1,7 +1,8 @@
 @model HBKPlatform.Models.DTO.ClientRecordDto
 @{
     ViewBag.Title = $"{Model.ClientName}'s Record, {Model.DateCreated}";
-    ViewBag.Scripts = "clientrecord.js";
+    ViewBag.Modules = "clientrecord.js";
+    ViewBag.css = "clientrecord.css";
     Layout = "_MyND";
 }
 
@@ -9,19 +10,21 @@
 <p>@Model.ClientName</p>
 <p>@Model.Title</p>
 
+<!--
 <form id="messageInput" asp-area="MyND" asp-controller="Record" asp-action="UpdateRecordBody" asp-route-recordId="@Model.Id" method="post">
+-->
     <textarea id="noteBody" name="noteBody">
 @Model.NoteBody
     </textarea>
-    <input type="submit" value="Save" id="btnSave" />
+    <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" />
+<!--
 </form>
+-->
 
 <p>@Model.Visibility</p>
 <p>@Model.IsPriority</p>
 
-TODO: Make async
-
-<form id="messageInput" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
+<form id="clientRecord" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
     <input type="submit" value="SetIsPriority" id="btnTogglePriority" />
 </form>
 

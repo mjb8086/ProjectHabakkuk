@@ -16,6 +16,17 @@
             // FIXME: Work with many stylesheets....
         <link rel="stylesheet" href="@Url.Content("~/css/" + ViewData["css"])" asp-append-version="true" />
     }
+    @if (ViewData["scripts"] != null)
+    {
+        // FIXME: Work with many scripts....
+        <script src ="@Url.Content("~/js/" + ViewData["scripts"])" asp-append-version="true" defer></script>
+    }
+    @if (ViewData["modules"] != null)
+    {
+        // FIXME: Work with many scripts....
+        <script type="module" src="@Url.Content("~/js/" + ViewData["modules"])" asp-append-version="true" defer></script>
+    }
+    @await RenderSectionAsync("Scripts", required: false)
 </head>
 <body>
     <header>
@@ -72,16 +83,8 @@
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/contrib/underscore-umd.js" defer></script>
     <script src="~/js/contrib/jquery-ui.js"></script>
     <script src="@Url.Content("~/js/site.js")" asp-append-version="true" defer></script>
-    @if (ViewData["scripts"] != null)
-    {
-        // FIXME: Work with many scripts....
-        <script src ="@Url.Content("~/js/" + ViewData["scripts"])" asp-append-version="true" defer></script>
-    }
-    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
 

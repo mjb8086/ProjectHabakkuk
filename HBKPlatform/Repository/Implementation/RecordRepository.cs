@@ -48,6 +48,7 @@ public class RecordRepository(ApplicationDbContext _db) : IRecordRepository
     
     public async Task<string> UpdateRecordBody(int recordId, string noteBody)
     {
+        if (noteBody == null) throw new InvalidOperationException("Note body was null, cannot proceed.");
         var clientRecord = await _db.ClientRecords.FirstOrDefaultAsync(x => x.Id == recordId) ??
                            throw new InvalidOperationException($"Client record {recordId} does not exist.");
         clientRecord.NoteBody = noteBody;
