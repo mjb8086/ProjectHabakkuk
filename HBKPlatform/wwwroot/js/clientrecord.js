@@ -37,15 +37,21 @@ function updateNote(id) {
             success: function (data) {  }
         });
     };
+    function deleteNote(noteId, clientId) {
+         window.location = `${Globals.BaseUrl}/mynd/record/delete?recordId=${noteId}&clientId=${clientId}`;
+    };
 
 // Listeners
     $("#btnSave").on('click', function (e) {
-        console.log("click");
         e.preventDefault();
         if (e.target.dataset.id > 0) {
             updateNote(e.target.dataset.id);
         } else {
             createNote(e.target.dataset.clientid)
         }
+    });
+    $("#btnDelete").on('click', function (e) {
+        e.preventDefault();
+        if (e.target.dataset.id > 0) deleteNote(e.target.dataset.id, e.target.dataset.clientid);
     });
 });

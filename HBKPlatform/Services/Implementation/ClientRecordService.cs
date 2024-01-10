@@ -4,6 +4,15 @@ using HBKPlatform.Repository;
 
 namespace HBKPlatform.Services.Implementation;
 
+/// <summary>
+/// HBKPlatform Client Record service.
+/// Middleware for client record controller and database functionality.
+/// 
+/// Author: Mark Brown
+/// Authored: 09/01/2024
+/// 
+/// © 2024 NowDoctor Ltd.
+/// </summary>
 public class ClientRecordService(IUserService _userService, ICacheService _cache, IRecordRepository _recordRepo): IClientRecordService
 {
     public async Task<MyNDClientRecordsIndex> GetClientRecordsIndex()

@@ -2,7 +2,7 @@
     Layout = "_Layout";
 }
 
-<div id="myNdNav">
-    <a asp-area="MyND" asp-controller="Reception" asp-action="Index">Reception</a> <a>Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index">Client Records</a> <a>Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a>
+<div id="myNdNav" class="subNav">
+    <a asp-area="MyND" asp-controller="Reception" asp-action="Index">Reception</a> <a asp-area="MyND" asp-controller="Appointment", asp-action="Index">Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index">Client Records</a> <a asp-area="MyND" asp-controller="Client" asp-action="Index">Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a>
 </div>
 @RenderBody()

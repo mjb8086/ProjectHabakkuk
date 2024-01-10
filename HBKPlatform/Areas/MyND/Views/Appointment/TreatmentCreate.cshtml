@@ -1,0 +1,45 @@
+@{
+    Layout = "_myND";
+    ViewData["Title"] = $"Treatment Management";
+}
+@await Html.PartialAsync("_AppointmentsPartial")
+
+<h1>Create A Treatment</h1>
+
+<form>
+
+<fieldset>
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title"/>
+</fieldset>
+  
+<fieldset>
+  <label for="description">Description</label>
+  <textarea name="description" id="description">
+</textarea> 
+</fieldset>
+  
+<fieldset>
+<label for="cost">Cost</label>
+<input type="number" name="cost" id="cost"/>
+</fieldset>
+
+<fieldset>
+  <legend>Requestability:</legend>
+  <details>Select who may request this treatment. Treatments may be booked by Practitioners only or the Client and Practitioner.</details>
+
+  <div>
+    <input type="radio" id="clientAndPractitioner" name="requestability" value="clientAndPractitioner" checked />
+    <label for="clientAndPractitioner">Client and Practitioner</label>
+  </div>
+
+  <div>
+    <input type="radio" id="pracOnly" name="requestability" value="pracOnly" />
+    <label for="pracOnly">Practitioner Only</label>
+  </div>
+</fieldset>
+
+<fieldset>
+<input type="submit" id="btnSave" value="Save"/>
+</fieldset>
+</form>

@@ -20,11 +20,15 @@
         <input type="submit" value="SetIsPriority" id="btnTogglePriority"/>
     </form>
     
-    <textarea id="noteBody" name="noteBody">
-    @Model.NoteBody
-    </textarea>
+<textarea id="noteBody" name="noteBody">
+@Model.NoteBody
+</textarea>
     
-    <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" data-clientId="@Model.ClientId"/>
+    <div>
+        <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" data-clientId="@Model.ClientId"/>
+        <input type="submit" value="Delete" id="btnDelete" data-id="@Model.Id" data-clientId="@Model.ClientId"/>
+        <span>Next</span> <span>Previous</span> <span>All Notes</span>
+    </div>
 </div>
 
 @if (Model.AppointmentId != null)

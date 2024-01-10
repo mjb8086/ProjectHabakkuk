@@ -75,5 +75,11 @@ public class RecordRepository(ApplicationDbContext _db) : IRecordRepository
         await _db.AddAsync(dbClientRecord);
         await _db.SaveChangesAsync();
     }
+
+    // TODO: revisit, should we retain 'deleted' for a period of time?
+    public async Task DeleteRecord(int recordId)
+    {
+        await _db.ClientRecords.Where(x => x.Id == recordId).ExecuteDeleteAsync();
+    }
     
 }

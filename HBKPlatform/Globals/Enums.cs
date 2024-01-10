@@ -23,7 +23,7 @@ public static class Enums
      
      public enum TreatmentRequestability
      {
-          ClientAndPrac, PracOnly, None
+          ClientAndPrac = 2, PracOnly = 1, None = 0
      }
 
      public enum Day

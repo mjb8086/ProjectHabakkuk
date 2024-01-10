@@ -150,7 +150,6 @@ namespace HBKPlatform.Database.Helpers
                         MessageBody = "don't steal that almanac you tool"
                     });
                     ctx.AddRange(conversation);
-                    ctx.SaveChanges();
 
                     var clientRecord1 = new ClientRecord()
                     {
@@ -158,6 +157,17 @@ namespace HBKPlatform.Database.Helpers
                         Title = "Bad news for the bowels", NoteBody = "bother shifting the goods"
                     };
                     ctx.Add(clientRecord1);
+
+                    var treatment1 = new Treatment()
+                    {
+                        Clinic = clinic,
+                        TreatmentRequestability = Enums.TreatmentRequestability.ClientAndPrac,
+                        Title = "Checkup",
+                        Description = "talk and pretend to do something",
+                        Cost = 15.50
+                    };
+
+                    ctx.Add(treatment1);
                     ctx.SaveChanges();
                 }
 

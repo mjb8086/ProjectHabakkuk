@@ -38,12 +38,14 @@ builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IClientMessageRepository, ClientMessageRepository>();
 builder.Services.AddScoped<IRecordRepository, RecordRepository>();
+builder.Services.AddScoped<ITreatmentRepository, TreatmentRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
 builder.Services.AddTransient<ICacheService, CacheService>();
 builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
+builder.Services.AddTransient<IAppointmentService, AppointmentService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

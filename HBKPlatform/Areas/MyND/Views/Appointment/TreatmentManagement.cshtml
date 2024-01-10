@@ -1,0 +1,18 @@
+@model HBKPlatform.Models.View.TreatmentManagementView
+@{
+    Layout = "_myND";
+    ViewData["Title"] = $"Treatment Management";
+}
+@await Html.PartialAsync("_AppointmentsPartial")
+
+<h1>Treatment Management</h1>
+<p>Create and manage treatments. A treatment is a service type that may be booked as an appointment.</p>
+
+<h2>Current treatments:</h2>
+@foreach (var treatment in Model.Treatments)
+{
+    <div>@treatment.Title @treatment.Cost @treatment.Requestability</div>
+}
+
+<a asp-area="MyND" asp-controller="Appointment" asp-action="CreateTreatment">Create New</a>
+

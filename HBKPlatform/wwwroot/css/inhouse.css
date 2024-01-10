@@ -91,6 +91,34 @@ div.list-body {
     padding-bottom: 10px;
 }
 
+/* MyND */
+.subNav {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    border-bottom: 1px solid grey;
+    margin-bottom: 4px;
+}
+.subNav a, .subNav a:visited {
+    text-decoration: none;
+    border-top: 1px solid grey;
+    min-width: 30px;
+    display: inline-block;
+    padding: 4px;
+    color: #282828;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    margin-right: 10px;
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    background-color: #d7d7d7;
+}
+
+.subNav a:hover {
+    background-color: #bffff1;
+    text-shadow: 1px 1px 2px #b7b7b7;
+}
+
 /* Home  - TODO breakout! */
 
 div#homeContainer {

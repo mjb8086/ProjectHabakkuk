@@ -10,4 +10,5 @@ public interface IRecordRepository
     public Task<string> UpdateRecordBody(int recordId, string noteBody);
     public Task SetRecordPriority(int recordId, bool priority);
     public Task CreateRecord(ClientRecordDto recordDto);
+    public Task DeleteRecord(int recordId);
 }

@@ -65,4 +65,12 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
         return Ok();
     }
     
+    [HttpGet]
+    public async Task<IActionResult> Delete(int clientId, int recordId)
+    {
+        // todo: Verify user has right to delete in record service
+        await _recordRepo.DeleteRecord(recordId);
+        return RedirectToRoute(new {controller = "Record", action = "ClientRecords", clientId = clientId});
+    }
+    
 }

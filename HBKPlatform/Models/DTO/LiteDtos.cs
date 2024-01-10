@@ -24,3 +24,11 @@ public class ClientRecordLite
     public Enums.RecordVisibility Visibility { get; set; }
     public bool IsPriority { get; set; }
 }
+
+public class TreatmentLite
+{
+    public int Id { get; set; }
+    public Enums.TreatmentRequestability Requestability { get; set; }
+    public double Cost { get; set; }
+    public string Title { get; set; }
+}
