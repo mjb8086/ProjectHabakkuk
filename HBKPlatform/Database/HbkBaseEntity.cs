@@ -12,6 +12,8 @@ namespace HBKPlatform.Database
         public DateTime DateCreated { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime? DateModified { get; set; }
+        public string? CreateActioner { get; set; }
+        public string? ModifyActioner { get; set; }
     }
 }
 

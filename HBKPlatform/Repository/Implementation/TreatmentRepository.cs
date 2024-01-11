@@ -53,4 +53,22 @@ public class TreatmentRepository(ApplicationDbContext _db) : ITreatmentRepositor
         await _db.SaveChangesAsync();
     }
     
+    public async Task UpdateTreatment(TreatmentDto treatmentDto)
+    {
+        if (treatmentDto == null) throw new InvalidOperationException("Treatment missing, cannot proceed.");
+        var treatment = await _db.Treatments.FirstOrDefaultAsync(x => x.Id == treatmentDto.Id) ??
+                           throw new InvalidOperationException($"Treatment {treatmentDto.Id} does not exist.");
+        treatment.Title = treatmentDto.Title;
+        treatment.Description = treatmentDto.Description;
+        treatment.Cost = treatmentDto.Cost;
+        treatment.TreatmentRequestability = treatmentDto.Requestability;
+        treatment.Img = treatmentDto.Img;
+        await _db.SaveChangesAsync();
+    }
+    
+    // TODO: revisit, should we retain 'deleted' for a period of time?
+    public async Task Delete(int treatmentId)
+    {
+        await _db.Treatments.Where(x => x.Id == treatmentId).ExecuteDeleteAsync();
+    }
 }

@@ -1,3 +1,4 @@
+using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,8 +36,32 @@ public class AppointmentController(IAppointmentService _appointmentService): Con
         return View(await _appointmentService.GetTreatmentMgmtView());
     }
     
-    public async Task<IActionResult> CreateTreatment()
+    public async Task<IActionResult> CreateTreatment(int? treatmentId)
     {
-        return View("TreatmentCreate");
+        return treatmentId.HasValue ? 
+            View("TreatmentCreate", await _appointmentService.GetTreatment(treatmentId.Value)) : 
+            View("TreatmentCreate", new TreatmentDto());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DoCreateTreatment([FromForm] TreatmentDto treatment)
+    {
+        await _appointmentService.CreateTreatment(treatment);
+        return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> DeleteTreatment(int treatmentId)
+    {
+        await _appointmentService.DeleteTreatment(treatmentId);
+        return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
+    }
+    
+    [HttpPut]
+    public async Task<IActionResult> DoUpdateTreatment([FromBody] TreatmentDto treatment)
+    {
+        // todo: Verify user has right to update 
+        await _appointmentService.UpdateTreatment(treatment);
+        return Ok();
     }
 }
