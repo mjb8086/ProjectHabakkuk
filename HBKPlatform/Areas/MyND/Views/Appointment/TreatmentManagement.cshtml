@@ -14,7 +14,6 @@
 @foreach (var treatment in Model.Treatments)
 {
     <div class="treatmentItem"><span>@treatment.Title</span> <span>@treatment.Cost.ToString("C2")</span> <span>@treatment.Requestability</span> <span><a asp-area="MyND" asp-controller="Appointment" asp-action="CreateTreatment" asp-route-treatmentId="@treatment.Id">Edit</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="DeleteTreatment" asp-route-treatmentId="@treatment.Id">Delete</a></span></div>
-                                                                                                                                                                                                                                                                                                                                                                                                  
 }
 </div>
 <a asp-area="MyND" asp-controller="Appointment" asp-action="CreateTreatment">Create New</a>

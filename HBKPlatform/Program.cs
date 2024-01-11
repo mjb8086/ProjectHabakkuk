@@ -30,7 +30,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
     .AddDefaultUI()
     .AddDefaultTokenProviders();
 
-// To ensure custom claims are added to new identity when principal is refreshed.
+// To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
 builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
 builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
@@ -39,6 +39,7 @@ builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IClientMessageRepository, ClientMessageRepository>();
 builder.Services.AddScoped<IRecordRepository, RecordRepository>();
 builder.Services.AddScoped<ITreatmentRepository, TreatmentRepository>();
+builder.Services.AddScoped<ITimeslotRepository, TimeslotRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -46,6 +47,7 @@ builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>()
 builder.Services.AddTransient<ICacheService, CacheService>();
 builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
 builder.Services.AddTransient<IAppointmentService, AppointmentService>();
+builder.Services.AddTransient<IBookingService, BookingService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

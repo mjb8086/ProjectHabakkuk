@@ -168,6 +168,9 @@ namespace HBKPlatform.Database.Helpers
                     };
 
                     ctx.Add(treatment1);
+
+                    var timeslots = new List<Timeslot>();
+                    
                     ctx.SaveChanges();
                 }
 
