@@ -15,6 +15,7 @@ public class TimeslotAvailability: HbkBaseEntity
     public int TimeslotId { get; set; }
     public int WeekNum { get; set; }
     public Enums.TimeslotAvailability Availability { get; set; }
+    public int Interlude { get; set; }
     
     // EF Navigations
     public Timeslot Timeslot { get; set; }

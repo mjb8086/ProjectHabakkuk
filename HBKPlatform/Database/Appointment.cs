@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database;
 
@@ -17,8 +17,9 @@ public class Appointment: HbkBaseEntity
     public int PractitionerId { get; set; }
     public int TreatmentId { get; set; }
     public int TimeslotId { get; set; }
-    public string Note { get; set; }
+    public string? Note { get; set; }
     public int WeekNum { get; set; }
+    public Enums.AppointmentStatus Status { get; set; }
     
     // EF Navigations
     public virtual Clinic Clinic { get; set; }

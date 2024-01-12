@@ -100,5 +100,27 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
         _memoryCache.Set(key,  clientIdMap, _cacheEntryOptions);
         return clientIdMap[clientId] == clinicId;
     }
+
+    // TODO: refresh cache when settings change
+    public async Task<Dictionary<string, SettingDto>> GetAllClinicSettings(int clinicId)
+    {
+        string key = $"Settings-c{clinicId}";
+        if (_memoryCache.TryGetValue(key, out Dictionary<string, SettingDto> clinicSettings))
+        {
+            return clinicSettings;
+        }
+        
+        // Ensure duplicate keys may not be created per-Clinic in Settings Repo!!!
+        clinicSettings = await _db.Settings.Where(x => x.ClinicId == clinicId).Select(x => new SettingDto()
+        {
+            Id = x.Id,
+            Key = x.Key,
+            Value = x.Value,
+            Value2 = x.Value2
+        }).ToDictionaryAsync(x => x.Key);
+        _memoryCache.Set(key,  clinicSettings, _cacheEntryOptions);
+        return clinicSettings;
+    }
+    
     
 }

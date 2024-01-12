@@ -22,7 +22,8 @@ public class TimeslotRepository(ApplicationDbContext _db) : ITimeslotRepository
             ClinicId = x.ClinicId,
             Description = x.Description,
             Duration = x.Duration,
-            Day = x.Day
+            Day = x.Day,
+            Time = x.Time
         }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Could not find timeslot Id");
     }
 
@@ -34,7 +35,8 @@ public class TimeslotRepository(ApplicationDbContext _db) : ITimeslotRepository
             ClinicId = x.ClinicId,
             Description = x.Description,
             Duration = x.Duration,
-            Day = x.Day
+            Day = x.Day,
+            Time = x.Time
         }).ToListAsync();
     }
 

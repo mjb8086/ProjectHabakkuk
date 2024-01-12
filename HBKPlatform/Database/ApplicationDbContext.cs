@@ -32,6 +32,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Timeslot> Timeslots { get; set; } = default!;
     public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
     public DbSet<Treatment> Treatments { get; set; } = default!;
+    public DbSet<Setting> Settings { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

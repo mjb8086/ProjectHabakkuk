@@ -1,8 +1,13 @@
+@model HBKPlatform.Models.View.MyNDUpcomingAppointmentsView;
 @{
     Layout = "_MyND";
 }
 @await Html.PartialAsync("_AppointmentsPartial")
 
 <h1>Upcoming Appointments</h1>
+@foreach (var appointment in Model.UpcomingAppointments)
+{
+    <p>@appointment.ClientName @appointment.DateString @appointment.TimeString</p>
+}
 
 <h2>Past Appointments</h2>

@@ -14,16 +14,16 @@ namespace HBKPlatform.Controllers;
 /// </summary>
 
 [Area("MyND")]
-public class AppointmentController(IAppointmentService _appointmentService): Controller
+public class AppointmentController(IAppointmentService _appointmentService, IBookingService _bookingService): Controller
 {
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        return View(await _bookingService.GetMyNDUpcomingAppointmentsView());
     }
     
-    public IActionResult TimeslotManagement()
+    public async Task<IActionResult> TimeslotManagement()
     {
-        return View();
+        return View(await _bookingService.GetTimeslotMgmtView());
     }
     
     public IActionResult AvailabilityManagement()
@@ -64,4 +64,5 @@ public class AppointmentController(IAppointmentService _appointmentService): Con
         await _appointmentService.UpdateTreatment(treatment);
         return Ok();
     }
+    
 }

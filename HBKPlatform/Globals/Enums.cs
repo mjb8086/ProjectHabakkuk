@@ -35,5 +35,10 @@ public static class Enums
      {
           Unavailable, Available
      }
+
+     public enum AppointmentStatus
+     {
+          Approved, Requested, CancelledByClient, CancelledByPractitioner
+     }
      
 }

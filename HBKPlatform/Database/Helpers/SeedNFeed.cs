@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Database.Helpers
 {
+    
     // Sneed's
     public static class SeedNFeed //Formerly Chuck's
     {
+        public const int DEFAULT_DURATION = 30;
         public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             using (var ctx = new ApplicationDbContext(
@@ -170,8 +172,43 @@ namespace HBKPlatform.Database.Helpers
                     ctx.Add(treatment1);
 
                     var timeslots = new List<Timeslot>();
+                    var days = new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday};
+                    foreach (var day in days)
+                    {
+                        var time = new DateTime(1970, 01, 01, 08, 00, 00).ToUniversalTime();
+                        var maxTime = new DateTime(1970, 01, 01, 19, 00, 00).ToUniversalTime();
+                        
+                        while (time <= maxTime)
+                        {
+                            timeslots.Add(new Timeslot() { Clinic = clinic, Description = $"{day} {time.ToShortTimeString()}", Day = day, Time = time.ToUniversalTime(), Duration = DEFAULT_DURATION});
+                            time = time.AddMinutes(DEFAULT_DURATION);
+                        }
+                    }
+                    
+                    ctx.AddRange(timeslots);
+                    ctx.SaveChanges();
+
+                    var appointment1 = new Appointment()
+                    {
+                        Client = client1,
+                        Clinic = clinic,
+                        Practitioner = prac1,
+                        Timeslot = timeslots[1],
+                        Status = Enums.AppointmentStatus.Approved,
+                        Treatment = treatment1
+                    };
+                    
+                    ctx.Add(appointment1);
+
+                    var startDate = new Setting()
+                    {
+                        Key = "DbStartDate",
+                        Value = "2024-01-01"
+                    };
+                    ctx.Add(startDate);
                     
                     ctx.SaveChanges();
+                    
                 }
 
             }

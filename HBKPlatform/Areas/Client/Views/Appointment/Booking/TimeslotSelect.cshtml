@@ -1,0 +1,12 @@
+@model HBKPlatform.Models.View.TimeslotSelectView;
+@{
+    ViewBag.Title = "Booking wizard: Select a timeslot";
+    Layout = "_Client";
+}
+
+<h1>Booking wizard.</h1>
+<h2>Select a timeslot</h2>
+@foreach (var timeslot in Model.AvailableTimeslots)
+{
+    <p>@timeslot.Description</p>
+}
