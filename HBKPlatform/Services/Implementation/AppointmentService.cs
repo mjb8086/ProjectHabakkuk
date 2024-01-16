@@ -44,5 +44,13 @@ public class AppointmentService(IUserService _userService, ITreatmentRepository 
     {
         return await _treatmentRepo.GetTreatment(treatmentId);
     }
+
+    public async Task<ClientTreatmentSelectView> GetTreatmentsViewForClient()
+    {
+        return new ClientTreatmentSelectView()
+        {
+            Treatments = await _treatmentRepo.GetClinicTreatments(_userService.GetClaimFromCookie("ClinicId"), true)
+        };
+    }
     
 }

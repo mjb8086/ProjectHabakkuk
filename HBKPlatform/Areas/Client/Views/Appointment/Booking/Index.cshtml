@@ -1,4 +1,4 @@
-
+@model HBKPlatform.Models.View.ClientTreatmentSelectView;
 @{
     ViewBag.Title = "Booking wizard";
     Layout = "_Client";
@@ -6,3 +6,7 @@
 
 <h1>Booking wizard.</h1>
 <h2>Select a treatment</h2>
+@foreach (var treatment in Model.Treatments)
+{
+    <a asp-area="Client" asp-controller="Appointment" asp-action="TimeslotSelect" asp-route-treatmentId="@treatment.Id">@treatment.Title @treatment.Cost</a>
+}

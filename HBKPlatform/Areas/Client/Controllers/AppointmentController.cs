@@ -12,7 +12,7 @@ namespace HBKPlatform.Client.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 [Area("Client")]
-public class AppointmentController(IBookingService _bookingService) : Controller
+public class AppointmentController(IBookingService _bookingService, IAppointmentService _appointmentService) : Controller
 {
     public async Task<IActionResult> Index()
     {
@@ -20,15 +20,21 @@ public class AppointmentController(IBookingService _bookingService) : Controller
     }
     
     [Route("booking/")]
-    public IActionResult Booking()
+    public async Task<IActionResult> Booking()
     {
-        return View("Booking/Index");
+        return View("Booking/Index", await _appointmentService.GetTreatmentsViewForClient());
     }
     
     [Route("booking/timeslotselect")]
-    public async Task<IActionResult> TimeslotSelect()
+    public async Task<IActionResult> TimeslotSelect(int treatmentId)
     {
-        return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsForClient());
+        return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsClientView(treatmentId));
+    }
+    
+    [Route("booking/treatmenttimeslotrequest")]
+    public async Task<IActionResult> TreatmentTimeslotRequest(int treatmentId,  int timeslotId, int weekNum)
+    {
+        return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsClientView(treatmentId));
     }
     
     [Route("booking/requestreceived")]

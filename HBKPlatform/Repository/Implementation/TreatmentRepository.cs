@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,9 +30,11 @@ public class TreatmentRepository(ApplicationDbContext _db) : ITreatmentRepositor
         }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Could not find treatment Id");
     }
     
-    public async Task<List<TreatmentLite>> GetClinicTreatments(int clinicId)
+    public async Task<List<TreatmentLite>> GetClinicTreatments(int clinicId, bool clientOnly)
     {
-        var treatments = await _db.Treatments.Where(x => x.ClinicId == clinicId).Select(x => new TreatmentLite()
+        var query = _db.Treatments.Where(x => x.ClinicId == clinicId);
+        query = clientOnly ? query.Where(x => x.TreatmentRequestability == Enums.TreatmentRequestability.ClientAndPrac) : query;
+        var treatments = await query.Select(x => new TreatmentLite()
         {
             Id = x.Id, Cost = x.Cost, Requestability = x.TreatmentRequestability, Title = x.Title
         }).ToListAsync();

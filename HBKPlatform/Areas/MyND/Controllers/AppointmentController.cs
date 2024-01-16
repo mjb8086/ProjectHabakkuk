@@ -20,7 +20,12 @@ public class AppointmentController(IAppointmentService _appointmentService, IBoo
     {
         return View(await _bookingService.GetMyNDUpcomingAppointmentsView());
     }
-    
+
+    public async Task<IActionResult> PractitionerBooking()
+    {
+        return View();
+    }
+
     public async Task<IActionResult> TimeslotManagement()
     {
         return View(await _bookingService.GetTimeslotMgmtView());

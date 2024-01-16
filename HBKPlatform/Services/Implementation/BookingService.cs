@@ -1,3 +1,4 @@
+using System.Data;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
 using HBKPlatform.Repository;
@@ -30,9 +31,22 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         return await _timeslotRepo.GetTimeslot(timeslotId);
     }
     
-    public async Task<TimeslotSelectView> GetAvailableTimeslotsForClient()
+    public async Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId)
     {
-        return new TimeslotSelectView() { AvailableTimeslots = await GetAllTimeslots() };
+        // Do clash checking - only show free and available timeslots in the future
+        // Get treatment Id
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        if (treatments.TryGetValue(treatmentId, out TreatmentDto treatment))
+        {
+            return new TimeslotSelectView()
+            {
+                AvailableTimeslots = await GetAllTimeslots(),
+                TreatmentName = treatment.Title
+            };
+        }
+
+        throw new MissingPrimaryKeyException($"Treatment ID {treatmentId} does not exist");
     }
 
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)
@@ -79,4 +93,5 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
                 await GetUpcomingAppointmentsForClient(_userService.GetClaimFromCookie("ClientId"))
         };
     }
+    
 }

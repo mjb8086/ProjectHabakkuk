@@ -121,6 +121,25 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
         _memoryCache.Set(key,  clinicSettings, _cacheEntryOptions);
         return clinicSettings;
     }
-    
-    
+
+    public async Task<Dictionary<int, TreatmentDto>> GetTreatments(int clinicId)
+    {
+        string key = $"Treatments-c{clinicId}";
+        if (_memoryCache.TryGetValue(key, out Dictionary<int, TreatmentDto> treatments))
+        {
+            return treatments;
+        }
+        
+        treatments = await _db.Treatments.Where(x => x.ClinicId == clinicId).Select(x => new TreatmentDto()
+        {
+            Id = x.Id,
+            Title = x.Title,
+            Cost = x.Cost,
+            Requestability = x.TreatmentRequestability
+        }).ToDictionaryAsync(x => x.Id);
+        _memoryCache.Set(key,  treatments, _cacheEntryOptions);
+        return treatments;
+    }
+
+
 }

@@ -10,4 +10,5 @@ public interface IAppointmentService
     public Task DeleteTreatment(int treatmentId);
     public Task UpdateTreatment(TreatmentDto treatment);
     public Task<TreatmentDto> GetTreatment(int treatmentId);
+    public Task<ClientTreatmentSelectView> GetTreatmentsViewForClient();
 }
