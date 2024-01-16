@@ -8,6 +8,6 @@ public class TimeslotDto
     public string Description { get; set; }
     public int ClinicId { get; set; }
     public Enums.Day Day { get; set; }
-    public DateTime Time { get; set; }
+    public TimeOnly Time { get; set; }
     public int Duration { get; set; }
 }

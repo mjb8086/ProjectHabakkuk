@@ -29,6 +29,7 @@
     <AdditionalFiles Include="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="HBK.Test\" />
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>

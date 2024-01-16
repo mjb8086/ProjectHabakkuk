@@ -1,6 +1,48 @@
+using System.Runtime.InteropServices.JavaScript;
+using HBKPlatform.Models.DTO;
+
 namespace HBKPlatform.Helpers;
 
+/// <summary>
+/// HBKPlatform Date time helpers.
+/// 
+/// Author: Mark Brown
+/// Authored: 16/01/2024
+/// 
+/// © 2024 NowDoctor Ltd.
+/// </summary>
 public class DateTimeHelper
 {
+    /// <summary>
+    /// Get the DateTime representation from a timeslot, week number and DbStartDate.
+    /// Note: WeekNumbers are 1-indexed. I.e., the week of dbStartDate will be counted as week 1
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static DateTime FromTimeslot(string dbStartDate, int weekNum, TimeslotDto timeslot)
+    {
+        if (string.IsNullOrEmpty(dbStartDate) || weekNum < 1 || timeslot == null)
+        {
+            throw new InvalidOperationException("Invalid parameters to produce DateTime");
+        }
+        // subtract 1 from weekNum to account for the first week being week 1 (origin)
+        return new DateTime(DateOnly.Parse(dbStartDate), timeslot.Time).AddDays(((weekNum-1) * 7) + (int)timeslot.Day);
+    }
+
+    /// <summary>
+    /// Get the current week number from the database start date
+    /// </summary>
+    public static int CurrentWeekNum(string dbStartDate)
+    {
+        return GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
+    }
     
+    public static int GetWeekNumFromDateTime(string dbStartDate, DateTime dateTime)
+    {
+        if (string.IsNullOrEmpty(dbStartDate))
+        {
+            throw new InvalidOperationException("Invalid parameters to produce WeekNum");
+        }
+        // add 1 to account for week 1
+        return ((int)Math.Floor((dateTime - DateTime.Parse(dbStartDate)).TotalDays) / 7) + 1;
+    }
 }

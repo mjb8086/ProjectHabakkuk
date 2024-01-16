@@ -175,12 +175,12 @@ namespace HBKPlatform.Database.Helpers
                     var days = new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday};
                     foreach (var day in days)
                     {
-                        var time = new DateTime(1970, 01, 01, 08, 00, 00).ToUniversalTime();
-                        var maxTime = new DateTime(1970, 01, 01, 19, 00, 00).ToUniversalTime();
+                        var time = new TimeOnly(08, 00, 00);
+                        var maxTime = new TimeOnly( 19, 00, 00);
                         
                         while (time <= maxTime)
                         {
-                            timeslots.Add(new Timeslot() { Clinic = clinic, Description = $"{day} {time.ToShortTimeString()}", Day = day, Time = time.ToUniversalTime(), Duration = DEFAULT_DURATION});
+                            timeslots.Add(new Timeslot() { Clinic = clinic, Description = $"{day} {time.ToShortTimeString()}", Day = day, Time = time, Duration = DEFAULT_DURATION});
                             time = time.AddMinutes(DEFAULT_DURATION);
                         }
                     }
