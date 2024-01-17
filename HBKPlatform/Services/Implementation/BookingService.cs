@@ -31,16 +31,39 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     {
         return await _timeslotRepo.GetTimeslot(timeslotId);
     }
-    public async Task<List<TimeslotDto>> GetTimeslotsForBooking(int clinicId)
+    private async Task<List<TimeslotDto>> GetTimeslotsForBooking(int clinicId)
     {
         var allTimeslots = await GetAllTimeslots();
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate", clinicId)).Value;
+        var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks", clinicId)).Value);
         var now = DateTime.UtcNow;
         var currentWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
-        foreach (var ts in allTimeslots)
+        var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+        var nowTime = new TimeOnly(now.Hour, now.Minute, now.Second);
+
+        var futureTs = new List<TimeslotDto>(allTimeslots.Count);
+
+        while (bookingAdvance > 0)
         {
-            if (ts.Day)
+            foreach (var ts in allTimeslots)
+            {
+                // FIXME: week num is not correct for advance weeks - recalc, clone TS object
+                if (ts.Day >= today && ts.Time > nowTime)
+                {
+                    ts.WeekNum = currentWeekNum;
+                    futureTs.Add(ts);
+                }
+                else
+                {
+                    ts.WeekNum = currentWeekNum + 1;
+                    futureTs.Add(ts);
+                }
+            }
+
+            bookingAdvance--;
         }
+
+        return futureTs;
     }
     
     public async Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId)
@@ -49,16 +72,26 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         // Get treatment Id
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var treatments = await _cacheService.GetTreatments(clinicId);
+        
+        var availableTs =  await GetTimeslotsForBooking(clinicId);
+        availableTs = (await ClashCheck(availableTs, 0)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        
         if (treatments.TryGetValue(treatmentId, out TreatmentDto treatment))
         {
             return new TimeslotSelectView()
             {
-                AvailableTimeslots = await GetAllTimeslots(),
+                AvailableTimeslots = availableTs,
                 TreatmentName = treatment.Title,
+                TreatmentId = treatment.Id
             };
         }
 
         throw new MissingPrimaryKeyException($"Treatment ID {treatmentId} does not exist");
+    }
+
+    private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
+    {
+        return timeslots;
     }
 
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)

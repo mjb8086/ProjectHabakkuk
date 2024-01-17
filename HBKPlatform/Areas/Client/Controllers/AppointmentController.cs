@@ -31,15 +31,15 @@ public class AppointmentController(IBookingService _bookingService, ITreatmentSe
         return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsClientView(treatmentId));
     }
     
-    [Route("booking/treatmenttimeslotrequest")]
-    public async Task<IActionResult> TreatmentTimeslotRequest(int treatmentId,  int timeslotId, int weekNum)
+    [Route("booking/bookingconfirm")]
+    public async Task<IActionResult> BookingConfirm(int treatmentId,  int timeslotId, int weekNum)
     {
-        return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsClientView(treatmentId));
+        return View("Booking/BookingConfirm");
     }
     
-    [Route("booking/requestreceived")]
-    public IActionResult RequestReceived()
+    [Route("booking/bookingconfirmed")]
+    public IActionResult BookingConfirmed()
     {
-        return View("Booking/RequestReceived");
+        return View("Booking/BookingConfirmed");
     }
 }

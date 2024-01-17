@@ -55,4 +55,20 @@ public class DateTimeHelper
         }
     }
 
+    /// <summary>
+    /// Convert a .NET DayOfWeek to a HbkPlatform Day.
+    /// .NET begins the week on a Sunday, we begin on a Monday. Thus some conversion is needed.
+    /// </summary>
+    public static Enums.Day ConvertDotNetDay(DayOfWeek day)
+    {
+        /*
+         *       M T W T F S S
+         * .NET  1 2 3 4 5 6 0  (USA)
+         *  HBK  0 1 2 3 4 5 6   (UK)
+         *  Damn Americanisations...
+         */
+        if (day == DayOfWeek.Sunday) return Enums.Day.Sunday;
+        return (Enums.Day)day-1;
+    }
+
 }

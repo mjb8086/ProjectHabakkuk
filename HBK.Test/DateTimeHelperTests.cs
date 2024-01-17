@@ -1,6 +1,7 @@
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
+using Xunit.Abstractions;
 
 namespace HBK.Test;
 
@@ -13,10 +14,10 @@ namespace HBK.Test;
 /// © 2024 NowDoctor Ltd.
 /// 
 /// </summary>
-public class DateTimeHelperTests
+public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
 {
     public static string DB_START_DATE = "2024-01-01";
-    
+
     /*
      * These first tests check bounds on the DateTimeHelper FromTimeslot method.
      *
@@ -167,5 +168,34 @@ public class DateTimeHelperTests
     {
         var sampleDate = new DateTime(2024, 07, 22, 20, 00, 00);
         Assert.Equal(30, DateTimeHelper.GetWeekNumFromDateTime(DB_START_DATE, sampleDate));
+    }
+    
+    /*
+     * ConvertDotNetDay tests
+     */
+
+    [Fact]
+    public void DotNetConverts_1()
+    {
+       Assert.Equal(Enums.Day.Monday, DateTimeHelper.ConvertDotNetDay(DayOfWeek.Monday)); 
+    }
+    
+    [Fact]
+    public void DotNetConverts_2()
+    {
+       Assert.Equal(Enums.Day.Wednesday, DateTimeHelper.ConvertDotNetDay(DayOfWeek.Wednesday)); 
+       _testOutputHelper.WriteLine("it's wednesday my dudes");
+    }
+    
+    [Fact]
+    public void DotNetConverts_3()
+    {
+       Assert.Equal(Enums.Day.Saturday, DateTimeHelper.ConvertDotNetDay(DayOfWeek.Saturday)); 
+    }
+    
+    [Fact]
+    public void DotNetConverts_4()
+    {
+       Assert.Equal(Enums.Day.Sunday, DateTimeHelper.ConvertDotNetDay(DayOfWeek.Sunday)); 
     }
 }
