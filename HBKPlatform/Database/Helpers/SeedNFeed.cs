@@ -168,8 +168,18 @@ namespace HBKPlatform.Database.Helpers
                         Description = "talk and pretend to do something",
                         Cost = 15.50
                     };
+                    
+                    var treatment2 = new Treatment()
+                    {
+                        Clinic = clinic,
+                        TreatmentRequestability = Enums.TreatmentRequestability.PracOnly,
+                        Title = "Prac Only Test",
+                        Description = "no book for client",
+                        Cost = 69.0
+                    };
 
                     ctx.Add(treatment1);
+                    ctx.Add(treatment2);
 
                     var timeslots = new List<Timeslot>();
                     var days = new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday};
@@ -195,7 +205,8 @@ namespace HBKPlatform.Database.Helpers
                         Practitioner = prac1,
                         Timeslot = timeslots[1],
                         Status = Enums.AppointmentStatus.Approved,
-                        Treatment = treatment1
+                        Treatment = treatment1,
+                        WeekNum = 4
                     };
                     
                     ctx.Add(appointment1);
@@ -203,7 +214,8 @@ namespace HBKPlatform.Database.Helpers
                     var startDate = new Setting()
                     {
                         Key = "DbStartDate",
-                        Value = "2024-01-01"
+                        Value = "2024-01-01",
+                        Clinic = clinic
                     };
                     ctx.Add(startDate);
                     

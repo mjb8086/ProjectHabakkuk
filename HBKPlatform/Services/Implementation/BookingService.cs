@@ -1,4 +1,5 @@
 using System.Data;
+using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
 using HBKPlatform.Repository;
@@ -14,7 +15,7 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, IAppointmentRepository _appointmentRepo) : IBookingService
+public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, IAppointmentRepository _appointmentRepo, IConfigurationService _config) : IBookingService
 {
     public async Task<List<TimeslotDto>> GetAllTimeslots()
     {
@@ -30,6 +31,17 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     {
         return await _timeslotRepo.GetTimeslot(timeslotId);
     }
+    public async Task<List<TimeslotDto>> GetTimeslotsForBooking(int clinicId)
+    {
+        var allTimeslots = await GetAllTimeslots();
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate", clinicId)).Value;
+        var now = DateTime.UtcNow;
+        var currentWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+        foreach (var ts in allTimeslots)
+        {
+            if (ts.Day)
+        }
+    }
     
     public async Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId)
     {
@@ -42,7 +54,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
             return new TimeslotSelectView()
             {
                 AvailableTimeslots = await GetAllTimeslots(),
-                TreatmentName = treatment.Title
+                TreatmentName = treatment.Title,
             };
         }
 
@@ -51,27 +63,38 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
 
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)
     {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var appointments = await _appointmentRepo.GetAppointmentsForClient(clientId);
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        var dbStartDate = await _config.GetSettingOrDefault("DbStartDate", clinicId);
+        
         foreach (var appointment in appointments)
         {
-            // TODO: Get others from cache
+            var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.WeekNum, appointment.Timeslot);
             appointment.PractitionerName = _cacheService.GetPracName(appointment.PractitionerId);
-            appointment.DateString = "TODO";
-            appointment.TimeString = "TODO";
-            appointment.TreatmentTitle = "TODO";
+            appointment.DateString = dateTime.ToShortDateString();
+            appointment.TimeString = dateTime.ToShortTimeString();
+            appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
         }
         return appointments;
     }
     
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId)
     {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        
         var appointments = await _appointmentRepo.GetAppointmentsForPractitioner(pracId);
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        var dbStartDate = await _config.GetSettingOrDefault("DbStartDate", clinicId);
+        
         foreach (var appointment in appointments)
         {
+            var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.WeekNum, appointment.Timeslot);
+            appointment.PractitionerName = _cacheService.GetPracName(appointment.PractitionerId);
+            appointment.DateString = dateTime.ToShortDateString();
+            appointment.TimeString = dateTime.ToShortTimeString();
+            appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
             appointment.ClientName = _cacheService.GetClientName(appointment.ClientId);
-            appointment.DateString = "TODO";
-            appointment.TimeString = "TODO";
-            appointment.TreatmentTitle = "TODO";
         }
         return appointments;
     }

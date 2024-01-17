@@ -7,5 +7,5 @@
 <h2>Upcoming appointments.</h2>
 @foreach (var appointment in Model.UpcomingAppointments)
 {
-    <p>@appointment.PractitionerName @appointment.DateString @appointment.TimeString</p>
+    <p>@appointment.TreatmentTitle with @appointment.PractitionerName on @appointment.DateString at @appointment.TimeString.</p>
 }

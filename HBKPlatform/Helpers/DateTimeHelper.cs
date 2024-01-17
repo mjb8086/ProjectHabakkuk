@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices.JavaScript;
+using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Helpers;
@@ -38,11 +39,20 @@ public class DateTimeHelper
     
     public static int GetWeekNumFromDateTime(string dbStartDate, DateTime dateTime)
     {
-        if (string.IsNullOrEmpty(dbStartDate))
+        if (string.IsNullOrEmpty(dbStartDate) || dateTime == DateTime.MinValue)
         {
             throw new InvalidOperationException("Invalid parameters to produce WeekNum");
         }
         // add 1 to account for week 1
         return ((int)Math.Floor((dateTime - DateTime.Parse(dbStartDate)).TotalDays) / 7) + 1;
     }
+    
+    public static void ValidateDbStartDate(string dbStartDate)
+    {
+        if (DateTime.Parse(dbStartDate).DayOfWeek != DayOfWeek.Monday)
+        {
+            throw new Exception("Database start date is not a Monday");
+        }
+    }
+
 }

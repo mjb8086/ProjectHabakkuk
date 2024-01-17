@@ -3,7 +3,7 @@ using HBKPlatform.Models.View;
 
 namespace HBKPlatform.Services;
 
-public interface IAppointmentService
+public interface ITreatmentService
 {
     public Task<TreatmentManagementView> GetTreatmentMgmtView();
     public Task CreateTreatment(TreatmentDto treatment);

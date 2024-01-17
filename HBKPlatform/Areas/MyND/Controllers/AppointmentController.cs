@@ -14,7 +14,7 @@ namespace HBKPlatform.Controllers;
 /// </summary>
 
 [Area("MyND")]
-public class AppointmentController(IAppointmentService _appointmentService, IBookingService _bookingService): Controller
+public class AppointmentController(ITreatmentService _treatmentService, IBookingService _bookingService): Controller
 {
     public async Task<IActionResult> Index()
     {
@@ -38,27 +38,27 @@ public class AppointmentController(IAppointmentService _appointmentService, IBoo
     
     public async Task<IActionResult> TreatmentManagement()
     {
-        return View(await _appointmentService.GetTreatmentMgmtView());
+        return View(await _treatmentService.GetTreatmentMgmtView());
     }
     
     public async Task<IActionResult> CreateTreatment(int? treatmentId)
     {
         return treatmentId.HasValue ? 
-            View("TreatmentCreate", await _appointmentService.GetTreatment(treatmentId.Value)) : 
+            View("TreatmentCreate", await _treatmentService.GetTreatment(treatmentId.Value)) : 
             View("TreatmentCreate", new TreatmentDto());
     }
 
     [HttpPost]
     public async Task<IActionResult> DoCreateTreatment([FromForm] TreatmentDto treatment)
     {
-        await _appointmentService.CreateTreatment(treatment);
+        await _treatmentService.CreateTreatment(treatment);
         return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
     }
     
     [HttpGet]
     public async Task<IActionResult> DeleteTreatment(int treatmentId)
     {
-        await _appointmentService.DeleteTreatment(treatmentId);
+        await _treatmentService.DeleteTreatment(treatmentId);
         return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
     }
     
@@ -66,7 +66,7 @@ public class AppointmentController(IAppointmentService _appointmentService, IBoo
     public async Task<IActionResult> DoUpdateTreatment([FromBody] TreatmentDto treatment)
     {
         // todo: Verify user has right to update 
-        await _appointmentService.UpdateTreatment(treatment);
+        await _treatmentService.UpdateTreatment(treatment);
         return Ok();
     }
     

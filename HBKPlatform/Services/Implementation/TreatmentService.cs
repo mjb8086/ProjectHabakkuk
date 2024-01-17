@@ -5,15 +5,15 @@ using HBKPlatform.Repository;
 namespace HBKPlatform.Services.Implementation;
 
 /// <summary>
-/// HBKPlatform Appointment service.
-/// Middleware for user controller and database functionality. Covers Appointments, treatments, and Timeslots.
+/// HBKPlatform Treatment service.
+/// Middleware for user controller and database functionality. Covers treatments.
 /// 
 /// Author: Mark Brown
 /// Authored: 10/01/2024
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class AppointmentService(IUserService _userService, ITreatmentRepository _treatmentRepo) : IAppointmentService
+public class TreatmentService(IUserService _userService, ITreatmentRepository _treatmentRepo) : ITreatmentService
 {
     public async Task<TreatmentManagementView> GetTreatmentMgmtView()
     {

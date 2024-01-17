@@ -10,4 +10,5 @@ public class TimeslotDto
     public Enums.Day Day { get; set; }
     public TimeOnly Time { get; set; }
     public int Duration { get; set; }
+    public int WeekNum { get; set; }
 }

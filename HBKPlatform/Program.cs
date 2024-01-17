@@ -48,8 +48,9 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
 builder.Services.AddTransient<ICacheService, CacheService>();
 builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
-builder.Services.AddTransient<IAppointmentService, AppointmentService>();
+builder.Services.AddTransient<ITreatmentService, TreatmentService>();
 builder.Services.AddTransient<IBookingService, BookingService>();
+builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
