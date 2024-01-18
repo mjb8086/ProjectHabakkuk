@@ -37,30 +37,33 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate", clinicId)).Value;
         var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks", clinicId)).Value);
         var now = DateTime.UtcNow;
-        var currentWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+        var thisWeek = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         var nowTime = new TimeOnly(now.Hour, now.Minute, now.Second);
 
         var futureTs = new List<TimeslotDto>(allTimeslots.Count);
 
-        while (bookingAdvance > 0)
+        var maxWeek = thisWeek + bookingAdvance;
+        var currentWeekNum = thisWeek;
+        while (currentWeekNum < maxWeek)
         {
             foreach (var ts in allTimeslots)
             {
-                // FIXME: week num is not correct for advance weeks - recalc, clone TS object
-                if (ts.Day >= today && ts.Time > nowTime)
+                var newTs = ts.Clone();
+                // split the timeslots at NOW, half will be this week, the preceding will be 'shifted' to the final week
+                if (currentWeekNum == thisWeek && (ts.Day < today || ts.Day == today && ts.Time < nowTime))
                 {
-                    ts.WeekNum = currentWeekNum;
-                    futureTs.Add(ts);
+                    newTs.WeekNum = maxWeek;
                 }
-                else
+                else 
                 {
-                    ts.WeekNum = currentWeekNum + 1;
-                    futureTs.Add(ts);
-                }
+                    newTs.WeekNum = currentWeekNum;
+                } 
+                newTs.Description = DateTimeHelper.FromTimeslot(dbStartDate, newTs).ToString("h:mm tt, dddd d MMMM yyyy");
+                futureTs.Add(newTs);
             }
 
-            bookingAdvance--;
+            currentWeekNum++;
         }
 
         return futureTs;
@@ -76,7 +79,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var availableTs =  await GetTimeslotsForBooking(clinicId);
         availableTs = (await ClashCheck(availableTs, 0)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
-        if (treatments.TryGetValue(treatmentId, out TreatmentDto treatment))
+        if (treatments.TryGetValue(treatmentId, out var treatment))
         {
             return new TimeslotSelectView()
             {
@@ -103,7 +106,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         
         foreach (var appointment in appointments)
         {
-            var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.WeekNum, appointment.Timeslot);
+            var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
             appointment.PractitionerName = _cacheService.GetPracName(appointment.PractitionerId);
             appointment.DateString = dateTime.ToShortDateString();
             appointment.TimeString = dateTime.ToShortTimeString();
@@ -122,7 +125,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         
         foreach (var appointment in appointments)
         {
-            var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.WeekNum, appointment.Timeslot);
+            var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
             appointment.PractitionerName = _cacheService.GetPracName(appointment.PractitionerId);
             appointment.DateString = dateTime.ToShortDateString();
             appointment.TimeString = dateTime.ToShortTimeString();

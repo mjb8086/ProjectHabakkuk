@@ -33,7 +33,7 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         };
         var weekNum = 1;
         
-        Assert.Equal(new DateTime(2024,01,01, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, weekNum, timeslot));
+        Assert.Equal(new DateTime(2024,01,01, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
     }
     
     [Fact]
@@ -46,7 +46,7 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         };
         var weekNum = 1;
         
-        Assert.Equal(new DateTime(2024,01,07, 23,59, 59, 99), DateTimeHelper.FromTimeslot(DB_START_DATE, weekNum, timeslot));
+        Assert.Equal(new DateTime(2024,01,07, 23,59, 59, 99), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
     }
     
     [Fact]
@@ -59,7 +59,7 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         };
         var weekNum = 2;
         
-        Assert.Equal(new DateTime(2024,01,08, 00,00, 00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, weekNum, timeslot));
+        Assert.Equal(new DateTime(2024,01,08, 00,00, 00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
     }
     
     [Fact]
@@ -72,7 +72,7 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         };
         var weekNum = 10;
         
-        Assert.Equal(new DateTime(2024,03,08, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, weekNum, timeslot));
+        Assert.Equal(new DateTime(2024,03,08, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
     }
     
     [Fact]
@@ -85,7 +85,7 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         };
         var weekNum = 53;
         
-        Assert.Equal(new DateTime(2024,12,30, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, weekNum, timeslot));
+        Assert.Equal(new DateTime(2024,12,30, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
     }
     
     [Fact]
@@ -98,9 +98,47 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         };
         var weekNum = 53;
         
-        Assert.Equal(new DateTime(2025,01,01, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, weekNum, timeslot));
+        Assert.Equal(new DateTime(2025,01,01, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+    }
+
+    [Fact]
+    public void ExplicitWeekNumHasPriority()
+    {
+        var timeslot = new TimeslotDto()
+        {
+            Day = Enums.Day.Thursday,
+            Time = new TimeOnly(14, 00),
+            WeekNum = 2
+        };
+        var weekNum = 3;
+        
+        Assert.Equal(new DateTime(2024,01,18,14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
     }
     
+    [Fact]
+    public void ExplicitWeekNumIsApplied()
+    {
+        var timeslot = new TimeslotDto()
+        {
+            Day = Enums.Day.Thursday,
+            Time = new TimeOnly(14, 00),
+            WeekNum = 2
+        };
+        
+        Assert.Equal(new DateTime(2024,01,11,14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot));
+    }
+
+    [Fact]
+    public void ExceptionThrowsForMissingWeek()
+    {
+        var timeslot = new TimeslotDto()
+        {
+            Day = Enums.Day.Thursday,
+            Time = new TimeOnly(14, 00)
+        };
+        
+        Assert.Throws<InvalidOperationException>(() => DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot));
+    }
     
     /*
      * Part 2 - now the reverse. Test GetWeekNumFromDateTime

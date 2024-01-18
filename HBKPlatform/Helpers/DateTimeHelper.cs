@@ -17,16 +17,19 @@ public class DateTimeHelper
     /// <summary>
     /// Get the DateTime representation from a timeslot, week number and DbStartDate.
     /// Note: WeekNumbers are 1-indexed. I.e., the week of dbStartDate will be counted as week 1
+    /// Uses either the timeslotDto's weekNum or the explicit weekNum, with the explicit weekNum
+    /// taking priority in the calculation.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-    public static DateTime FromTimeslot(string dbStartDate, int weekNum, TimeslotDto timeslot)
+    public static DateTime FromTimeslot(string dbStartDate, TimeslotDto timeslot, int? weekNum = null)
     {
-        if (string.IsNullOrEmpty(dbStartDate) || weekNum < 1 || timeslot == null)
+        if (string.IsNullOrEmpty(dbStartDate) || timeslot == null || (weekNum == null && timeslot.WeekNum < 1) || weekNum.HasValue && weekNum.Value < 1)
         {
-            throw new InvalidOperationException("Invalid parameters to produce DateTime");
+            throw new InvalidOperationException("Inadequate parameters to produce DateTime.");
         }
+
         // subtract 1 from weekNum to account for the first week being week 1 (origin)
-        return new DateTime(DateOnly.Parse(dbStartDate), timeslot.Time).AddDays(((weekNum-1) * 7) + (int)timeslot.Day);
+        return new DateTime(DateOnly.Parse(dbStartDate), timeslot.Time).AddDays((((weekNum ?? timeslot.WeekNum)-1) * 7) + (int)timeslot.Day);
     }
 
     /// <summary>
