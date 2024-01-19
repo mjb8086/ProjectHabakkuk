@@ -29,6 +29,21 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
         return GetClientDetailsLite(clientId).Name;
     }
 
+    /// <summary>
+    /// Get the 'First' matching prac with a clinic Id.
+    /// Deprecate once we have a 'lead' prac implemented in a multi practitioner clinic.
+    /// </summary>
+    public int GetDefaultPracIdForClinic(int clinicId)
+    {
+        string key = $"DefaultPrac-c{clinicId}";
+        if (_memoryCache.TryGetValue(key, out int pracId)) return pracId;
+        
+        var prac = _db.Practitioners.FirstOrDefault(x => x.ClinicId == clinicId);
+        if (prac == null) throw new KeyNotFoundException($"No practitioner for clinicId {clinicId} exists");
+        _memoryCache.Set(key, prac.Id, _cacheEntryOptions);
+        return prac.Id;
+    }
+
     // TODO: Refresh when all these details are updated in DB
     public PracDetailsLite GetPracDetailsLite(int pracId)
     {

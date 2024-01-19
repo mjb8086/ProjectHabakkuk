@@ -15,7 +15,7 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, IAppointmentRepository _appointmentRepo, IConfigurationService _config) : IBookingService
+public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime) : IBookingService
 {
     public async Task<List<TimeslotDto>> GetAllTimeslots()
     {
@@ -36,7 +36,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var allTimeslots = await GetAllTimeslots();
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate", clinicId)).Value;
         var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks", clinicId)).Value);
-        var now = DateTime.UtcNow;
+        var now = _dateTime.Now;
         var thisWeek = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         var nowTime = new TimeOnly(now.Hour, now.Minute, now.Second);
@@ -75,9 +75,10 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         // Get treatment Id
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var treatments = await _cacheService.GetTreatments(clinicId);
+        var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
         
         var availableTs =  await GetTimeslotsForBooking(clinicId);
-        availableTs = (await ClashCheck(availableTs, 0)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        availableTs = (await ClashCheck(availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
         if (treatments.TryGetValue(treatmentId, out var treatment))
         {
@@ -94,6 +95,16 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
 
     private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
     {
+        var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
+        var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
+        
+        foreach (var ts in timeslots)
+        {
+            foreach (var occupiedTs in occupiedTimeslots)
+            {
+                if (ts.IsClash(occupiedTs)) timeslots.Remove(ts);
+            }
+        }
         return timeslots;
     }
 

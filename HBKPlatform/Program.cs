@@ -1,10 +1,12 @@
 using HBKPlatform.Areas.Account;
 using HBKPlatform.Database;
 using HBKPlatform.Database.Helpers;
+using HBKPlatform.Helpers;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,6 +53,7 @@ builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
 builder.Services.AddTransient<ITreatmentService, TreatmentService>();
 builder.Services.AddTransient<IBookingService, BookingService>();
 builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
+builder.Services.AddTransient<IDateTimeWrapper, DateTimeWrapper>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

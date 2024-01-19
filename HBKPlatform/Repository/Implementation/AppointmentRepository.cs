@@ -1,5 +1,7 @@
 using HBKPlatform.Database;
+using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Repository.Implementation;
@@ -12,7 +14,7 @@ namespace HBKPlatform.Repository.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class AppointmentRepository(ApplicationDbContext _db) : IAppointmentRepository
+public class AppointmentRepository(ApplicationDbContext _db, IConfigurationService _config) : IAppointmentRepository
 {
     public async Task CreateAppointment(AppointmentDto appointmentDto)
     {
@@ -38,7 +40,6 @@ public class AppointmentRepository(ApplicationDbContext _db) : IAppointmentRepos
 
     public async Task<List<AppointmentDto>> GetAppointmentsForClient(int clientId)
     {
-        // TODO: order by timeslot day and time
         return await _db.Appointments.Include("Timeslot").Where(x => x.ClientId == clientId)
             .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
             .Select(x => new AppointmentDto()
@@ -53,7 +54,6 @@ public class AppointmentRepository(ApplicationDbContext _db) : IAppointmentRepos
     
     public async Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId)
     {
-        // TODO: order by timeslot day and time
         return await _db.Appointments.Include("Timeslot").Where(x => x.PractitionerId == pracId)
             .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
             .Select(x => new AppointmentDto()
@@ -65,5 +65,24 @@ public class AppointmentRepository(ApplicationDbContext _db) : IAppointmentRepos
                 }
             }).AsNoTracking().ToListAsync();
     }
+    
+    public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now)
+    {
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+        var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+        
+        return await _db.Appointments.Include("Timeslot").Where(x => x.PractitionerId == pracId && x.WeekNum >= weekNum && x.Timeslot.Day >= today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))
+            .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
+            .Select(x => new AppointmentDto()
+            {
+                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note,
+                PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
+                {
+                    Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
+                }
+            }).AsNoTracking().ToListAsync();
+    }
+    
     
 }

@@ -6,6 +6,7 @@ public interface ICacheService
 {
     public string GetPracName(int pracId);
     public string GetClientName(int clientId);
+    public int GetDefaultPracIdForClinic(int clinicId);
     public PracDetailsLite GetPracDetailsLite(int pracId);
     public ClientDetailsLite GetClientDetailsLite(int clientId);
     public Task<List<PracDetailsLite>> GetClinicPracDetailsLite(int clinicId);

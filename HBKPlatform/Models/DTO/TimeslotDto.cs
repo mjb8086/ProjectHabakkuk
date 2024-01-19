@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using HBKPlatform.Globals;
 
@@ -11,6 +12,7 @@ public class TimeslotDto
     public int ClinicId { get; set; }
     public Enums.Day Day { get; set; }
     public TimeOnly Time { get; set; }
+    [Range(10,300)]
     public int Duration { get; set; }
     public int WeekNum { get; set; }
 
@@ -31,4 +33,33 @@ public class TimeslotDto
             WeekNum = this.WeekNum
         };
     }
+
+    public bool IsClash(TimeslotDto other)
+    {
+        if (other.WeekNum == this.WeekNum && other.Day == this.Day && other.Time == this.Time) return true;
+        var myEndTime = this.Time.AddMinutes(this.Duration);
+        var otherEndTime = other.Time.AddMinutes(other.Duration);
+        // wip - currently broken
+        if (other.WeekNum == this.WeekNum && other.Day == this.Day && (myEndTime > other.Time && this.Time < other.Time || this.Time < otherEndTime)) return true;
+        return false;
+    }
+
+    private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>
+    {
+        public bool Equals(TimeslotDto x, TimeslotDto y)
+        {
+            if (ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(x, null)) return false;
+            if (ReferenceEquals(y, null)) return false;
+            if (x.GetType() != y.GetType()) return false;
+            return x.Id == y.Id && x.Description == y.Description && x.ClinicId == y.ClinicId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+        }
+
+        public int GetHashCode(TimeslotDto obj)
+        {
+            return HashCode.Combine(obj.Id, obj.Description, obj.ClinicId, (int)obj.Day, obj.Time, obj.Duration, obj.WeekNum);
+        }
+    }
+
+    public static IEqualityComparer<TimeslotDto> TimeslotDtoComparer { get; } = new TimeslotDtoEqualityComparer();
 }

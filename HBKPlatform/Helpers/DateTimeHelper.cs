@@ -50,6 +50,9 @@ public class DateTimeHelper
         return ((int)Math.Floor((dateTime - DateTime.Parse(dbStartDate)).TotalDays) / 7) + 1;
     }
     
+    /// <summary>
+    /// Verify that the start date falls on a Monday. Otherwise HBK can't guarantee other date time calculations.
+    /// </summary>
     public static void ValidateDbStartDate(string dbStartDate)
     {
         if (DateTime.Parse(dbStartDate).DayOfWeek != DayOfWeek.Monday)
@@ -74,4 +77,14 @@ public class DateTimeHelper
         return (Enums.Day)day-1;
     }
 
+
 }
+public interface IDateTimeWrapper
+{
+    /// <summary>
+    /// Silly wrapper but saves massive headaches whilst unit testing...
+    /// </summary>
+    public DateTime Now { get { return DateTime.Now; } }
+}
+
+public class DateTimeWrapper : IDateTimeWrapper {}
