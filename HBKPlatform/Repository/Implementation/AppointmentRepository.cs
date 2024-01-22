@@ -24,7 +24,8 @@ public class AppointmentRepository(ApplicationDbContext _db, IConfigurationServi
             ClinicId = appointmentDto.ClinicId,
             PractitionerId = appointmentDto.PractitionerId,
             TimeslotId = appointmentDto.TimeslotId,
-            WeekNum = appointmentDto.WeekNum
+            WeekNum = appointmentDto.WeekNum,
+            TreatmentId = appointmentDto.TreatmentId
         };
         await _db.AddAsync(appointment);
         await _db.SaveChangesAsync();

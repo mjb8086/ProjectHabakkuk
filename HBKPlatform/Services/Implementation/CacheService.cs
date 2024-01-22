@@ -99,7 +99,7 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
         return  clientDetails;
     }
 
-    // TODO: Refresh this when a new client is registertef for the clinic
+    // TODO: Refresh this when a new client is registered to the clinic
     /// <summary>
     /// Security method, verify that the client Id specified is registered under the clinic.
     /// </summary>

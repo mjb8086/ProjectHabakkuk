@@ -37,11 +37,9 @@ public class TimeslotDto
     public bool IsClash(TimeslotDto other)
     {
         if (other.WeekNum == this.WeekNum && other.Day == this.Day && other.Time == this.Time) return true;
-        var myEndTime = this.Time.AddMinutes(this.Duration);
-        var otherEndTime = other.Time.AddMinutes(other.Duration);
-        // wip - currently broken
-        if (other.WeekNum == this.WeekNum && other.Day == this.Day && (myEndTime > other.Time && this.Time < other.Time || this.Time < otherEndTime)) return true;
-        return false;
+        return (other.WeekNum == this.WeekNum && other.Day == this.Day &&
+                (this.Time < other.Time.AddMinutes(other.Duration) &&
+                 this.Time.AddMinutes(this.Duration) > other.Time));
     }
 
     private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>

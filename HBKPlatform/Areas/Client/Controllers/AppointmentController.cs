@@ -34,12 +34,13 @@ public class AppointmentController(IBookingService _bookingService, ITreatmentSe
     [Route("booking/bookingconfirm")]
     public async Task<IActionResult> BookingConfirm(int treatmentId,  int timeslotId, int weekNum)
     {
-        return View("Booking/BookingConfirm");
+        return View("Booking/BookingConfirm", await _bookingService.GetBookingConfirmModel(treatmentId, timeslotId, weekNum));
     }
     
     [Route("booking/bookingconfirmed")]
-    public IActionResult BookingConfirmed()
+    public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum)
     {
-        return View("Booking/BookingConfirmed");
+        var model = await _bookingService.DoBookingClient(treatmentId, timeslotId, weekNum);
+        return View("Booking/BookingConfirmed", model);
     }
 }

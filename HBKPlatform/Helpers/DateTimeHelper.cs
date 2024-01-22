@@ -77,6 +77,10 @@ public class DateTimeHelper
         return (Enums.Day)day-1;
     }
 
+    public static string GetFriendlyDateTimeString(DateTime dateTime)
+    {
+        return dateTime.ToString("h:mm tt, dddd d MMMM yyyy");
+    }
 
 }
 public interface IDateTimeWrapper

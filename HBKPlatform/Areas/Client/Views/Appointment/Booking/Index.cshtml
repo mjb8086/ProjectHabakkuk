@@ -5,8 +5,9 @@
 }
 
 <h1>Booking wizard.</h1>
-<h2>Select a treatment</h2>
+<p>Select a Treatment -> Select a Time -> Confirm -> Done!</p>
+<h2>Select a treatment from one of the following:</h2>
 @foreach (var treatment in Model.Treatments)
 {
-    <a asp-area="Client" asp-controller="Appointment" asp-action="TimeslotSelect" asp-route-treatmentId="@treatment.Id">@treatment.Title @treatment.Cost</a>
+    <p>@treatment.Title. @treatment.Cost.ToString("C2") <a asp-area="Client" asp-controller="Appointment" asp-action="TimeslotSelect" asp-route-treatmentId="@treatment.Id">Book</a></p>
 }

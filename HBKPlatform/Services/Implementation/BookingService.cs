@@ -59,7 +59,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
                 {
                     newTs.WeekNum = currentWeekNum;
                 } 
-                newTs.Description = DateTimeHelper.FromTimeslot(dbStartDate, newTs).ToString("h:mm tt, dddd d MMMM yyyy");
+                newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, newTs));
                 futureTs.Add(newTs);
             }
 
@@ -98,14 +98,31 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
         var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
         
-        foreach (var ts in timeslots)
+        foreach (var occupiedTs in occupiedTimeslots)
         {
-            foreach (var occupiedTs in occupiedTimeslots)
+            foreach (var ts in timeslots)
             {
                 if (ts.IsClash(occupiedTs)) timeslots.Remove(ts);
             }
         }
         return timeslots;
+    }
+    
+    /// <summary>
+    /// Check whether the timeslot is free for the practitioner.
+    /// </summary>
+    /// <returns>TRUE - timeslot clashes with another appointment.</returns>
+    private async Task<bool> ClashCheck(int timeslotId, int pracId)
+    {
+        var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
+        var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
+        var ts = await _timeslotRepo.GetTimeslot(timeslotId);
+        
+        foreach (var occupiedTs in occupiedTimeslots)
+        {
+            if (ts.IsClash(occupiedTs)) return true;
+        }
+        return false;
     }
 
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)
@@ -161,6 +178,70 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         {
             UpcomingAppointments =
                 await GetUpcomingAppointmentsForClient(_userService.GetClaimFromCookie("ClientId"))
+        };
+    }
+
+    public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum)
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        var treatmentTitle = treatments.TryGetValue(treatmentId, out var treatment) ? treatment.Title : "";
+        var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        
+        return new BookingConfirm()
+        {
+            TreatmentId = treatmentId,
+            WeekNum = weekNum,
+            TimeslotId = timeslotId,
+            PracctitionerName = _cacheService.GetPracName(pracId),
+            TreatmentTitle = treatmentTitle,
+            BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
+        };
+    }
+
+    public async Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum)
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var clientId = _userService.GetClaimFromCookie("ClientId");
+        var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
+        
+        // first check for no clashes
+        if (await ClashCheck(timeslotId, pracId))
+        {
+            throw new InvalidOperationException("Another appointment has already been booked into the timeslot.");
+        }
+
+        // all clear? then create the booking
+        try
+        {
+            await _appointmentRepo.CreateAppointment(new AppointmentDto()
+            {
+                ClientId = clientId, PractitionerId = pracId, TreatmentId = treatmentId, WeekNum = weekNum,
+                TimeslotId = timeslotId, ClinicId = clinicId
+            });
+        }
+        catch (Exception e)
+        {
+           // todo: log exact exception
+           throw new InvalidOperationException("Problem when creating booking. Please try again.");
+        }
+
+        // todo: notify, email
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        var treatmentTitle = treatments.TryGetValue(treatmentId, out var treatment) ? treatment.Description : "";
+        var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        
+        return new BookingConfirm()
+        {
+            TreatmentId = treatmentId,
+            WeekNum = weekNum,
+            TimeslotId = timeslotId,
+            PracctitionerName = _cacheService.GetPracName(pracId),
+            TreatmentTitle = treatmentTitle,
+            BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
         };
     }
     
