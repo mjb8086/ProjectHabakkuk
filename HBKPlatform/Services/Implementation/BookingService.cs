@@ -98,25 +98,19 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
         var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
         
-        foreach (var occupiedTs in occupiedTimeslots)
-        {
-            foreach (var ts in timeslots)
-            {
-                if (ts.IsClash(occupiedTs)) timeslots.Remove(ts);
-            }
-        }
-        return timeslots;
+        return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots)).ToList();
     }
     
     /// <summary>
     /// Check whether the timeslot is free for the practitioner.
     /// </summary>
     /// <returns>TRUE - timeslot clashes with another appointment.</returns>
-    private async Task<bool> ClashCheck(int timeslotId, int pracId)
+    private async Task<bool> ClashCheck(int timeslotId, int pracId, int weekNum)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
         var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
         var ts = await _timeslotRepo.GetTimeslot(timeslotId);
+        ts.WeekNum = weekNum;
         
         foreach (var occupiedTs in occupiedTimeslots)
         {
@@ -208,7 +202,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
         
         // first check for no clashes
-        if (await ClashCheck(timeslotId, pracId))
+        if (await ClashCheck(timeslotId, pracId, weekNum))
         {
             throw new InvalidOperationException("Another appointment has already been booked into the timeslot.");
         }

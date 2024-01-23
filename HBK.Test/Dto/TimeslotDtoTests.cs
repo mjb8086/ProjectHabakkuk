@@ -150,4 +150,35 @@ public class TimeslotDtoTests
         var ts2 = new TimeslotDto() { Time = new TimeOnly(12,00), Duration = 30, Day = Enums.Day.Wednesday };
         Assert.True(ts2.IsClash(ts1));
     }
+
+    [Fact]
+    public void TimeslotIsNotClash_Any()
+    {
+        var timeslots = new[]
+        {
+            new TimeslotDto() { Time = new TimeOnly(10, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(11, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(12, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(14, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(15, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+        };
+        var myTs = new TimeslotDto() { Time = new TimeOnly(13, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 };
+        Assert.True(myTs.IsNotClashAny(timeslots.ToList()));
+    }
+    
+    [Fact]
+    public void TimeslotIsNotClash_Any_IsClash()
+    {
+        var timeslots = new[]
+        {
+            new TimeslotDto() { Time = new TimeOnly(10, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(11, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(12, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(13, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(14, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+            new TimeslotDto() { Time = new TimeOnly(15, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 },
+        };
+        var myTs = new TimeslotDto() { Time = new TimeOnly(13, 00), Duration = 60, Day = Enums.Day.Wednesday, WeekNum = 3 };
+        Assert.False(myTs.IsNotClashAny(timeslots.ToList()));
+    }
 }

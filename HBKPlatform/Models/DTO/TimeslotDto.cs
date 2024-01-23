@@ -36,10 +36,16 @@ public class TimeslotDto
 
     public bool IsClash(TimeslotDto other)
     {
-        if (other.WeekNum == this.WeekNum && other.Day == this.Day && other.Time == this.Time) return true;
+//        if (other.WeekNum == this.WeekNum && other.Day == this.Day && other.Time == this.Time) return true;
+//        if (other.WeekNum == 0 || this.WeekNum == 0) return true; // not strictly a clash but still bad
         return (other.WeekNum == this.WeekNum && other.Day == this.Day &&
                 (this.Time < other.Time.AddMinutes(other.Duration) &&
                  this.Time.AddMinutes(this.Duration) > other.Time));
+    }
+    
+    public bool IsNotClashAny(List<TimeslotDto> others)
+    {
+        return !others.Any(x => x.IsClash(this));
     }
 
     private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>
