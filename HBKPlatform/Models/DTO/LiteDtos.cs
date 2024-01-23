@@ -32,3 +32,10 @@ public class TreatmentLite
     public double Cost { get; set; }
     public string Title { get; set; }
 }
+
+public class TimeslotLite
+{
+    public int Id { get; set; }
+    public int WeekNum { get; set; }
+    public string Description { get; set; }
+}

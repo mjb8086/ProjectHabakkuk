@@ -1,0 +1,47 @@
+@using HBKPlatform.Globals
+@model HBKPlatform.Models.View.MyNDBookClientTreatment
+@{
+    Layout = "_myND";
+    ViewData["Title"] = "Book Client onto Treatment";
+    ViewBag.Css = "mynd-appointments.css";
+}
+@await Html.PartialAsync("_AppointmentsPartial")
+
+<h1>Booking</h1>
+<p>Book your clients onto a treatment using the quick booking form.</p>
+
+<form id="treatmentDetails" asp-area="MyND" asp-controller="Appointment" asp-action="AppointmentConfirm" method="post">
+
+<fieldset>
+  <label for="client" class="form-textfield">Client</label>
+  <select id="client" name="clientId">
+    @foreach (var client in Model.Clients)
+    {
+      <option value="@client.Id">@client.Name</option>
+    }
+  </select>
+</fieldset>
+  
+  <fieldset>
+    <label for="treatment" class="form-textfield">Treatment</label>
+    <select id="treatment" name="treatmentId">
+      @foreach (var treatment in Model.Treatments)
+      {
+        <option value="@treatment.Id">@treatment.Title</option>
+      }
+    </select>
+  </fieldset>
+  
+  <fieldset>
+    <label for="timeslot" class="form-textfield">Client</label>
+    <select id="timeslot" name="timeslotId">
+      @foreach (var ts in Model.Timeslots)
+      {
+        <option value="@ts.Id">@ts.Description</option>
+      }
+    </select>
+  </fieldset>
+  <fieldset>
+  <button>Book Client</button>
+  </fieldset>
+</form>

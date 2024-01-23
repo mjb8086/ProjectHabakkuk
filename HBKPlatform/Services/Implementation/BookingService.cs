@@ -238,5 +238,27 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
             BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
         };
     }
+
+    public async Task<MyNDBookClientTreatment> GetBookClientTreatmentView()
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        var clients = await _cacheService.GetClinicClientDetailsLite(clinicId);
+        var timeslots = await GetTimeslotsForBooking(clinicId);
+        timeslots = (await ClashCheck(timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        
+        var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
+        var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);
+
+        return new MyNDBookClientTreatment()
+        {
+            Clients = clients,
+            Timeslots = timeslotsLite,
+            Treatments = treatmentsLite
+        };
+    }
     
 }

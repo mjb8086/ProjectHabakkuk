@@ -1,4 +1,5 @@
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,11 +20,6 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     public async Task<IActionResult> Index()
     {
         return View(await _bookingService.GetMyNDUpcomingAppointmentsView());
-    }
-
-    public async Task<IActionResult> PractitionerBooking()
-    {
-        return View();
     }
 
     public async Task<IActionResult> TimeslotManagement()
@@ -68,6 +64,18 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
         // todo: Verify user has right to update 
         await _treatmentService.UpdateTreatment(treatment);
         return Ok();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> BookClientTreatment()
+    {
+        return View(await _bookingService.GetBookClientTreatmentView());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AppointmentConfirm([FromForm] AppointmentDto appointment)
+    {
+        return Ok("good");
     }
     
 }

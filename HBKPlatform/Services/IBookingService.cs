@@ -15,4 +15,5 @@ public interface IBookingService
     public Task<ClientUpcomingAppointmentsView> GetClientUpcomingAppointmentsView();
     public Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum);
     public Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum);
+    public Task<MyNDBookClientTreatment> GetBookClientTreatmentView();
 }
