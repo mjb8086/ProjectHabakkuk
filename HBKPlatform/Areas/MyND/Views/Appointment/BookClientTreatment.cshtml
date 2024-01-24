@@ -10,7 +10,7 @@
 <h1>Booking</h1>
 <p>Book your clients onto a treatment using the quick booking form.</p>
 
-<form id="treatmentDetails" asp-area="MyND" asp-controller="Appointment" asp-action="AppointmentConfirm" method="post">
+<form id="treatmentDetails" asp-area="MyND" asp-controller="Appointment" asp-action="BookingConfirm" method="post">
 
 <fieldset>
   <label for="client" class="form-textfield">Client</label>
@@ -34,10 +34,10 @@
   
   <fieldset>
     <label for="timeslot" class="form-textfield">Client</label>
-    <select id="timeslot" name="timeslotId">
+    <select id="timeslot" name="timeslotWeekNum">
       @foreach (var ts in Model.Timeslots)
       {
-        <option value="@ts.Id">@ts.Description</option>
+        <option value="@ts.Id|@ts.WeekNum">@ts.Description</option>
       }
     </select>
   </fieldset>

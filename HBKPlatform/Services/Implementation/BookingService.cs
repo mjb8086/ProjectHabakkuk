@@ -175,10 +175,20 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         };
     }
 
-    public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum)
+    public async Task<BookingConfirm> GetBookingConfirmModel(PracBookingFormModel model)
+    {
+        var tsWeekNum = model.ParseTsWeekNum();
+        return await GetBookingConfirmModel(model.TreatmentId, tsWeekNum[0], tsWeekNum[1], model.ClientId);
+    }
+    
+    /// <summary>
+    /// Get booking confirm model. Used by both Client and Practitioner views. In client view, clientId is null.
+    /// </summary>
+    public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? clientId)
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        pracId = pracId < 1 ? _cacheService.GetDefaultPracIdForClinic(clinicId) : pracId;
         var treatments = await _cacheService.GetTreatments(clinicId);
         var treatmentTitle = treatments.TryGetValue(treatmentId, out var treatment) ? treatment.Title : "";
         var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
@@ -190,6 +200,8 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
             WeekNum = weekNum,
             TimeslotId = timeslotId,
             PracctitionerName = _cacheService.GetPracName(pracId),
+            ClientId = clientId,
+            ClientName = clientId.HasValue ? _cacheService.GetClientName(clientId.Value) : "",
             TreatmentTitle = treatmentTitle,
             BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
         };
@@ -200,7 +212,20 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var clientId = _userService.GetClaimFromCookie("ClientId");
         var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
-        
+
+        return await DoBooking(clinicId, timeslotId, pracId, weekNum, clientId, treatmentId);
+    }
+
+    public async Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId)
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+
+        return await DoBooking(clinicId, timeslotId, pracId, weekNum, clientId, treatmentId);
+    }
+    
+    private async Task<BookingConfirm> DoBooking(int clinicId, int timeslotId, int pracId, int weekNum, int clientId, int treatmentId)
+    {
         // first check for no clashes
         if (await ClashCheck(timeslotId, pracId, weekNum))
         {
@@ -234,6 +259,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
             WeekNum = weekNum,
             TimeslotId = timeslotId,
             PracctitionerName = _cacheService.GetPracName(pracId),
+            ClientName = _cacheService.GetClientName(clientId),
             TreatmentTitle = treatmentTitle,
             BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
         };
@@ -260,5 +286,6 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
             Treatments = treatmentsLite
         };
     }
-    
+
+
 }

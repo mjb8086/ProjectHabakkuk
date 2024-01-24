@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database;
@@ -20,6 +22,7 @@ public class Appointment: HbkBaseEntity
     public string? Note { get; set; }
     public int WeekNum { get; set; }
     public Enums.AppointmentStatus Status { get; set; }
+    public string? CancellationReason { get; set; }
     
     // EF Navigations
     public virtual Clinic Clinic { get; set; }

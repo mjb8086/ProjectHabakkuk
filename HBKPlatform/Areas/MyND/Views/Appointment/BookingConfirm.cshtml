@@ -1,0 +1,12 @@
+@model HBKPlatform.Models.View.BookingConfirm
+@{
+    ViewBag.Title = "Booking wizard";
+    Layout = "_MyND";
+}
+@await Html.PartialAsync("_AppointmentsPartial")
+
+<h1>Booking form.</h1>
+<h2>Confirm booking?</h2>
+<p>You are booking @Model.TreatmentTitle on @Model.BookingDate for @Model.ClientName.</p>
+<p><a asp-area="MyND" asp-controller="Appointment" asp-action="BookingConfirmed" asp-route-clientId="@Model.ClientId" asp-route-treatmentId="@Model.TreatmentId" asp-route-timeslotId="@Model.TimeslotId" asp-route-weekNum="@Model.WeekNum">Confirm Booking</a></p>
+<p><a asp-area="MyND" asp-controller="Appointment" asp-action="BookClientTreatment">Modify this prospective booking.</a></p>

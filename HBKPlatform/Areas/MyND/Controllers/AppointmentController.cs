@@ -1,5 +1,4 @@
 using HBKPlatform.Models.DTO;
-using HBKPlatform.Models.View;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -73,9 +72,14 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     }
 
     [HttpPost]
-    public async Task<IActionResult> AppointmentConfirm([FromForm] AppointmentDto appointment)
+    public async Task<IActionResult> BookingConfirm([FromForm] PracBookingFormModel appointment)
     {
-        return Ok("good");
+        return View(await _bookingService.GetBookingConfirmModel(appointment));
+    }
+    
+    public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum, int clientId)
+    {
+        return View(await _bookingService.DoBookingPractitioner(treatmentId, timeslotId, weekNum, clientId));
     }
     
 }

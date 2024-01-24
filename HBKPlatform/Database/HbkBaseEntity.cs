@@ -5,9 +5,10 @@ namespace HBKPlatform.Database
 {
     public abstract class HbkBaseEntity
     {
+        // sequencing bug needs fixed with pgsql driver (not my problem)
         [Key]
         [Column(Order = 1)]
-        public int Id { get; set; }
+        public int Id { get; set; } 
         [DataType(DataType.DateTime)]
         public DateTime DateCreated { get; set; }
         [DataType(DataType.DateTime)]

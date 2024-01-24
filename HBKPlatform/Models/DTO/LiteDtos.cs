@@ -2,21 +2,21 @@ using HBKPlatform.Globals;
 
 namespace HBKPlatform.Models.DTO;
 
-public class ClientDetailsLite
+public struct ClientDetailsLite
 {
     public string Name { get; set; }
     public int Id { get; set; }
     public int ClinicId { get; set; }
 }
 
-public class PracDetailsLite
+public struct PracDetailsLite
 {
     public string Name { get; set; }
     public int Id { get; set; }
     public int ClinicId { get; set; }
 }
 
-public class ClientRecordLite
+public struct ClientRecordLite
 {
     public int Id { get; set; }
     public string Title { get; set; }
@@ -25,7 +25,7 @@ public class ClientRecordLite
     public bool IsPriority { get; set; }
 }
 
-public class TreatmentLite
+public struct TreatmentLite
 {
     public int Id { get; set; }
     public Enums.TreatmentRequestability Requestability { get; set; }
@@ -33,9 +33,21 @@ public class TreatmentLite
     public string Title { get; set; }
 }
 
-public class TimeslotLite
+public struct TimeslotLite
 {
     public int Id { get; set; }
     public int WeekNum { get; set; }
     public string Description { get; set; }
+}
+
+public class PracBookingFormModel
+{
+    public string TimeslotWeekNum { get; set; }
+    public int TreatmentId { get; set; }
+    public int ClientId { get; set; }
+
+    public int[] ParseTsWeekNum()
+    {
+        return TimeslotWeekNum.Split('|').Select(int.Parse).ToArray();
+    }
 }
