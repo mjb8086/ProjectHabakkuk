@@ -51,3 +51,8 @@ public class PracBookingFormModel
         return TimeslotWeekNum.Split('|').Select(int.Parse).ToArray();
     }
 }
+
+public class CancelAppointmentFormModel
+{
+    public string Reason { get; set; }
+}

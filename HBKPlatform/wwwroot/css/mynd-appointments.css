@@ -32,3 +32,9 @@ div.treatmentItem {
     justify-content: space-between;
     border-bottom: 1px solid #d7d7d7;
 }
+
+/* cancellation form */
+textarea#cancellationReason {
+    width: 400px;
+    height: 200px;
+}

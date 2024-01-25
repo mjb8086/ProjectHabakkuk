@@ -1,3 +1,5 @@
+using HBKPlatform.Globals;
+
 namespace HBKPlatform.Models.DTO;
 
 public class AppointmentDto
@@ -15,6 +17,7 @@ public class AppointmentDto
     public string ClientName { get; set; }
     public string PractitionerName { get; set; }
     public string TreatmentTitle { get; set; }
+    public Enums.AppointmentStatus Status { get; set; }
 
     public TimeslotDto Timeslot { get; set; }
 }

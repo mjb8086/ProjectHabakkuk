@@ -38,7 +38,7 @@ public static class Enums
 
      public enum AppointmentStatus
      {
-          Approved, CancelledByClient, CancelledByPractitioner
+          Live, CancelledByClient, CancelledByPractitioner
      }
      
 }

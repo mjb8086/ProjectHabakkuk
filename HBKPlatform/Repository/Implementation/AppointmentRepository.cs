@@ -1,4 +1,6 @@
+using System.Data;
 using HBKPlatform.Database;
+using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
@@ -45,7 +47,7 @@ public class AppointmentRepository(ApplicationDbContext _db, IConfigurationServi
             .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
             .Select(x => new AppointmentDto()
             {
-                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note,
+                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note, Status = x.Status,
                 PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                 {
                    Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
@@ -59,7 +61,7 @@ public class AppointmentRepository(ApplicationDbContext _db, IConfigurationServi
             .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
             .Select(x => new AppointmentDto()
             {
-                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note,
+                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note, Status = x.Status,
                 PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                 {
                     Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
@@ -67,23 +69,41 @@ public class AppointmentRepository(ApplicationDbContext _db, IConfigurationServi
             }).AsNoTracking().ToListAsync();
     }
     
+    /// <summary>
+    /// Get upcoming appointments for the practitionerId.
+    /// </summary>
     public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now)
     {
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
-        return await _db.Appointments.Include("Timeslot").Where(x => x.PractitionerId == pracId && x.WeekNum >= weekNum && x.Timeslot.Day >= today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))
+        return await _db.Appointments.Include("Timeslot")
+            .Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
             .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
             .Select(x => new AppointmentDto()
             {
-                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note,
+                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, ClinicId = x.ClinicId, Note = x.Note, Status = x.Status,
                 PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                 {
                     Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
                 }
             }).AsNoTracking().ToListAsync();
     }
-    
-    
+
+    public async Task CancelAppointment(int appointmentId, string reason, Enums.AppointmentStatus cancelActioner)
+    {
+        // is appointment already cancelled?
+        var appointment = await _db.Appointments.FirstOrDefaultAsync(x => x.Id == appointmentId) ??
+                          throw new MissingPrimaryKeyException($"Appointment ID {appointmentId} does not exist.");
+
+        if (appointment.Status != Enums.AppointmentStatus.Live)
+            throw new InvalidOperationException("Appointment is already cancelled.");
+
+        // if not, update appointment to be cancelled and append reason
+        appointment.Status = cancelActioner;
+        appointment.CancellationReason = reason;
+        await _db.SaveChangesAsync();
+    }
+
 }

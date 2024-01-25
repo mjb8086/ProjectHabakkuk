@@ -1,3 +1,4 @@
+using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
 
@@ -18,4 +19,6 @@ public interface IBookingService
     public Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum);
     public Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId);
     public Task<MyNDBookClientTreatment> GetBookClientTreatmentView();
+    public Task<BookingCancel> GetBookingCancelView(int appointmentId);
+    public Task DoCancelBooking(int appointmentId, string reason, Enums.AppointmentStatus actioner);
 }

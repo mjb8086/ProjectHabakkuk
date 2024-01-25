@@ -1,4 +1,5 @@
 using System.Data;
+using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
@@ -96,7 +97,8 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-        var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
+        // TODO: If new appointment statuses are added, update predicate
+        var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
         
         return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots)).ToList();
     }
@@ -108,7 +110,8 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     private async Task<bool> ClashCheck(int timeslotId, int pracId, int weekNum)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-        var occupiedTimeslots = futureAppts.Select(x => x.Timeslot).ToList();
+        // TODO: If new appointment statuses are added, update predicate
+        var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
         var ts = await _timeslotRepo.GetTimeslot(timeslotId);
         ts.WeekNum = weekNum;
         
@@ -148,7 +151,6 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         foreach (var appointment in appointments)
         {
             var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
-            appointment.PractitionerName = _cacheService.GetPracName(appointment.PractitionerId);
             appointment.DateString = dateTime.ToShortDateString();
             appointment.TimeString = dateTime.ToShortTimeString();
             appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
@@ -159,10 +161,17 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
 
     public async Task<MyNDUpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView()
     {
+        var now = DateTime.UtcNow;
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+        var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+        
+        var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"));
         return new MyNDUpcomingAppointmentsView()
         {
-            UpcomingAppointments =
-                await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"))
+            UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))).ToList(),
+            RecentCancellations = appts.Where(x => x.Status is Enums.AppointmentStatus.CancelledByPractitioner or Enums.AppointmentStatus.CancelledByClient).ToList(),
+            PastAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum < weekNum || x.WeekNum == weekNum && x.Timeslot.Day < today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time < TimeOnly.FromDateTime(now))).ToList()
         };
     }
     
@@ -287,5 +296,28 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         };
     }
 
+    public async Task<BookingCancel> GetBookingCancelView(int appointmentId)
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var appointment = await _appointmentRepo.GetAppointment(appointmentId);
+        var timeslot = await _timeslotRepo.GetTimeslot(appointment.TimeslotId);
+        var treatments = await _cacheService.GetTreatments(clinicId);
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+
+        return new BookingCancel()
+        {
+            AppointmentId = appointment.Id,
+            PractitionerName = _cacheService.GetPracName(appointment.PractitionerId),
+            ClientName = _cacheService.GetClientName(appointment.ClientId),
+            DateString = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslot, appointment.WeekNum)),
+            TreatmentTitle = treatments[appointment.TreatmentId].Title
+        };
+    }
+
+    public async Task DoCancelBooking(int appointmentId, string reason, Enums.AppointmentStatus actioner)
+    {
+        // todo - security checks
+        await _appointmentRepo.CancelAppointment(appointmentId, reason, actioner);
+    }
 
 }

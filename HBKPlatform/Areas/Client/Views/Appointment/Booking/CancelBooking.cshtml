@@ -1,0 +1,22 @@
+@model HBKPlatform.Models.View.BookingCancel
+@{
+    Layout = "_Client";
+    ViewData["Title"] = "Cancel Appointment";
+    ViewBag.Css = "mynd-appointments.css";
+}
+
+<h1>Booking</h1>
+<p>Cancel @Model.TreatmentTitle with @Model.PractitionerName on @Model.DateString?</p>
+
+<form id="bookingCancel" asp-area="Client" asp-controller="Appointment" asp-action="DoCancelBooking" asp-route-appointmentId="@Model.AppointmentId" method="post">
+
+    <fieldset>
+        <label for="reason" class="form-textfield">Cancellation Reason</label>
+        <textarea id="cancellationReason" name="reason"> </textarea>
+    </fieldset>
+    <fieldset>
+        <button>Cancel Appointment</button>
+    </fieldset>
+</form>
+
+<a asp-area="Client" asp-controller="Appointment" asp-action="Index">Exit without cancelling</a>

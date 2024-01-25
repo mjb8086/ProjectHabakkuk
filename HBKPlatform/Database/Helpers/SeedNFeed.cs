@@ -198,18 +198,43 @@ namespace HBKPlatform.Database.Helpers
                     ctx.AddRange(timeslots);
                     ctx.SaveChanges();
 
-                    var appointment1 = new Appointment()
-                    {
-                        Client = client1,
-                        Clinic = clinic,
-                        Practitioner = prac1,
-                        Timeslot = timeslots[1],
-                        Status = Enums.AppointmentStatus.Approved,
-                        Treatment = treatment1,
-                        WeekNum = 4
+                    var appointments = new[] { 
+                        new Appointment()
+                        {
+                            Client = client1,
+                            Clinic = clinic,
+                            Practitioner = prac1,
+                            Timeslot = timeslots[1],
+                            Status = Enums.AppointmentStatus.Live,
+                            Treatment = treatment1,
+                            WeekNum = 4
+                        },
+                        new Appointment()
+                        {
+                            Client = client1,
+                            Clinic = clinic,
+                            Practitioner = prac1,
+                            Timeslot = timeslots[2],
+                            Status = Enums.AppointmentStatus.CancelledByClient,
+                            CancellationReason = "Someone else does it cheaper, sorry",
+                            Treatment = treatment1,
+                            WeekNum = 30
+                        },
+                        new Appointment()
+                        {
+                            Client = client1,
+                            Clinic = clinic,
+                            Practitioner = prac1,
+                            Timeslot = timeslots[2],
+                            Status = Enums.AppointmentStatus.CancelledByPractitioner,
+                            CancellationReason = "bollocks",
+                            Treatment = treatment2,
+                            WeekNum = 30
+                        }
+                        
                     };
                     
-                    ctx.Add(appointment1);
+                    ctx.AddRange(appointments);
 
                     var startDate = new Setting()
                     {

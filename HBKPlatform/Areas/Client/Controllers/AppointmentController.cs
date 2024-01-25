@@ -1,10 +1,12 @@
+using HBKPlatform.Globals;
+using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Client.Controllers;
 
 /// <summary>
-/// HBKPlatform Appointment controller.
+/// HBKPlatform Client appointment controller.
 /// 
 /// Author: Mark Brown
 /// Authored: 12/01/2024
@@ -42,5 +44,20 @@ public class AppointmentController(IBookingService _bookingService, ITreatmentSe
     {
         var model = await _bookingService.DoBookingClient(treatmentId, timeslotId, weekNum);
         return View("Booking/BookingConfirmed", model);
+    }
+    
+    [Route("booking/cancel")]
+    public async Task<IActionResult> CancelBooking(int appointmentId)
+    {
+        return View("Booking/CancelBooking", await _bookingService.GetBookingCancelView(appointmentId));
+    }
+
+    [Route("booking/docancel")]
+    public async Task<IActionResult> DoCancelBooking([FromQuery] int appointmentId, [FromForm] CancelAppointmentFormModel model)
+    {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
+        await _bookingService.DoCancelBooking(appointmentId, model.Reason, Enums.AppointmentStatus.CancelledByClient);
+        ViewBag.Message = "Successfully cancelled booking";
+        return RedirectToRoute(new { controller = "Appointment", action = "Index" });
     }
 }

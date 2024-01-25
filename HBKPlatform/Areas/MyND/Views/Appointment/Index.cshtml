@@ -7,8 +7,16 @@
 <h1>Upcoming Appointments</h1>
 @foreach (var appointment in Model.UpcomingAppointments)
 {
-    <p>@appointment.ClientName @appointment.DateString @appointment.TimeString @appointment.TreatmentTitle</p>
+    <p>@appointment.ClientName @appointment.DateString @appointment.TimeString @appointment.TreatmentTitle <a asp-area="MyND" asp-controller="Appointment" asp-action="CancelBooking" asp-route-appointmentId="@appointment.Id">Cancel...</a></p>
 }
 
 <h2>Past Appointments</h2>
+@foreach (var appointment in Model.PastAppointments)
+{
+    <p>@appointment.ClientName @appointment.DateString @appointment.TimeString @appointment.TreatmentTitle</p>
+}
 <h2>Recent Cancellations</h2>
+@foreach (var appointment in Model.RecentCancellations)
+{
+    <p>@appointment.ClientName @appointment.DateString @appointment.TimeString @appointment.TreatmentTitle @appointment.Status</p>
+}

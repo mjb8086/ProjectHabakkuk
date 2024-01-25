@@ -1,3 +1,4 @@
+using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Repository;
@@ -9,5 +10,6 @@ public interface IAppointmentRepository
     public Task<List<AppointmentDto>> GetAppointmentsForClient(int clientId);
     public Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId);
     public Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now);
+    public Task CancelAppointment(int appointmentId, string reason, Enums.AppointmentStatus actioner);
 
 }

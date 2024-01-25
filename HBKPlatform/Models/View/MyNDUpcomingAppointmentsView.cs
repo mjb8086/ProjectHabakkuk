@@ -6,4 +6,5 @@ public class MyNDUpcomingAppointmentsView
 {
     public List<AppointmentDto> UpcomingAppointments { get; set; }
     public List<AppointmentDto> PastAppointments { get; set; }
+    public List<AppointmentDto> RecentCancellations { get; set; }
 }
