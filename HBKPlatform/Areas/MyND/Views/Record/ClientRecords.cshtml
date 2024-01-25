@@ -1,4 +1,4 @@
-@model HBKPlatform.Models.View.MyNDClientRecords
+@model HBKPlatform.Models.View.MyND.ClientRecords
 @{
     ViewBag.Title = $"{Model.ClientName}'s Records";
     ViewBag.Modules = "clientrecords.js";
@@ -8,7 +8,7 @@
 
 <h2>@Model.ClientName's Records</h2>
 <div id="clientRecordWrap">
-@foreach (var record in Model.ClientRecords)
+@foreach (var record in Model.ClientRecordList)
 {
     <div class="clientRecordItem"><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> <span>@record.Date @record.Visibility</span> <span>@record.IsPriority</span></div>
 }

@@ -1,5 +1,6 @@
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
+using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
 
 namespace HBKPlatform.Services.Implementation;
@@ -15,20 +16,20 @@ namespace HBKPlatform.Services.Implementation;
 /// </summary>
 public class ClientRecordService(IUserService _userService, ICacheService _cache, IRecordRepository _recordRepo): IClientRecordService
 {
-    public async Task<MyNDClientRecordsIndex> GetClientRecordsIndex()
+    public async Task<ClientRecordsIndex> GetClientRecordsIndex()
     {
-        return new MyNDClientRecordsIndex
+        return new ClientRecordsIndex
         {
             ClientDetails = await _cache.GetClinicClientDetailsLite(_userService.GetClaimFromCookie("ClinicId"))
         };
     }
-    public async Task<MyNDClientRecords> GetClientRecords(int clientId)
+    public async Task<ClientRecords> GetClientRecords(int clientId)
     {
-        return new MyNDClientRecords
+        return new ClientRecords
         {
             ClientName = _cache.GetClientName(clientId),
             ClientId = clientId,
-            ClientRecords = await _recordRepo.GetClientRecordsLite(clientId)
+            ClientRecordList = await _recordRepo.GetClientRecordsLite(clientId)
         };
     }
 

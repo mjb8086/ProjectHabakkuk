@@ -60,5 +60,6 @@
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Shared\Account\_ViewImports.cshtml" />
+    <_ContentIncludedByDefault Remove="App_Code\Helpers.cshtml" />
   </ItemGroup>
 </Project>

@@ -1,8 +1,8 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Models.View;
+namespace HBKPlatform.Models.View.MyND;
 
-public struct MyNDBookClientTreatment
+public struct BookClientTreatment
 {
     public List<ClientDetailsLite> Clients { get; set; }
     public List<TreatmentLite> Treatments { get; set; }

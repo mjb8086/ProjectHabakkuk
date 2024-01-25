@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database;
 
 public class Client : HbkBaseEntity
 {
-    public Title Title { get; set; }
-    public Sex Sex { get; set; }
+    public Enums.Title Title { get; set; }
+    public Enums.Sex Sex { get; set; }
     public string Forename { get; set; }
     public string Surname { get; set; }
 

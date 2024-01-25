@@ -3,6 +3,7 @@ using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
+using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,9 +27,9 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
         return client.ClinicId == prac.ClinicId;
     }
 
-    public async Task<MyNDInboxModel> GetInboxModel()
+    public async Task<InboxModel> GetInboxModel()
     {
-        var inboxModel = new MyNDInboxModel();
+        var inboxModel = new InboxModel();
         inboxModel.ClientDetails = new List<ClientDetailsLite>();
         
         var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
@@ -57,9 +58,9 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
         return data;
     }
 
-    public async Task<MyNDReceptionModel> GetReceptionModel()
+    public async Task<ReceptionModel> GetReceptionModel()
     {
-        var data = new MyNDReceptionModel();
+        var data = new ReceptionModel();
         var pracIdClaim = httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
         if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
         {

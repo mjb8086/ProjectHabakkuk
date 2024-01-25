@@ -3,6 +3,7 @@ using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
+using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
 
 namespace HBKPlatform.Services.Implementation;
@@ -159,7 +160,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         return appointments;
     }
 
-    public async Task<MyNDUpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView()
+    public async Task<UpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView()
     {
         var now = DateTime.UtcNow;
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
@@ -167,7 +168,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
         var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"));
-        return new MyNDUpcomingAppointmentsView()
+        return new UpcomingAppointmentsView()
         {
             UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))).ToList(),
             RecentCancellations = appts.Where(x => x.Status is Enums.AppointmentStatus.CancelledByPractitioner or Enums.AppointmentStatus.CancelledByClient).ToList(),
@@ -274,7 +275,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         };
     }
 
-    public async Task<MyNDBookClientTreatment> GetBookClientTreatmentView()
+    public async Task<BookClientTreatment> GetBookClientTreatmentView()
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
@@ -288,7 +289,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
         var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);
 
-        return new MyNDBookClientTreatment()
+        return new BookClientTreatment()
         {
             Clients = clients,
             Timeslots = timeslotsLite,

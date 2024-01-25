@@ -1,12 +1,13 @@
 using HBKPlatform.Models;
 using HBKPlatform.Models.View;
+using HBKPlatform.Models.View.MyND;
 
 namespace HBKPlatform.Services;
 
 public interface IClinicService
 {
     public Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId);
-    public Task<MyNDInboxModel> GetInboxModel();
+    public Task<InboxModel> GetInboxModel();
     public Task<ClientClinicData> GetClientClinicData();
-    public Task<MyNDReceptionModel> GetReceptionModel();
+    public Task<ReceptionModel> GetReceptionModel();
 }

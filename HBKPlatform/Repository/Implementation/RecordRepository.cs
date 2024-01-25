@@ -36,7 +36,7 @@ public class RecordRepository(ApplicationDbContext _db) : IRecordRepository
     /*
     public async Task UpdateRecord(ClientRecordDto recordDto)
     {
-        var dbRecord = await _db.ClientRecords.FirstOrDefaultAsync(x => x.Id == recordDto.Id) ?? 
+        var dbRecord = await _db.ClientRecordList.FirstOrDefaultAsync(x => x.Id == recordDto.Id) ?? 
                        throw new InvalidOperationException($"Record Id {recordDto.Id} not found.");
         dbRecord.Title = recordDto.Title;
         dbRecord.NoteBody = recordDto.NoteBody;

@@ -1,3 +1,5 @@
+using HBKPlatform.Models.DTO;
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -12,16 +14,27 @@ namespace HBKPlatform.Controllers;
 /// </summary>
 
 [Area(("MyND"))]
-public class ClientController : Controller
+public class ClientController(IClientDetailsService _cdSrv) : Controller
 {
     public IActionResult Index()
     {
         return View();
     }
     
-    public IActionResult ClientDetails()
+    public async Task<IActionResult> AllClients()
     {
-        return View();
+        return View(await _cdSrv.GetAllClientsView());
+    }
+    
+    public async Task<IActionResult> AddEditClient(int? clientId)
+    {
+        return View(clientId.HasValue ? await _cdSrv.GetClient(clientId.Value) : new ClientDto());
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DoAddEditClient(int? clientId)
+    {
+        return Ok("wip");
     }
     
 }

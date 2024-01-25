@@ -41,4 +41,14 @@ public static class Enums
           Live, CancelledByClient, CancelledByPractitioner
      }
      
+    public enum Title
+    {
+        Dr, Mr, Mrs, Miss, Ms, Lord, Cpl, Pope, Rev, RtHon
+    }
+
+    public enum Sex
+    {
+        Male, Female, Other, NotSpecified
+    }
+     
 }

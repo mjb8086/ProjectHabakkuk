@@ -7,7 +7,7 @@
 ******************************/
 
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database
 {
@@ -18,13 +18,13 @@ namespace HBKPlatform.Database
         [Required]
         public string Surname { get; set; }
         [Required]
-        public Title Title { get; set; }
+        public Enums.Title Title { get; set; }
         public string? Location { get; set; }
         public string? Bio { get; set; }
         [DataType(DataType.Date)]
         public DateTime DateOfBirth { get; set; }
         public string? Img { get; set; }
-        public Sex Sex { get; set; }
+        public Enums.Sex Sex { get; set; }
 
         public int ClinicId { get; set; }
         public Clinic Clinic { get; set; }
@@ -34,14 +34,5 @@ namespace HBKPlatform.Database
         public virtual ICollection<ClientMessage> ClientMessages { get; set; }
     }
 
-    public enum Title
-    {
-        Dr, Mr, Mrs, Miss, Ms, Lord, Cpl, Pope, Rev, RtHon
-    }
-
-    public enum Sex
-    {
-        Male, Female, Other, NotSpecified
-    }
 }
 

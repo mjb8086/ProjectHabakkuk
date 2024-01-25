@@ -54,6 +54,7 @@ builder.Services.AddTransient<ITreatmentService, TreatmentService>();
 builder.Services.AddTransient<IBookingService, BookingService>();
 builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
 builder.Services.AddTransient<IDateTimeWrapper, DateTimeWrapper>();
+builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

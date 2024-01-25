@@ -1,0 +1,11 @@
+@model HBKPlatform.Models.View.MyND.AllClients
+@{
+    Layout = "_MyND";
+}
+
+<h1>All client details</h1>
+@foreach (var client in Model.Clients)
+{
+    <p>@client.Name <a asp-area="MyND" asp-controller="Client" asp-action="AddEditClient" asp-route-clientId="@client.Id">Edit</a></p>
+}
+<p><a asp-area="MyND" asp-controller="Client" asp-action="AddEditClient">Add New Client</a></p>

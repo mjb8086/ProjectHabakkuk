@@ -54,7 +54,7 @@ namespace HBKPlatform.Database.Helpers
                     {
                         Forename = "Emmett",
                         Surname = "Brown",
-                        Title = Title.Dr,
+                        Title = Enums.Title.Dr,
                         Bio = "inventor of the flux capacitor",
                         Location = "hill valley",
                         DateOfBirth = new DateTime(1932, 07, 08).ToUniversalTime(),
@@ -80,7 +80,7 @@ namespace HBKPlatform.Database.Helpers
                     {
                         Forename = "Marty",
                         Surname = "McFly",
-                        Title = Title.Mr,
+                        Title = Enums.Title.Mr,
                         Address = "Unknown",
                         DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
                         Img = new string("samples/marty.jpg"),
@@ -106,7 +106,7 @@ namespace HBKPlatform.Database.Helpers
                     {
                         Forename = "Biff",
                         Surname = "Tenant",
-                        Title = Title.Mr,
+                        Title = Enums.Title.Mr,
                         Address = "Unknown",
                         DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
                         Img = "samples/biff.jpg",

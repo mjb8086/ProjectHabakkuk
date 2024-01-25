@@ -4,5 +4,6 @@ namespace HBKPlatform.Repository;
 
 public interface IClientRepository
 {
-    public ClientDetailsLite GetLiteDetails(int clientId);
+    public ClientDto GetClientDetails(int clientId);
+    public Task<List<ClientDetailsLite>> GetLiteDetails(int clinicId);
 }

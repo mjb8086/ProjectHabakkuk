@@ -1,0 +1,31 @@
+@model HBKPlatform.Models.DTO.ClientDto
+@{
+    Layout = "_MyND";
+}
+
+<h1>client details</h1>
+<form id="treatmentDetails" asp-area="MyND" asp-controller="Client" asp-action="DoAddEditClient" method="post">
+
+<fieldset>
+    <label for="title" class="form-textfield">Title</label>
+    <input type="text" name="title" id="title" value="@Model.Title"/>
+</fieldset>
+  
+<fieldset>
+  <label for="forename" class="form-textfield">Forename</label>
+  <input type="text" name="forename" id="forename" value="@Model.Forename"/>
+  <label for="surname" class="form-textfield">Surname</label>
+  <input type="text" name="surname" id="surname" value="@Model.Surname"/>
+</fieldset>
+
+<fieldset>
+  <label for="address" class="form-textfield">Address</label>
+  <textarea name="address" id="address">
+@Model.Address
+  </textarea> 
+</fieldset>
+
+<fieldset>
+  <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/> <button id="btnGoBack">Go Back</button>
+</fieldset>
+</form>

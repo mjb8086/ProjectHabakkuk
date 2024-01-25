@@ -2,7 +2,14 @@
     Layout = "_Layout";
 }
 
+@functions
+{
+    public string GetActiveClass(string navPath){
+        if (ViewBag.CurrentNav == null) return "";
+        return navPath.Contains(ViewBag.CurrentNav) ? "class=\"active\"" : "";
+    }
+}
 <div id="myNdNav" class="subNav">
-    <a asp-area="MyND" asp-controller="Reception" asp-action="Index">Reception</a> <a asp-area="MyND" asp-controller="Appointment", asp-action="Index">Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index">Client Records</a> <a asp-area="MyND" asp-controller="Client" asp-action="Index">Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a> <a asp-area="MyND" asp-controller="Configuration" asp-action="Index">System Configuration</a>
+    <a asp-area="MyND" asp-controller="Reception" asp-action="Index" >Reception</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="Index" >Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index">Client Records</a> <a asp-area="MyND" asp-controller="Client" asp-action="Index">Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a> <a asp-area="MyND" asp-controller="Configuration" asp-action="Index">System Configuration</a>
 </div>
 @RenderBody()

@@ -7,7 +7,6 @@ namespace HBKPlatform.Repository
     public interface IPractitionerRepository
     {
         public Practitioner GetPractitioner(int mciIdx);
-        public PractitionerViewModel GetPractitionerView(Practitioner practitioner);
     }
 }
 

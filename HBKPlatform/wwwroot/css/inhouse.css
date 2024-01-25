@@ -115,8 +115,12 @@ div.list-body {
 }
 
 .subNav a:hover {
-    background-color: #bffff1;
+    background-color: #998eca;
     text-shadow: 1px 1px 2px #b7b7b7;
+}
+
+.subNav a.active {
+    background-color: #99a8fd; 
 }
 
 /* Home  - TODO breakout! */

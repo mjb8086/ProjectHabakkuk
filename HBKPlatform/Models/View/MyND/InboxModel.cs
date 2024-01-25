@@ -1,8 +1,8 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Models.View;
+namespace HBKPlatform.Models.View.MyND;
 
-public class MyNDInboxModel
+public class InboxModel
 {
     public List<ClientDetailsLite> ClientDetails { get; set; }
 }

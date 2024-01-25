@@ -20,11 +20,5 @@ public class PractitionerRepository(ApplicationDbContext applicationDbContext) :
         return practitioner;
     }
 
-    public PractitionerViewModel GetPractitionerView(Practitioner practitioner)
-    {
-        var newPracViewModel = PractitionerHelper.DbModelToViewModel(practitioner);
-        // TEMP
-        return newPracViewModel;
-    }
 }
 
