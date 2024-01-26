@@ -4,6 +4,7 @@
     ViewData["Title"] = $"Conversation with {Model.Recipient}";
     ViewData["css"] = "messaging.css";
     ViewData["scripts"] = "messaging.js";
+    ViewBag.CurrentNav = "Messaging";
 }
 @await Html.PartialAsync("Components/_Messaging", Model)
 <div id="messageInputWrap">

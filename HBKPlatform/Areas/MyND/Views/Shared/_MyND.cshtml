@@ -6,10 +6,10 @@
 {
     public string GetActiveClass(string navPath){
         if (ViewBag.CurrentNav == null) return "";
-        return navPath.Contains(ViewBag.CurrentNav) ? "class=\"active\"" : "";
+        return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
     }
 }
 <div id="myNdNav" class="subNav">
-    <a asp-area="MyND" asp-controller="Reception" asp-action="Index" >Reception</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="Index" >Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index">Client Records</a> <a asp-area="MyND" asp-controller="Client" asp-action="Index">Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a> <a asp-area="MyND" asp-controller="Configuration" asp-action="Index">System Configuration</a>
+    <a asp-area="MyND" asp-controller="Reception" asp-action="Index" class="@GetActiveClass("Reception")" >Reception</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="Index" class="@GetActiveClass("Appointment")">Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index" class="@GetActiveClass("ClientRecord")">Client Records</a> <a asp-area="MyND" asp-controller="Client" asp-action="Index" class="@GetActiveClass("ClientDetail")">Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index" class="@GetActiveClass("Messaging")">Messaging</a> <a asp-area="MyND" asp-controller="Configuration" asp-action="Index" class="@GetActiveClass("Configuration")">System Configuration</a>
 </div>
 @RenderBody()

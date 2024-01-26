@@ -1,3 +1,10 @@
+@functions
+{
+    public string GetActiveClass(string navPath){
+        if (ViewBag.CurrentNav == null) return "";
+        return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
+    }
+}
 <div id="myNdNavAppointments" class="subNav">
-    <a asp-area="MyND" asp-controller="Appointment" asp-action="Index">Overview</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="BookClientTreatment">Booking</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="AvailabilityManagement">Availability Management</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="TimeslotManagement">Timeslot Management</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="TreatmentManagement">Treatment Management</a>
+    <a asp-area="MyND" asp-controller="Appointment" asp-action="Index" class="@GetActiveClass("Appointment|Index")">Overview</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="BookClientTreatment" class="@GetActiveClass("Appointment|Booking")">Booking</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="AvailabilityManagement" class="@GetActiveClass("Appointment|Availability")">Availability Management</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="TimeslotManagement" class="@GetActiveClass("Appointment|TimeslotManagement")">Timeslot Management</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="TreatmentManagement" class="@GetActiveClass("Appointment|TreatmentManagement")">Treatment Management</a>
 </div>
