@@ -1,11 +1,23 @@
 textarea#noteBody {
-    width: 500px;
+    width: 650px;
     height: 300px;
+    margin: 15px;
 }
 
 div#clientRecordWrap {
     max-width: 700px;
     min-height: 200px;
+    margin-bottom: 10px;
+}
+
+div#noteActions {
+    margin: 5px;
+    display: flex;
+    justify-content: space-around;
+}
+
+div#table1Wrap {
+    background-color: #ffffe9;
 }
 
 div#clientRecordStuffing {

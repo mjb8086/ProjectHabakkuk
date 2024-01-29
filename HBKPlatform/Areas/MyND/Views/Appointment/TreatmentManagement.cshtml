@@ -11,11 +11,12 @@
 <p>Create and manage treatments. A treatment is a service type that may be booked as an appointment.</p>
 
 <h2>Current treatments:</h2>
-<div id="treatmentsWrap">
-@foreach (var treatment in Model.Treatments)
-{
-    <div class="treatmentItem"><span>@treatment.Title</span> <span>@treatment.Cost.ToString("C2")</span> <span>@treatment.Requestability</span> <span><a asp-area="MyND" asp-controller="Appointment" asp-action="CreateTreatment" asp-route-treatmentId="@treatment.Id">Edit</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="DeleteTreatment" asp-route-treatmentId="@treatment.Id">Delete</a></span></div>
-}
+<div id="table1Wrap" class="treatmentWrap">
+    <div class="table1Item"><span>Title</span> <span>Cost</span> <span>Requestability</span> <span>Actions</span></div>
+    @foreach (var treatment in Model.Treatments)
+    {
+        <div class="table1Item"><span>@treatment.Title</span> <span>@treatment.Cost.ToString("C2")</span> <span>@treatment.Requestability</span> <span><a asp-area="MyND" asp-controller="Appointment" asp-action="CreateTreatment" asp-route-treatmentId="@treatment.Id">Edit</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="DeleteTreatment" asp-route-treatmentId="@treatment.Id">Delete</a></span></div>
+    }
 </div>
 <a asp-area="MyND" asp-controller="Appointment" asp-action="CreateTreatment">Create New</a>
 

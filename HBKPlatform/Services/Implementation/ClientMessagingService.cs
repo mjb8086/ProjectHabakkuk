@@ -13,9 +13,8 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, 
-     IClientMessageRepository _clientMessageRepository, IClinicService _clinicService, IClientRepository _clientRepository, 
-     ICacheService _cache) : IClientMessagingService
+public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, IClientMessageRepository _clientMessageRepository, 
+     IClinicService _clinicService, ICacheService _cache) : IClientMessagingService
 {
      public async Task SendMessage(string messageBody, int recipientId)
      {

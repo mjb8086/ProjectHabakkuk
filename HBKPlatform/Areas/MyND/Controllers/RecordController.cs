@@ -51,11 +51,11 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
         return Ok(await _recordRepo.UpdateRecordBody(recordId, record.NoteBody));
     }
 
-    [HttpPut]
+    [HttpPost]
     public async Task<IActionResult> SetRecordPriority(int recordId, bool isPriority)
     {
         await _recordRepo.SetRecordPriority(recordId, isPriority);
-        return Ok();
+        return RedirectToRoute(new { controller = "Record", action = "ClientRecord", recordId=recordId });
     }
 
     [HttpPost]

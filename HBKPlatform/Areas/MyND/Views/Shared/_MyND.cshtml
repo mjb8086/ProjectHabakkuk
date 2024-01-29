@@ -1,7 +1,10 @@
+@using System.Text.Encodings.Web
 @{
     Layout = "_Layout";
 }
-
+<script>
+window.hbkFlasher = @(ViewBag.Message != null ? ViewBag.Message : Html.Raw("\"\""));
+</script>
 @functions
 {
     public string GetActiveClass(string navPath){

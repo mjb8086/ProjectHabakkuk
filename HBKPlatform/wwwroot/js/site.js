@@ -5,5 +5,5 @@
 
 $(document).ready(function () {
     console.log("Global Hello World!");
-
+    if (window.hbkFlasher && window.hbkFLasher != "") window.alert(window.hbkFlasher);
 })

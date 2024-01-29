@@ -1,5 +1,6 @@
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -14,11 +15,12 @@ namespace HBKPlatform.Controllers;
 /// </summary>
 
 [Area(("MyND"))]
+[Authorize]
 public class ClientController(IClientDetailsService _cdSrv) : Controller
 {
     public IActionResult Index()
     {
-        return View();
+        return View(_cdSrv.GetClientDetailsIndex());
     }
     
     public async Task<IActionResult> AllClients()
@@ -32,9 +34,22 @@ public class ClientController(IClientDetailsService _cdSrv) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> DoAddEditClient(int? clientId)
+    public async Task<IActionResult> DoAddClient([FromForm] ClientDto client)
     {
-        return Ok("wip");
+        await _cdSrv.CreateClient(client);
+        ViewBag.Message = "New client registered. An activation email will be sent to his/her inbox.";
+        
+        return RedirectToRoute(new { controller = "Client", action = "AllClients" });
+    }
+    
+    // TODO: Make PUT
+    [HttpPost]
+    public async Task<IActionResult> DoEditClient(int clientId, [FromForm] ClientDto client)
+    {
+        client.Id = clientId;
+        await _cdSrv.UpdateClientDetails(client);
+        ViewBag.Message = "Successfully updated client details";
+        return RedirectToRoute(new { controller = "Client", action = "AllClients" });
     }
     
 }

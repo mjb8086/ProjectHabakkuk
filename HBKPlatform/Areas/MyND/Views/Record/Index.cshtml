@@ -2,11 +2,16 @@
 @{
     ViewBag.Title = "My Client Records";
     ViewBag.CurrentNav = "ClientRecord";
+    ViewBag.Css = "clientrecord.css";
     Layout = "_MyND";
 }
 
 <h2>My Client Records</h2>
+<p>Store medical records and appointment notes here. Notes may be optionally shared with a client.</p>
+
+<div id="table1Wrap">
 @foreach (var client in Model.ClientDetails)
 {
-    <p><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecords" asp-route-clientId="@client.Id">@client.Name</a></p>
+    <div class="table1Item"><span>@client.Name</span> <a asp-area="MyND" asp-controller="Record" asp-action="ClientRecords" asp-route-clientId="@client.Id">View Records</a></div>
 }
+</div>

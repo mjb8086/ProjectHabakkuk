@@ -7,28 +7,33 @@
     Layout = "_MyND";
 }
 
-<h2>Client Record</h2>
-<p>@Model.ClientName</p>
+<h2>Client Record - @Model.ClientName</h2>
 <div id="clientRecordWrap" class="clientRecordView">
     <div class="clientRecordItem">
-        <input type="text" id="noteTitle" name="noteTitle" value="@Model.Title"/>
-        <span>@Model.DateCreated</span>
-        <span>@Model.Visibility</span>
-        <span>@Model.IsPriority</span>
+        <input type="text" id="noteTitle" name="noteTitle" value="@Model.Title" placeholder="Title"/>
+        <span>Date<br/>@(Model.Id > 0 ? Model.DateCreated : DateTime.Now.ToShortDateString())</span>
+        <span>Visibility<br/>@Model.Visibility</span>
+        <span>@(Model.IsPriority ? "Priority" : "")
+            @if (Model.Id > 0)
+            {
+                <form id="clientRecord" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
+                    <input type="submit" value="Toggle Priority" id="btnTogglePriority"/>
+                </form>
+            }
+        </span>
     </div>
     
-    <form id="clientRecord" asp-area="MyND" asp-controller="Record" asp-action="SetRecordPriority" asp-route-recordId="@Model.Id" asp-route-isPriority=@(Model.IsPriority ? "false" : "true") method="post">
-        <input type="submit" value="SetIsPriority" id="btnTogglePriority"/>
-    </form>
-    
-<textarea id="noteBody" name="noteBody">
+<textarea id="noteBody" name="noteBody" placeholder="Type your client note here.">
 @Model.NoteBody
 </textarea>
     
-    <div>
+    <div id="noteActions">
         <input type="submit" value="Save" id="btnSave" data-id="@Model.Id" data-clientId="@Model.ClientId"/>
+        @if (Model.Id > 0)
+        {
         <input type="submit" value="Delete" id="btnDelete" data-id="@Model.Id" data-clientId="@Model.ClientId"/>
-        <span>Next</span> <span>Previous</span> <span>All Notes</span>
+        }
+        <span>Next</span> <span>Previous</span> <button id="btnAllNotes" data-id="@Model.ClientId">All Notes</button>
     </div>
 </div>
 

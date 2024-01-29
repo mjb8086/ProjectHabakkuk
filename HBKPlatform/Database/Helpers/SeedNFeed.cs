@@ -81,8 +81,8 @@ namespace HBKPlatform.Database.Helpers
                         Forename = "Marty",
                         Surname = "McFly",
                         Title = Enums.Title.Mr,
-                        Address = "Unknown",
-                        DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
+                        Address = "a garage",
+                        DateOfBirth = new DateOnly(1962, 07, 08),
                         Img = new string("samples/marty.jpg"),
                         Telephone = "999",
                         User = client1User
@@ -107,8 +107,8 @@ namespace HBKPlatform.Database.Helpers
                         Forename = "Biff",
                         Surname = "Tenant",
                         Title = Enums.Title.Mr,
-                        Address = "Unknown",
-                        DateOfBirth = new DateTime(1962, 07, 08).ToUniversalTime(),
+                        Address = "A big house somewhere",
+                        DateOfBirth = new DateOnly(1962, 07, 08),
                         Img = "samples/biff.jpg",
                         Telephone = "299",
                         User = client2User

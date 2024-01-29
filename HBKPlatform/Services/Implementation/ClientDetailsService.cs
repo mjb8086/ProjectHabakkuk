@@ -14,6 +14,24 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
 
     public async Task<ClientDto> GetClient(int clientId)
     {
+        // todo : security checks
         return _clientRepo.GetClientDetails(clientId);
+    }
+
+    public async Task UpdateClientDetails(ClientDto client)
+    {
+        await _clientRepo.Update(client);
+    }
+
+    public async Task CreateClient(ClientDto client)
+    {
+        client.ClinicId = _userService.GetClaimFromCookie("ClinicId");
+        await _clientRepo.Create(client);
+    }
+
+    public ClientDetailsIndex GetClientDetailsIndex()
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        return new ClientDetailsIndex() { NumClients = _clientRepo.GetClientCount(clinicId) };
     }
 }

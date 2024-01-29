@@ -1,18 +1,36 @@
+@using HBKPlatform.Globals
 @model HBKPlatform.Models.DTO.ClientDto
 @{
     Layout = "_MyND";
     ViewBag.CurrentNav = "ClientDetail|AddEdit";
     ViewBag.Title = "Add/Edit Client Details";
+    ViewBag.Modules = "add-edit-client.js";
 }
 
-<h1>client details</h1>
-<form id="treatmentDetails" asp-area="MyND" asp-controller="Client" asp-action="DoAddEditClient" method="post">
+@if(Model.Id > 0) {
+<h1>View or edit client details</h1>
+} else {
+<h1>Register a new client</h1>
+}
 
+@{
+    // Note - on EDIT jquery will override the route and method parameters
+}
+<form id="treatmentDetails" asp-area="MyND" asp-controller="Client" asp-action="DoAddClient"  method="post"> 
 <fieldset>
     <label for="title" class="form-textfield">Title</label>
-    <input type="text" name="title" id="title" value="@Model.Title"/>
+    <select id="title" asp-for="Title" 
+            asp-items="Html.GetEnumSelectList<Enums.Title>()">
+    </select> 
 </fieldset>
-  
+
+<fieldset>
+    <label for="sex" class="form-textfield">Sex</label>
+    <select id="sex" asp-for="Sex" 
+            asp-items="Html.GetEnumSelectList<Enums.Sex>()">
+    </select> 
+</fieldset>
+    
 <fieldset>
   <label for="forename" class="form-textfield">Forename</label>
   <input type="text" name="forename" id="forename" value="@Model.Forename"/>
@@ -27,6 +45,28 @@
   </textarea> 
 </fieldset>
 
+<fieldset>
+    <label for="dateOfBirth" class="form-textfield">Date of birth</label>
+    <input asp-for="DateOfBirth" name="dateOfBirth" id="dateOfBirth" value="@(Model.Id > 0 ? Model.DateOfBirth.ToString("yyyy-MM-dd") : "1970-01-01")"/>
+</fieldset>
+  
+<fieldset>
+    <label for="telephone" class="form-textfield">Telephone</label>
+    <input type="text" name="telephone" id="telephone" value="@Model.Telephone"/>
+</fieldset>
+  
+<fieldset>
+    <label for="email" class="form-textfield">Email</label>
+    <input type="text" name="email" id="email" value="@Model.Email"/>
+</fieldset>
+  
+@if(Model.Id > 0) {
+<fieldset>
+    <label class="form-textfield">Has user account?</label>
+    <p>@(Model.HasUserAccount ? "Yes" : "No")</p>
+</fieldset>
+}
+  
 <fieldset>
   <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/> <button id="btnGoBack">Go Back</button>
 </fieldset>

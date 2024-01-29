@@ -9,10 +9,16 @@
 
 <h2>@Model.ClientName's Records</h2>
 <div id="clientRecordWrap">
-@foreach (var record in Model.ClientRecordList)
-{
-    <div class="clientRecordItem"><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> <span>@record.Date @record.Visibility</span> <span>@record.IsPriority</span></div>
+@if(Model.ClientRecordList.Count > 0) {
+    @foreach (var record in Model.ClientRecordList)
+    {
+        <div class="clientRecordItem"><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> <span>@record.Date @record.Visibility</span> <span>@(record.IsPriority ? "Priority" : "" )</span></div>
+    }
 }
-<div id="clientRecordStuffing"></div>
+else
+{
+    <div class="clientRecordItem">No records currently exist for @Model.ClientName.</div>
+}
+    <div id="clientRecordStuffing"></div>
 </div>
 <input type="submit" value="Add New" id="btnAdd" data-clientId="@Model.ClientId" />

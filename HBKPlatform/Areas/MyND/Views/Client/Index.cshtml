@@ -1,3 +1,4 @@
+@model HBKPlatform.Models.View.MyND.ClientDetailsIndex;
 @{
     Layout = "_MyND";
     ViewBag.CurrentNav = "ClientDetail|Index";
@@ -5,6 +6,7 @@
 }
 
 <h1>Client Details</h1>
-<p>x clients are currently registered with the clinic.</p>
+<p>View or update your clients' contact details.</p>
 <p><a asp-area="MyND" asp-controller="Client" asp-action="AddEditClient">Add New Client</a></p>
 <p><a asp-area="MyNd" asp-controller="Client" asp-action="AllClients">View Clients' Details</a></p>
+<p>@Model.NumClients clients are currently registered with the clinic.</p>

@@ -54,4 +54,7 @@ function updateNote(id) {
         e.preventDefault();
         if (e.target.dataset.id > 0) deleteNote(e.target.dataset.id, e.target.dataset.clientid);
     });
+    $("#btnAllNotes").on('click', function (e) {
+        window.location = `${Globals.BaseUrl}/mynd/record/clientRecords?clientId=${e.target.dataset.id}`;
+    });
 });

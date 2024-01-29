@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace HBKPlatform.Globals;
 
 public static class Enums
@@ -38,7 +40,11 @@ public static class Enums
 
      public enum AppointmentStatus
      {
-          Live, CancelledByClient, CancelledByPractitioner
+          Live, 
+          [Display(Name = "Cancelled by client")]
+          CancelledByClient, 
+          [Display(Name = "Cancelled by practitioner")]
+          CancelledByPractitioner
      }
      
     public enum Title
@@ -48,7 +54,7 @@ public static class Enums
 
     public enum Sex
     {
-        Male, Female, Other, NotSpecified
+        Male, Female, Other, NotSpecified, YesPlease
     }
      
 }

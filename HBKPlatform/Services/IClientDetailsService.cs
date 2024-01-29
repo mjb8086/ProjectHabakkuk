@@ -7,4 +7,7 @@ public interface IClientDetailsService
 {
     public Task<AllClients> GetAllClientsView();
     public Task<ClientDto> GetClient(int clientId);
+    public Task UpdateClientDetails(ClientDto client);
+    public Task CreateClient(ClientDto client);
+    public ClientDetailsIndex GetClientDetailsIndex();
 }
