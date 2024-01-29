@@ -26,6 +26,9 @@
         // FIXME: Work with many scripts....
         <script type="module" src="@Url.Content("~/js/" + ViewData["modules"])" asp-append-version="true" defer></script>
     }
+    <script>
+    window.hbkFlasher = @(TempData["Message"] != null ? Html.Raw($"\"{TempData["Message"]}\"") : Html.Raw("\"\""));
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </head>
 <body>

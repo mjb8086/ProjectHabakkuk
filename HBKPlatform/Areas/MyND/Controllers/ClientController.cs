@@ -37,7 +37,7 @@ public class ClientController(IClientDetailsService _cdSrv) : Controller
     public async Task<IActionResult> DoAddClient([FromForm] ClientDto client)
     {
         await _cdSrv.CreateClient(client);
-        ViewBag.Message = "New client registered. An activation email will be sent to his/her inbox.";
+        TempData["Message"] = "New client registered. An activation email will be sent to his/her inbox.";
         
         return RedirectToRoute(new { controller = "Client", action = "AllClients" });
     }
@@ -48,7 +48,7 @@ public class ClientController(IClientDetailsService _cdSrv) : Controller
     {
         client.Id = clientId;
         await _cdSrv.UpdateClientDetails(client);
-        ViewBag.Message = "Successfully updated client details";
+        TempData["Message"] = "Successfully updated client details";
         return RedirectToRoute(new { controller = "Client", action = "AllClients" });
     }
     

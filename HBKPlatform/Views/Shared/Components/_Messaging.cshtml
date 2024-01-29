@@ -2,13 +2,20 @@
 
 <h2>Conversation with @Model.Recipient</h2>
 <div id="conversationBody">
-@foreach (var message in Model.Messages)
-{
-    <div class="conversation-row @(Model.CurrentConverser == message.MessageOrigin ? "conversation-row-sender" : "")">
-        <div class="conversation-message @(Model.CurrentConverser == message.MessageOrigin ? "conversation-message-sender" : "")">
-            <span class="message-origin">@(Model.CurrentConverser == message.MessageOrigin ? Model.Sender : Model.Recipient)</span>: 
-            <span class="message-body">@message.MessageBody</span>
+    @if (Model.Messages.Count <= 0)
+    {
+        <p>System Message: No messages yet.</p>
+    }
+    else 
+    {
+    @foreach (var message in Model.Messages)
+    {
+        <div class="conversation-row @(Model.CurrentConverser == message.MessageOrigin ? "conversation-row-sender" : "")">
+            <div class="conversation-message @(Model.CurrentConverser == message.MessageOrigin ? "conversation-message-sender" : "")">
+                <span class="message-origin">@(Model.CurrentConverser == message.MessageOrigin ? Model.Sender : Model.Recipient)</span>:
+                <span class="message-body">@message.MessageBody</span>
+            </div>
         </div>
-    </div>
-}
+    }
+    }
 </div>

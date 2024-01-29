@@ -48,6 +48,7 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
     [HttpPut]
     public async Task<IActionResult> UpdateRecordBody(int recordId, [FromBody] ClientRecordDto record)
     {
+        TempData["Message"] = "Record updated";
         return Ok(await _recordRepo.UpdateRecordBody(recordId, record.NoteBody));
     }
 

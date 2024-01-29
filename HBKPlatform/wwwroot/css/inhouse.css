@@ -91,6 +91,30 @@ div.list-body {
     padding-bottom: 10px;
 }
 
+/* Flasher */
+div#hbkFlasher {
+    min-height: 100px;
+    z-index: 99;
+    margin: 20px;
+    
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    
+    background-color: #00c600;
+    opacity: 85%;
+    border-radius: 15px;
+    cursor: pointer;
+}
+div.hbkStatusError {
+    background-color: #f42626;
+}
+div#hbkFlasherMessage {
+    display: flex;
+    align-items: center;
+}
+
 /* MyND */
 .subNav {
     display: flex;

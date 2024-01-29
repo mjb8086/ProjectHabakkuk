@@ -6,8 +6,11 @@
 }
 
 <h2>Message Inbox</h2>
-<p>My Clients</p>
-@foreach (var client in Model.ClientDetails)
-{
-    <p><a asp-area="MyND" asp-controller="Messaging" asp-action="Conversation" asp-route-clientId="@client.Id">@client.Name</a></p>
-}
+<p>Read and reply to private messages with your clients.</p>
+<div id="table1Wrap">
+    <div class="table1Item"><span>Conversation</span></div>
+    @foreach (var client in Model.ClientDetails)
+    {
+        <div class="table1Item"><a asp-area="MyND" asp-controller="Messaging" asp-action="Conversation" asp-route-clientId="@client.Id">@client.Name</a></div>
+    }
+</div>

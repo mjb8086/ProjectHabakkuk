@@ -48,7 +48,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     public async Task<IActionResult> DoCreateTreatment([FromForm] TreatmentDto treatment)
     {
         await _treatmentService.CreateTreatment(treatment);
-        ViewBag.Message = "Successfully created treatment.";
+        TempData["Message"] = "Successfully created treatment.";
         return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
     }
     
@@ -64,7 +64,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     {
         // todo: Verify user has right to update 
         await _treatmentService.UpdateTreatment(treatment);
-        ViewBag.Message = "Successfully updated treatment.";
+        TempData["Message"] = "Successfully updated treatment.";
         return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
     }
 
@@ -93,7 +93,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     public async Task<IActionResult> DoCancelBooking([FromQuery] int appointmentId, [FromForm] CancelAppointmentFormModel model)
     {
         await _bookingService.DoCancelBooking(appointmentId, model.Reason, Enums.AppointmentStatus.CancelledByPractitioner);
-        ViewBag.Message = "Successfully cancelled booking";
+        TempData["Message"] = "Successfully cancelled booking";
         return RedirectToRoute(new { controller = "Appointment", action = "Index" });
     }
     
