@@ -19,7 +19,7 @@ function updateNote(id) {
         contentType: "application/json",
         method: "PUT",
         data: JSON.stringify({noteBody: $("#noteBody").val()}),
-        success: function (data) { $("#noteBody").val(data); }
+        success: function (data) { $("#noteBody").val(data); Globals.HBKFlasher("Successfully saved note."); }
     });
 };
     function createNote(clientId) {
@@ -34,7 +34,7 @@ function updateNote(id) {
                 isPriority: false,
                 clientId: clientId
             }),
-            success: function (data) {  }
+            success: function (data) { Globals.HBKFlasher("New note created.") }
         });
     };
     function deleteNote(noteId, clientId) {

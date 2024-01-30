@@ -22,6 +22,5 @@ $(document).ready(function () {
         setTimeout(dismiss, 4000);
     }
     
-    console.log("Global Hello World!");
     if (window.hbkFlasher && window.hbkFLasher != "") flashMessage(window.hbkFlasher, "");
 })

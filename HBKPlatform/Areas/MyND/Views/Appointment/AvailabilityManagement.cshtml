@@ -1,3 +1,4 @@
+@model HBKPlatform.Models.View.MyND.AvailabilityManagementIndex;
 @{
     Layout = "_MyND";
     ViewBag.CurrentNav = "Appointment|Availability";
@@ -5,6 +6,13 @@
 @await Html.PartialAsync("_AppointmentsPartial")
 
 <h1>Availability Management</h1>
-<p>Set your availability for each timeslot.</p>
+<p>Open a week and set your availability for each timeslot. Availability may be set for up to 52 weeks in advance.</p>
 
-<p></p>
+<div id="table1Wrap">
+    <div class="table1Item"><span>Week Range</span> <span>Option</span></div>
+    @foreach (var weekNum in Model.WeekDates.Keys)
+    {
+        <div class="table1Item"><span>@Model.WeekDates[weekNum]</span> <span><a asp-area="MyND" asp-controller="Appointment" asp-action="SetWeekAvailability" asp-route-weekNum="@weekNum">Set availability</a></span></div>
+
+    }
+</div>

@@ -44,6 +44,7 @@ builder.Services.AddScoped<ITreatmentRepository, TreatmentRepository>();
 builder.Services.AddScoped<ITimeslotRepository, TimeslotRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ISettingRepository, SettingRepository>();
+builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -55,6 +56,7 @@ builder.Services.AddTransient<IBookingService, BookingService>();
 builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
 builder.Services.AddTransient<IDateTimeWrapper, DateTimeWrapper>();
 builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
+builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 

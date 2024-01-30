@@ -200,6 +200,7 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
         Assert.Equal(3, DateTimeHelper.GetWeekNumFromDateTime(DB_START_DATE, sampleDate));
     }
     
+    
     [Fact]
     public void FromDateTimeIsCorrect_6()
     {
@@ -234,5 +235,24 @@ public class DateTimeHelperTests(ITestOutputHelper _testOutputHelper)
     public void DotNetConverts_4()
     {
        Assert.Equal(Enums.Day.Sunday, DateTimeHelper.ConvertDotNetDay(DayOfWeek.Sunday)); 
+    }
+    
+    /*
+     * GetDateRangeStringFromWeekNum tests
+    */
+
+    [Theory]
+    [InlineData("01/01/2024 - 07/01/2024",  0)] // test abnormal cases
+    [InlineData("01/01/2024 - 07/01/2024",  -1)] // test abnormal cases
+    [InlineData("01/01/2024 - 07/01/2024",  1)]
+    [InlineData("08/01/2024 - 14/01/2024",  2)]
+    [InlineData("15/01/2024 - 21/01/2024",  3)]
+    [InlineData("22/01/2024 - 28/01/2024",  4)]
+    [InlineData("29/01/2024 - 04/02/2024",  5)]
+    [InlineData("23/12/2024 - 29/12/2024",  52)]
+    [InlineData("24/11/2025 - 30/11/2025",  100)]
+    public void DateRangeIsCorrect(string expected, int weekNum)
+    {
+        Assert.Equal(expected, DateTimeHelper.GetDateRangeStringFromWeekNum(DB_START_DATE, weekNum));
     }
 }

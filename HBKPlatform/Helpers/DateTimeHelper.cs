@@ -82,13 +82,36 @@ public class DateTimeHelper
         return dateTime.ToString("h:mm tt, dddd d MMMM yyyy");
     }
 
+    public static string GetDateRangeStringFromWeekNum(string dbStartDate, int weekNum)
+    {
+        if (weekNum <= 0) weekNum = 1;
+        var startDate = DateTime.Parse(dbStartDate);
+        startDate = startDate.AddDays(7 * (weekNum-1)); // week numbers are 0-indexed in practice...
+        var endDate = startDate.AddDays(6);
+        return $"{startDate.ToString("dd/MM/yyyy")} - {endDate.ToString("dd/MM/yyyy")}";
+    }
+
+    public static string GetDateRangeStringForThisWeek(string dbStartDate)
+    {
+        var now = DateTime.Now;
+        var thisWeek = GetWeekNumFromDateTime(dbStartDate, now);
+        var startDate = DateTime.Parse(dbStartDate);
+        startDate = startDate.AddDays(7 * (thisWeek-1)); // week numbers are 0-indexed in practice...
+        var endDate = startDate.AddDays(6);
+        
+        return $"{now.ToString("dd/MM/yyyy")} - {endDate.ToString("dd/MM/yyyy")}";
+    }
+
 }
 public interface IDateTimeWrapper
 {
     /// <summary>
     /// Silly wrapper but saves massive headaches whilst unit testing...
     /// </summary>
-    public DateTime Now { get { return DateTime.Now; } }
+    public DateTime Now
+    {
+        get { return DateTime.Now; }
+    }
 }
 
 public class DateTimeWrapper : IDateTimeWrapper {}

@@ -1,0 +1,22 @@
+@model HBKPlatform.Models.AvailabilityModel;
+@{
+    Layout = "_MyND";
+    ViewBag.CurrentNav = "Appointment|Availability";
+}
+@await Html.PartialAsync("_AppointmentsPartial")
+
+<h1>Availability</h1>
+<p>Week @Model.WeekNum (@Model.WeekStr).</p>
+
+<table>
+    <thead>
+    <tr>
+        <th>Time Period</th> <th colspan="7">Day</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>8pm - 8.30pm</td> <td><input type="checkbox"/></td>
+    </tr>
+    </tbody>
+</table>

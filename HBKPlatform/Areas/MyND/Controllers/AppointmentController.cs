@@ -1,4 +1,5 @@
 using HBKPlatform.Globals;
+using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +16,7 @@ namespace HBKPlatform.Controllers;
 /// </summary>
 
 [Area("MyND")]
-public class AppointmentController(ITreatmentService _treatmentService, IBookingService _bookingService): Controller
+public class AppointmentController(ITreatmentService _treatmentService, IBookingService _bookingService, IAvailabilityManagementService _availabilityMgmt): Controller
 {
     public async Task<IActionResult> Index()
     {
@@ -27,9 +28,21 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
         return View(await _bookingService.GetTimeslotMgmtView());
     }
     
-    public IActionResult AvailabilityManagement()
+    public async Task<IActionResult> AvailabilityManagement()
     {
-        return View();
+        return View(await _availabilityMgmt.GetAvailabilityManagementIndexModel());
+    }
+    
+    public async Task<IActionResult> SetWeekAvailability(int weekNum)
+    {
+        return View(await _availabilityMgmt.GetAvailabilityModelForWeek(weekNum));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DoSetWeekAvailability(int weekNum, [FromBody] AvailabilityModel model)
+    {
+        await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum, model);
+        return Ok();
     }
     
     public async Task<IActionResult> TreatmentManagement()
