@@ -1,6 +1,8 @@
+using HBKPlatform.Globals;
+
 namespace HBKPlatform.Repository;
 
-public class IAvailabilityRepository
+public interface IAvailabilityRepository
 {
-    
+    public Task<Dictionary<int, Enums.TimeslotAvailability>> GetAvailabilityLookupForWeek(int clinicId, int weekNum);
 }

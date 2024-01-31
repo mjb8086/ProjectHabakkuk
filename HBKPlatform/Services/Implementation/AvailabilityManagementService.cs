@@ -7,8 +7,10 @@ using HBKPlatform.Repository;
 namespace HBKPlatform.Services.Implementation;
 
 public class AvailabilityManagementService(IUserService _userService, IAvailabilityRepository _availabilityRepo, 
-    IConfigurationService _configService, ITimeslotRepository _timeslotRepo) : IAvailabilityManagementService
+    IConfigurationService _configService, ITimeslotRepository _timeslotRepo, IAvailabilityRepository _avaRepo) : IAvailabilityManagementService
 {
+    private Dictionary<int, Enums.TimeslotAvailability> CurrentAvailability;
+    
     public async Task<AvailabilityManagementIndex> GetAvailabilityManagementIndexModel()
     {
         var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
@@ -37,13 +39,14 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
+        CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, weekNum);
         var dailyTimeslotLookup = new Dictionary<Enums.Day, List<AvailabilityLite>>();
         foreach (var day in new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday})
         {
             var thisDayTs = allTimeslots.Where(x => x.Day == day).OrderBy(x => x.Time).ToList();
             dailyTimeslotLookup[day] = thisDayTs.Select(x => new AvailabilityLite()
             {
-                Description = x.Time.ToShortTimeString(), IsAvailable = true, TimeslotId = x.Id
+                Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.Id), TimeslotId = x.Id
             }).ToList();
         }
         
@@ -53,6 +56,25 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
             WeekNum = weekNum,
             DailyTimeslotLookup = dailyTimeslotLookup
         };
+    }
+
+    /// <summary>
+    ///  Determine whether the db TimeslotAvailability enum is true or false.
+    /// If no value is set, we assume true.
+    /// </summary>
+    private bool IsAvailable(int tsId)
+    {
+        if (!CurrentAvailability.TryGetValue(tsId, out var avaEnum))
+        {
+            return true;
+        }
+        
+        switch (avaEnum)
+        {
+            case Enums.TimeslotAvailability.Available: return true;
+            case Enums.TimeslotAvailability.Unavailable: return false;
+            default: return true;
+        }
     }
 
     public async Task UpdateAvailabilityForWeek(int weekNum, AvailabilityModel model)
