@@ -1,0 +1,21 @@
+table, td, tr, th {
+    border: 1px solid black;
+}
+
+td.ava-ts {
+    padding: 5px; 
+    cursor: pointer;
+    background-color: #9a9a9a;
+}
+
+td.ava-ts.available {
+   background-color: #00c600; 
+}
+
+td.ava-ts.unavailable {
+    background-color: #c0402a;
+}
+
+td.dayCell {
+    cursor: pointer;
+}

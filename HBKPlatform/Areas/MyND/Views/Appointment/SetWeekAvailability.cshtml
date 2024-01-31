@@ -1,7 +1,24 @@
+@using HBKPlatform.Globals
 @model HBKPlatform.Models.AvailabilityModel;
 @{
     Layout = "_MyND";
     ViewBag.CurrentNav = "Appointment|Availability";
+    ViewBag.Css = "mynd-setweekavailability.css";
+    ViewBag.Title = $"Set availability for week {Model.WeekNum}";
+    ViewBag.Modules = "mynd-setweekavailability.js";
+}
+@functions 
+{
+    void RenderDay(Enums.Day day)
+    {
+        <tr>
+            <td class="dayCell">@day.ToString()</td>
+            @foreach (var al in Model.DailyTimeslotLookup[day])
+            {
+                <td data-available="@al.IsAvailable.ToString().ToLower()" data-tsId="@al.TimeslotId" class="ava-ts @(al.IsAvailable ? "available" : "unavailable")">@al.Description</td>
+            }
+        </tr>
+    }
 }
 @await Html.PartialAsync("_AppointmentsPartial")
 
@@ -11,12 +28,23 @@
 <table>
     <thead>
     <tr>
-        <th>Time Period</th> <th colspan="7">Day</th>
+        <th>Day</th> <th colspan="50">Time Period</th>
     </tr>
     </thead>
     <tbody>
-    <tr>
-        <td>8pm - 8.30pm</td> <td><input type="checkbox"/></td>
-    </tr>
+    @{ RenderDay(Enums.Day.Monday); }
+    @{ RenderDay(Enums.Day.Tuesday); }
+    @{ RenderDay(Enums.Day.Wednesday); }
+    @{ RenderDay(Enums.Day.Thursday); }
+    @{ RenderDay(Enums.Day.Friday); }
+    @{ RenderDay(Enums.Day.Saturday); }
+    @{ RenderDay(Enums.Day.Sunday); }
     </tbody>
 </table>
+
+<button id="btnApply" class="changeBtn" disabled="disabled">Apply</button>
+<button id="btnDiscard" class="changeBtn" disabled="disabled">Discard</button>
+<button id="btnRevert" class="changeBtn" disabled="disabled">Revert</button>
+<button id="btnExit">Exit</button>
+<div id="changesMade" style="display: none">You have unsaved changes. Click 'Apply' to save them or 'Discard' to revert.</div>
+<div>Clicking 'Revert' will revert all timeslots back to being available.</div>
