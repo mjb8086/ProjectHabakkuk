@@ -243,7 +243,39 @@ namespace HBKPlatform.Database.Helpers
                         Clinic = clinic
                     };
                     ctx.Add(startDate);
-                    
+
+                    var ta = new List<TimeslotAvailability>()
+                    {
+                        new TimeslotAvailability()
+                        {
+                            Timeslot = timeslots[100],
+                            Practitioner = prac1,
+                            Availability = Enums.TimeslotAvailability.Unavailable,
+                            WeekNum = 20
+                        },
+                        new TimeslotAvailability()
+                        {
+                            Timeslot = timeslots[101],
+                            Practitioner = prac1,
+                            Availability = Enums.TimeslotAvailability.Unavailable,
+                            WeekNum = 20
+                        },
+                        new TimeslotAvailability()
+                        {
+                            Timeslot = timeslots[102],
+                            Practitioner = prac1,
+                            Availability = Enums.TimeslotAvailability.Unavailable,
+                            WeekNum = 20
+                        },
+                        new TimeslotAvailability()
+                        {
+                            Timeslot = timeslots[104],
+                            Practitioner = prac1,
+                            Availability = Enums.TimeslotAvailability.Available,
+                            WeekNum = 20
+                        },
+                    };
+                    ctx.AddRange(ta);
                     ctx.SaveChanges();
                     
                 }

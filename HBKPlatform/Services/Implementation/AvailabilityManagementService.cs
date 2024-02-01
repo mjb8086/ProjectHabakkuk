@@ -7,7 +7,7 @@ using HBKPlatform.Repository;
 namespace HBKPlatform.Services.Implementation;
 
 public class AvailabilityManagementService(IUserService _userService, IAvailabilityRepository _availabilityRepo, 
-    IConfigurationService _configService, ITimeslotRepository _timeslotRepo, IAvailabilityRepository _avaRepo) : IAvailabilityManagementService
+    IConfigurationService _configService, ITimeslotRepository _timeslotRepo) : IAvailabilityManagementService
 {
     private Dictionary<int, Enums.TimeslotAvailability> CurrentAvailability;
     
@@ -30,7 +30,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     {
         var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var practitionerId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
         
         var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
         var dateRangeStr = currentWeek == weekNum
@@ -39,7 +39,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
-        CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, weekNum);
+        CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
         var dailyTimeslotLookup = new Dictionary<Enums.Day, List<AvailabilityLite>>();
         foreach (var day in new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday})
         {
@@ -77,9 +77,11 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         }
     }
 
-    public async Task UpdateAvailabilityForWeek(int weekNum, AvailabilityModel model)
+    public async Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model)
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, clinicId, model.Updated);
     }
     
 }

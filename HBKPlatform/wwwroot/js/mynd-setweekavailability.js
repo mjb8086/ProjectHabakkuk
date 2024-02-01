@@ -27,6 +27,21 @@ $(document).ready(function () {
     
     $("#btnExit").on('click', function() {
         window.location.href = `${Globals.BaseUrl}/mynd/appointment/availabilitymanagement`;
-    })
+    });
+    
+    $("#btnApply").on('click', function(e) {
+        $.ajax({
+            url: `${Globals.BaseUrl}/mynd/appointment/dosetweekavailability?weekNum=${e.target.dataset.weeknum}`,
+            contentType: "application/json",
+            method: "POST",
+            data: JSON.stringify({
+                updated: updatedAvailability
+            }),
+            success: function (data) {
+                Globals.HBKFlasher("Successfully updated availability.");
+                $('#changesMade').hide();
+            }
+        });
+    });
 
 });

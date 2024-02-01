@@ -15,3 +15,8 @@ public class AvailabilityLite
     public string Description { get; set; }
     public bool IsAvailable { get; set; }
 }
+
+public class UpdatedAvailability
+{
+    public Dictionary<int, bool> Updated { get; set; }
+}

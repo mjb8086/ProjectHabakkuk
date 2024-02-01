@@ -39,7 +39,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     }
 
     [HttpPost]
-    public async Task<IActionResult> DoSetWeekAvailability(int weekNum, [FromBody] AvailabilityModel model)
+    public async Task<IActionResult> DoSetWeekAvailability(int weekNum, [FromBody] UpdatedAvailability model)
     {
         await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum, model);
         return Ok();

@@ -6,7 +6,7 @@ namespace HBKPlatform.Services;
 public interface IAvailabilityManagementService
 {
     public Task<AvailabilityManagementIndex> GetAvailabilityManagementIndexModel();
-    public Task UpdateAvailabilityForWeek(int weekNum, AvailabilityModel model);
 
+    public Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model);
     public Task<AvailabilityModel> GetAvailabilityModelForWeek(int weekNum);
 }
