@@ -44,6 +44,12 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
         await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum, model);
         return Ok();
     }
+
+    public async Task<IActionResult> DoRevertAvailability(int weekNum)
+    {
+        await _availabilityMgmt.RevertAvailabilityForWeek(weekNum);
+        return Ok();
+    }
     
     public async Task<IActionResult> TreatmentManagement()
     {

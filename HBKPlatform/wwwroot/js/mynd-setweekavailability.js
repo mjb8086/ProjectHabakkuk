@@ -1,11 +1,23 @@
 import Globals from './globals.js';
 
 $(document).ready(function () {
+    // Model
     var updatedAvailability = {};
+    
+    // Elements
     const btnDiscard = $("#btnDiscard");
+    const allTs = $(".ava-ts");
+    
+    // Functions
+    function revertAll()
+    {
+        allTs.removeClass("unavailable");
+        allTs.addClass("available");
+        allTs.attr("data-available", "true");
+    }
     
     // Listeners
-    $(".ava-ts").on('click', function (e) {
+    allTs.on('click', function (e) {
         $('.changeBtn').prop('disabled', false);
         $('#changesMade').show();
         if (this.dataset.available == "true") {
@@ -39,6 +51,18 @@ $(document).ready(function () {
             }),
             success: function (data) {
                 Globals.HBKFlasher("Successfully updated availability.");
+                $('#changesMade').hide();
+            }
+        });
+    });
+    
+    $("#btnRevert").on('click', function(e) {
+        $.ajax({
+            url: `${Globals.BaseUrl}/mynd/appointment/dorevertavailability?weekNum=${e.target.dataset.weeknum}`,
+            method: "GET",
+            success: function (data) {
+                Globals.HBKFlasher("Successfully reverted availability. All time periods are now available for this week.");
+                revertAll();
                 $('#changesMade').hide();
             }
         });

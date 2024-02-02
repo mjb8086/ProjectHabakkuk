@@ -44,7 +44,7 @@
 
 <button id="btnApply" class="changeBtn" disabled="disabled" data-weekNum="@Model.WeekNum">Apply</button>
 <button id="btnDiscard" class="changeBtn" disabled="disabled">Discard</button>
-<button id="btnRevert" class="changeBtn" disabled="disabled">Revert</button>
+<button id="btnRevert" data-weekNum="@Model.WeekNum">Revert</button>
 <button id="btnExit">Exit</button>
 <div id="changesMade" style="display: none">You have unsaved changes. Click 'Apply' to save them or 'Discard' to revert.</div>
 <div>Clicking 'Revert' will revert all timeslots back to being available.</div>

@@ -9,4 +9,5 @@ public interface IAvailabilityManagementService
 
     public Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model);
     public Task<AvailabilityModel> GetAvailabilityModelForWeek(int weekNum);
+    public Task RevertAvailabilityForWeek(int weekNum);
 }

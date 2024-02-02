@@ -1,5 +1,6 @@
 using HBKPlatform.Database;
 using HBKPlatform.Globals;
+using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,13 @@ public class AvailabilityRepository(ApplicationDbContext _db) : IAvailabilityRep
         return await _db.TimeslotAvailabilities.Include("Timeslot")
             .Where(x => x.Timeslot.ClinicId == clinicId && x.WeekNum == weekNum && x.PractitionerId == pracId)
             .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
+    }
+    
+    public async Task<List<TimeslotAvailabilityDto>> GetAvailabilityLookupForWeeks(int clinicId, int pracId, int[] weekNums)
+    {
+        return await _db.TimeslotAvailabilities.Include("Timeslot")
+            .Where(x => x.Timeslot.ClinicId == clinicId && weekNums.Contains(x.WeekNum) && x.PractitionerId == pracId)
+            .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.TimeslotId, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
     }
 
     public async Task UpdateAvailabilityForWeek(int weekNum, int pracId, int clinicId, Dictionary<int, bool> tsAvaDict)
@@ -46,6 +54,11 @@ public class AvailabilityRepository(ApplicationDbContext _db) : IAvailabilityRep
         }
         await _db.AddRangeAsync(newAva);
         await _db.SaveChangesAsync();
+    }
+
+    public async Task RevertAvailabilityForWeek(int weekNum, int pracId, int clinicId)
+    {
+        await _db.TimeslotAvailabilities.Include("Timeslot").Where(x => x.WeekNum == weekNum && x.PractitionerId == pracId && x.Timeslot.ClinicId == clinicId).ExecuteDeleteAsync();
     }
 
 }

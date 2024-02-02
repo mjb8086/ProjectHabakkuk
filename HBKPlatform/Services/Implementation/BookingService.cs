@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Data;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
@@ -17,7 +18,8 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime) : IBookingService
+public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, 
+    IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime, IAvailabilityRepository _avaRepo) : IBookingService
 {
     public async Task<List<TimeslotDto>> GetAllTimeslots()
     {
@@ -80,7 +82,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
         
         var availableTs =  await GetTimeslotsForBooking(clinicId);
-        availableTs = (await ClashCheck(availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        availableTs = (await ClashCheck(clinicId, availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
         if (treatments.TryGetValue(treatmentId, out var treatment))
         {
@@ -95,27 +97,36 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         throw new MissingPrimaryKeyException($"Treatment ID {treatmentId} does not exist");
     }
 
-    private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
+    private async Task<List<TimeslotDto>> ClashCheck(int clinicId, List<TimeslotDto> timeslots, int pracId)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
+        var tsAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(clinicId, pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
         // TODO: If new appointment statuses are added, update predicate
         var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
+        var unavailableTs = tsAvaLookup.Where(x => x.Availability == Enums.TimeslotAvailability.Unavailable).ToList();
         
-        return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots)).ToList();
+        // If the ts is unavailable, return true
+        return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && !unavailableTs.Any(y => y.WeekNum == x.WeekNum && y.TimeslotId == x.Id)).ToList();
     }
     
     /// <summary>
     /// Check whether the timeslot is free for the practitioner.
     /// </summary>
-    /// <returns>TRUE - timeslot clashes with another appointment.</returns>
-    private async Task<bool> ClashCheck(int timeslotId, int pracId, int weekNum)
+    /// <returns>TRUE - timeslot clashes with another appointment, or is set to unavailable.</returns>
+    private async Task<bool> ClashCheckSingle(int timeslotId, int clinicId, int pracId, int weekNum)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
+        var tsAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
+        
+        // If the ts is unavailable, return true
+        if (tsAvaLookup.TryGetValue(timeslotId, out var ava) && ava == Enums.TimeslotAvailability.Unavailable) return true;
+        
         // TODO: If new appointment statuses are added, update predicate
         var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
         var ts = await _timeslotRepo.GetTimeslot(timeslotId);
         ts.WeekNum = weekNum;
         
+        // check for clashes with other appointments
         foreach (var occupiedTs in occupiedTimeslots)
         {
             if (ts.IsClash(occupiedTs)) return true;
@@ -237,7 +248,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     private async Task<BookingConfirm> DoBooking(int clinicId, int timeslotId, int pracId, int weekNum, int clientId, int treatmentId)
     {
         // first check for no clashes
-        if (await ClashCheck(timeslotId, pracId, weekNum))
+        if (await ClashCheckSingle(timeslotId, clinicId, pracId, weekNum))
         {
             throw new InvalidOperationException("Another appointment has already been booked into the timeslot.");
         }
@@ -284,7 +295,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var treatments = await _cacheService.GetTreatments(clinicId);
         var clients = await _cacheService.GetClinicClientDetailsLite(clinicId);
         var timeslots = await GetTimeslotsForBooking(clinicId);
-        timeslots = (await ClashCheck(timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        timeslots = (await ClashCheck(clinicId, timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
         var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
         var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);

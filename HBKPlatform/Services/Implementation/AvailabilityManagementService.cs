@@ -83,5 +83,12 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, clinicId, model.Updated);
     }
+
+    public async Task RevertAvailabilityForWeek(int weekNum)
+    {
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId, clinicId);
+    }
     
 }
