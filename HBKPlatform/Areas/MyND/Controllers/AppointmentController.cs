@@ -39,18 +39,38 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     {
         return View(await _availabilityMgmt.GetAvailabilityModelForWeek(weekNum));
     }
+    
+    public async Task<IActionResult> SetIndefAvailability()
+    {
+        return View(await _availabilityMgmt.GetAvailabilityModelForWeek(1));
+    }
 
     [HttpPost]
-    public async Task<IActionResult> DoSetWeekAvailability(int weekNum, [FromBody] UpdatedAvailability model)
+    public async Task<IActionResult> DoSetAvailability(int? weekNum, [FromBody] UpdatedAvailability model)
     {
         if (!ModelState.IsValid) throw new Exception("Model bad");
-        await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum, model);
+        if (weekNum.HasValue)
+        {
+            await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum.Value, model);
+        }
+        else
+        {
+            await _availabilityMgmt.UpdateAvailabilityForIndef(model);
+        }
         return Ok();
     }
 
-    public async Task<IActionResult> DoRevertAvailability(int weekNum)
+    public async Task<IActionResult> DoRevertAvailability(int? weekNum)
     {
-        await _availabilityMgmt.RevertAvailabilityForWeek(weekNum);
+        if (weekNum.HasValue)
+        {
+            await _availabilityMgmt.RevertAvailabilityForWeek(weekNum.Value);
+        }
+        else
+        {
+            await _availabilityMgmt.RevertAvailabilityForIndef();
+        }
+
         return Ok();
     }
     

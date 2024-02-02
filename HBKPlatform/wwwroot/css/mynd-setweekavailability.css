@@ -16,6 +16,10 @@ td.ava-ts.unavailable {
     background-color: #c0402a;
 }
 
+td.ava-ts.unavailable.indefinite {
+    background-color: #f4907e;
+}
+
 td.dayCell {
     cursor: pointer;
 }

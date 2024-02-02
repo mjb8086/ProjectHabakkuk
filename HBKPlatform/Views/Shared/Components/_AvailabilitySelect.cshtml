@@ -1,0 +1,32 @@
+@using HBKPlatform.Globals
+@model HBKPlatform.Models.AvailabilityModel;
+@functions 
+{
+    void RenderDay(Enums.Day day)
+    {
+        <tr>
+            <td class="dayCell">@day.ToString()</td>
+            @foreach (var al in Model.DailyTimeslotLookup[day])
+            {
+                <td data-available="@al.IsAvailable.ToString().ToLower()" data-tsId="@al.TimeslotId" class="ava-ts @(al.IsAvailable ? "available" : "unavailable") @(al.IsIndefinite ? "indefinite" : "")">@al.Description</td>
+            }
+        </tr>
+    }
+}
+
+<table>
+    <thead>
+    <tr>
+        <th>Day</th> <th colspan="50">Time Period</th>
+    </tr>
+    </thead>
+    <tbody>
+    @{ RenderDay(Enums.Day.Monday); }
+    @{ RenderDay(Enums.Day.Tuesday); }
+    @{ RenderDay(Enums.Day.Wednesday); }
+    @{ RenderDay(Enums.Day.Thursday); }
+    @{ RenderDay(Enums.Day.Friday); }
+    @{ RenderDay(Enums.Day.Saturday); }
+    @{ RenderDay(Enums.Day.Sunday); }
+    </tbody>
+</table>

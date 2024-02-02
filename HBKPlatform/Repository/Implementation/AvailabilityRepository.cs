@@ -15,6 +15,13 @@ public class AvailabilityRepository(ApplicationDbContext _db) : IAvailabilityRep
             .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
     }
     
+    public async Task<Dictionary<int, Enums.TimeslotAvailability>> GetAvailabilityLookupForIndef(int clinicId, int pracId)
+    {
+        return await _db.TimeslotAvailabilities.Include("Timeslot")
+            .Where(x => x.Timeslot.ClinicId == clinicId && x.IsIndefinite && x.PractitionerId == pracId)
+            .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
+    }
+    
     public async Task<List<TimeslotAvailabilityDto>> GetAvailabilityLookupForWeeks(int clinicId, int pracId, int[] weekNums)
     {
         return await _db.TimeslotAvailabilities.Include("Timeslot")
@@ -29,6 +36,37 @@ public class AvailabilityRepository(ApplicationDbContext _db) : IAvailabilityRep
                 x.WeekNum == weekNum && x.Timeslot.ClinicId == clinicId && x.PractitionerId == pracId)
             .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
 
+        UpdateExistingRecords(tsAvaDict, existingRecords);
+        
+        // 2. Create any new records 
+        var newAva = GetNewRecords(tsAvaDict, weekNum, pracId, false);
+        
+        await _db.AddRangeAsync(newAva);
+        await _db.SaveChangesAsync();
+    }
+    
+    public async Task UpdateAvailabilityForIndef(int pracId, int clinicId, Dictionary<int, bool> tsAvaDict)
+    {
+        // 1. Find and update any existing availability records
+        var existingRecords = await _db.TimeslotAvailabilities.Include("Timeslot").Where(x =>
+                x.IsIndefinite && x.Timeslot.ClinicId == clinicId && x.PractitionerId == pracId)
+            .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
+
+        UpdateExistingRecords(tsAvaDict, existingRecords);
+        
+        // 2. Create any new records 
+        var newAva = GetNewRecords(tsAvaDict, -1, pracId, true);
+        
+        await _db.AddRangeAsync(newAva);
+        await _db.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Set availability on existing db records if any were changed in the tsAvaDict.
+    /// NOTE: will remove elements from the tsAvaDict if there are any matches to the db.
+    /// </summary>
+    private void UpdateExistingRecords(Dictionary<int, bool> tsAvaDict, Dictionary<int, Enums.TimeslotAvailability> existingRecords)
+    {
         foreach (var tsId in existingRecords.Keys)
         {
             if (tsAvaDict.TryGetValue(tsId, out bool isAvailable))
@@ -39,26 +77,33 @@ public class AvailabilityRepository(ApplicationDbContext _db) : IAvailabilityRep
                 tsAvaDict.Remove(tsId);
             }
         }
+    }
 
-        // 2. Create any new records 
+    private List<TimeslotAvailability> GetNewRecords(Dictionary<int, bool> tsAvaDict, int weekNum, int pracId, bool isIndefinite)
+    {
         var newAva = new List<TimeslotAvailability>();
         foreach (var tsId in tsAvaDict.Keys)
         {
             newAva.Add(new TimeslotAvailability()
             {
-                TimeslotId = tsId, WeekNum = weekNum, PractitionerId = pracId,
+                TimeslotId = tsId, WeekNum = weekNum, PractitionerId = pracId, IsIndefinite = isIndefinite,
                 Availability = tsAvaDict[tsId]
                     ? Enums.TimeslotAvailability.Available
                     : Enums.TimeslotAvailability.Unavailable
             });
         }
-        await _db.AddRangeAsync(newAva);
-        await _db.SaveChangesAsync();
+
+        return newAva;
     }
 
     public async Task RevertAvailabilityForWeek(int weekNum, int pracId, int clinicId)
     {
         await _db.TimeslotAvailabilities.Include("Timeslot").Where(x => x.WeekNum == weekNum && x.PractitionerId == pracId && x.Timeslot.ClinicId == clinicId).ExecuteDeleteAsync();
+    }
+    
+    public async Task RevertAvailabilityForIndef(int pracId, int clinicId)
+    {
+        await _db.TimeslotAvailabilities.Include("Timeslot").Where(x => x.IsIndefinite && x.PractitionerId == pracId && x.Timeslot.ClinicId == clinicId).ExecuteDeleteAsync();
     }
 
 }

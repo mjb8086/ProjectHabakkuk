@@ -1,22 +1,21 @@
-@using HBKPlatform.Globals
 @model HBKPlatform.Models.AvailabilityModel;
 @{
     Layout = "_MyND";
     ViewBag.CurrentNav = "Appointment|Availability";
-    ViewBag.Title = $"Set availability for week {Model.WeekNum}";
+    ViewBag.Title = $"Set availability for all weeks";
     ViewBag.Css = "mynd-setweekavailability.css";
     ViewBag.Modules = "mynd-setweekavailability.js";
 }
 @await Html.PartialAsync("_AppointmentsPartial")
 
-<h1>Availability</h1>
-<p>Week @Model.WeekNum (@Model.WeekStr).</p>
+<h1>Default Availability</h1>
+<p>Set your preference for all weeks. You may also use the per-week view to override these preferences.</p>
 
 @await Html.PartialAsync("Components/_AvailabilitySelect", Model)
 
-<button id="btnApply" class="changeBtn" disabled="disabled" data-weekNum="@Model.WeekNum">Apply</button>
+<button id="btnApply" class="changeBtn" disabled="disabled">Apply</button>
 <button id="btnDiscard" class="changeBtn" disabled="disabled">Discard</button>
-<button id="btnRevert" data-weekNum="@Model.WeekNum">Revert</button>
+<button id="btnRevert" >Revert</button>
 <button id="btnExit">Exit</button>
 <div id="changesMade" style="display: none">You have unsaved changes. Click 'Apply' to save them or 'Discard' to revert.</div>
-<div>Clicking 'Revert' will revert all timeslots back to being available.</div>
+<div><b>Usage notes:</b><br>Per-week availability will override any all-week availability.<br>Clicking 'Revert' will revert all timeslots back to being available.</div>

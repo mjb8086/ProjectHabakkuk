@@ -10,6 +10,7 @@
 
 <div id="table1Wrap">
     <div class="table1Item"><span>Week Range</span> <span>Option</span></div>
+    <div class="table1Item"><span style="font-weight: bold">All Weeks</span> <span><a asp-area="MyND" asp-controller="Appointment" asp-action="SetIndefAvailability" >Set global availability preference</a></span></div>
     @foreach (var weekNum in Model.WeekDates.Keys)
     {
         <div class="table1Item"><span>@Model.WeekDates[weekNum]</span> <span><a asp-area="MyND" asp-controller="Appointment" asp-action="SetWeekAvailability" asp-route-weekNum="@weekNum">Set availability</a></span></div>

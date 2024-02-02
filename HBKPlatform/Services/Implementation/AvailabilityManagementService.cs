@@ -1,6 +1,7 @@
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models;
+using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
 
@@ -40,22 +41,51 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
         CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
+        
+        return new AvailabilityModel()
+        {
+            WeekStr = dateRangeStr,
+            WeekNum = weekNum,
+            DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots)
+        };
+    }
+    
+    /// <summary>
+    /// Get the availability model for all weeks.
+    /// </summary>
+    public async Task<AvailabilityModel> GetAvailabilityModelForIndef()
+    {
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        
+        var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
+
+        CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        
+        return new AvailabilityModel()
+        {
+            DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
+        };
+    }
+
+    /// <summary>
+    /// Build availability dictionary from timeslots. Used both per-week and for all weeks.
+    /// </summary>
+    public Dictionary<Enums.Day, List<AvailabilityLite>> BuildAvaLiteDict(List<TimeslotDto> allTimeslots)
+    {
+        if (CurrentAvailability == null) throw new NullReferenceException("Current availability is not populated.");
         var dailyTimeslotLookup = new Dictionary<Enums.Day, List<AvailabilityLite>>();
         foreach (var day in new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday})
         {
             var thisDayTs = allTimeslots.Where(x => x.Day == day).OrderBy(x => x.Time).ToList();
             dailyTimeslotLookup[day] = thisDayTs.Select(x => new AvailabilityLite()
             {
+                // IsAvailable depends on CurrentAvailability being populated.
                 Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.Id), TimeslotId = x.Id
             }).ToList();
         }
-        
-        return new AvailabilityModel()
-        {
-            WeekStr = dateRangeStr,
-            WeekNum = weekNum,
-            DailyTimeslotLookup = dailyTimeslotLookup
-        };
+
+        return dailyTimeslotLookup;
     }
 
     /// <summary>
@@ -89,6 +119,20 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId, clinicId);
+    }
+    
+    public async Task UpdateAvailabilityForIndef(UpdatedAvailability model)
+    {
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        await _availabilityRepo.UpdateAvailabilityForIndef(pracId, clinicId, model.Updated);
+    }
+
+    public async Task RevertAvailabilityForIndef()
+    {
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        await _availabilityRepo.RevertAvailabilityForIndef(pracId, clinicId);
     }
     
 }

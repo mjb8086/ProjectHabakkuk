@@ -43,7 +43,7 @@ $(document).ready(function () {
     
     $("#btnApply").on('click', function(e) {
         $.ajax({
-            url: `${Globals.BaseUrl}/mynd/appointment/dosetweekavailability?weekNum=${e.target.dataset.weeknum}`,
+            url: `${Globals.BaseUrl}/mynd/appointment/dosetavailability` + (e.target.dataset.weeknum ? `?weekNum=${e.target.dataset.weeknum}` : ""),
             contentType: "application/json",
             method: "POST",
             data: JSON.stringify({
@@ -58,7 +58,7 @@ $(document).ready(function () {
     
     $("#btnRevert").on('click', function(e) {
         $.ajax({
-            url: `${Globals.BaseUrl}/mynd/appointment/dorevertavailability?weekNum=${e.target.dataset.weeknum}`,
+            url: `${Globals.BaseUrl}/mynd/appointment/dorevertavailability` + (e.target.dataset.weeknum ? `?weekNum=${e.target.dataset.weeknum}` : ""),
             method: "GET",
             success: function (data) {
                 Globals.HBKFlasher("Successfully reverted availability. All time periods are now available for this week.");
