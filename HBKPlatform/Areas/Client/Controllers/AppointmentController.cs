@@ -1,6 +1,7 @@
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Client.Controllers;
@@ -14,6 +15,7 @@ namespace HBKPlatform.Client.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 [Area("Client")]
+[Authorize]
 public class AppointmentController(IBookingService _bookingService, ITreatmentService _treatmentService) : Controller
 {
     public async Task<IActionResult> Index()

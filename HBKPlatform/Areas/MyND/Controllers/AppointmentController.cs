@@ -2,6 +2,7 @@ using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -16,6 +17,7 @@ namespace HBKPlatform.Controllers;
 /// </summary>
 
 [Area("MyND")]
+[Authorize]
 public class AppointmentController(ITreatmentService _treatmentService, IBookingService _bookingService, IAvailabilityManagementService _availabilityMgmt): Controller
 {
     public async Task<IActionResult> Index()
@@ -41,6 +43,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     [HttpPost]
     public async Task<IActionResult> DoSetWeekAvailability(int weekNum, [FromBody] UpdatedAvailability model)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum, model);
         return Ok();
     }
@@ -66,6 +69,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     [HttpPost]
     public async Task<IActionResult> DoCreateTreatment([FromForm] TreatmentDto treatment)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         await _treatmentService.CreateTreatment(treatment);
         TempData["Message"] = "Successfully created treatment.";
         return RedirectToRoute(new { controller = "Appointment", action = "TreatmentManagement" });
@@ -81,6 +85,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     [HttpPut]
     public async Task<IActionResult> DoUpdateTreatment([FromBody] TreatmentDto treatment)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         // todo: Verify user has right to update 
         await _treatmentService.UpdateTreatment(treatment);
         TempData["Message"] = "Successfully updated treatment.";
@@ -96,6 +101,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     [HttpPost]
     public async Task<IActionResult> BookingConfirm([FromForm] PracBookingFormModel appointment)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         return View(await _bookingService.GetBookingConfirmModel(appointment));
     }
     
@@ -111,6 +117,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
 
     public async Task<IActionResult> DoCancelBooking([FromQuery] int appointmentId, [FromForm] CancelAppointmentFormModel model)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         await _bookingService.DoCancelBooking(appointmentId, model.Reason, Enums.AppointmentStatus.CancelledByPractitioner);
         TempData["Message"] = "Successfully cancelled booking";
         return RedirectToRoute(new { controller = "Appointment", action = "Index" });

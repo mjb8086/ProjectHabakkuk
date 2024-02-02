@@ -1,4 +1,5 @@
 using HBKPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -13,6 +14,7 @@ namespace HBKPlatform.Controllers;
 /// © 2023 NowDoctor Ltd.
 /// </summary>
 [Area("MyND")]
+[Authorize]
 public class ReceptionController(IClinicService _clinicService): Controller
 {
     public async Task<IActionResult> Index()

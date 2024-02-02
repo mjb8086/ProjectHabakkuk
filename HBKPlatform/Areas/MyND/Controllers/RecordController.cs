@@ -1,6 +1,7 @@
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Repository;
 using HBKPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Controllers;
@@ -15,6 +16,7 @@ namespace HBKPlatform.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 [Area("MyND")]
+[Authorize]
 public class RecordController(IClientRecordService _recordService, IRecordRepository _recordRepo): Controller
 {
     /// <summary>
@@ -48,6 +50,7 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
     [HttpPut]
     public async Task<IActionResult> UpdateRecordBody(int recordId, [FromBody] ClientRecordDto record)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         return Ok(await _recordRepo.UpdateRecordBody(recordId, record.NoteBody));
     }
 
@@ -61,6 +64,7 @@ public class RecordController(IClientRecordService _recordService, IRecordReposi
     [HttpPost]
     public async Task<IActionResult> CreateRecord([FromBody] ClientRecordDto recordDto)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         await _recordService.CreateRecord(recordDto);
         return Ok();
     }

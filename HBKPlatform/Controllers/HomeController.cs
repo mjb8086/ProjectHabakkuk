@@ -40,13 +40,6 @@ public class HomeController : Controller
         return View();
     }
 
-
-    [HttpPost]
-    public string Search(string query)
-    {
-        return HtmlEncoder.Default.Encode(query); 
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

@@ -1,4 +1,5 @@
 using HBKPlatform.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Client.Controllers;
@@ -13,6 +14,7 @@ namespace HBKPlatform.Client.Controllers;
 /// © 2023 NowDoctor Ltd.
 /// </summary>
 [Area("Client")]
+[Authorize]
 public class MessagingController
     (IClientMessagingService _clientMessagingService, ICacheService _cache, IHttpContextAccessor _httpContextAccessor) : Controller
 {

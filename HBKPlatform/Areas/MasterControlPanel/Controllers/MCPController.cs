@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HBKPlatform.Areas.MasterControlPanel.Controllers;
@@ -13,6 +14,7 @@ namespace HBKPlatform.Areas.MasterControlPanel.Controllers;
 /// </summary>
 [Area("MasterControlPanel")]
 [Route(("mcp"))]
+[Authorize]
 public class MCPController : Controller
 {
     private readonly ApplicationDbContext _context;

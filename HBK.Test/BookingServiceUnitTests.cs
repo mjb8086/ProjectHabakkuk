@@ -52,7 +52,7 @@ public class BookingServiceUnitTests
         mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks", CLINIC_ID)).ReturnsAsync(new SettingDto() {Value = "2"});
         mockDateTimeHelper.Setup(x => x.Now).Returns(new DateTime(2024, 01, 17, 14, 00, 00));
 
-        var bookingService = new BookingService(mockTimeslotRepo.Object, null, null, null, mockConfigService.Object, mockDateTimeHelper.Object);
+        var bookingService = new BookingService(mockTimeslotRepo.Object, null, null, null, mockConfigService.Object, mockDateTimeHelper.Object, null);
         // todo: mock other dependencies
 //        var timeslots = bookingService.Get
     }

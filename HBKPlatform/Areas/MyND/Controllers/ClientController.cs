@@ -36,6 +36,7 @@ public class ClientController(IClientDetailsService _cdSrv) : Controller
     [HttpPost]
     public async Task<IActionResult> DoAddClient([FromForm] ClientDto client)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         await _cdSrv.CreateClient(client);
         TempData["Message"] = "New client registered. An activation email will be sent to his/her inbox.";
         
@@ -46,6 +47,7 @@ public class ClientController(IClientDetailsService _cdSrv) : Controller
     [HttpPost]
     public async Task<IActionResult> DoEditClient(int clientId, [FromForm] ClientDto client)
     {
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         client.Id = clientId;
         await _cdSrv.UpdateClientDetails(client);
         TempData["Message"] = "Successfully updated client details";
