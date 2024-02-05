@@ -10,7 +10,8 @@ namespace HBKPlatform.Services.Implementation;
 public class AvailabilityManagementService(IUserService _userService, IAvailabilityRepository _availabilityRepo, 
     IConfigurationService _configService, ITimeslotRepository _timeslotRepo) : IAvailabilityManagementService
 {
-    private Dictionary<int, Enums.TimeslotAvailability> CurrentAvailability;
+    private Dictionary<int, TimeslotAvailabilityDto> CurrentAvailability;
+    private Dictionary<int, TimeslotAvailabilityDto> IndefiniteAvailability;
     
     public async Task<AvailabilityManagementIndex> GetAvailabilityManagementIndexModel()
     {
@@ -41,6 +42,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
         CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
+        IndefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
         
         return new AvailabilityModel()
         {
@@ -60,7 +62,8 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
-        CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        // identical for indef model construction
+        CurrentAvailability = IndefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
         
         return new AvailabilityModel()
         {
@@ -81,7 +84,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
             dailyTimeslotLookup[day] = thisDayTs.Select(x => new AvailabilityLite()
             {
                 // IsAvailable depends on CurrentAvailability being populated.
-                Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.Id), TimeslotId = x.Id
+                Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.Id), TimeslotId = x.Id, IsIndefinite = IsIndefiniteUnavailable(x.Id)
             }).ToList();
         }
 
@@ -89,22 +92,36 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     }
 
     /// <summary>
-    ///  Determine whether the db TimeslotAvailability enum is true or false.
+    ///  Determine whether the db TimeslotAvailability enum resolves to true or false.
     /// If no value is set, we assume true.
     /// </summary>
     private bool IsAvailable(int tsId)
     {
-        if (!CurrentAvailability.TryGetValue(tsId, out var avaEnum))
+        if (!CurrentAvailability.TryGetValue(tsId, out var avaDto))
         {
             return true;
         }
         
-        switch (avaEnum)
+        switch (avaDto.Availability)
         {
             case Enums.TimeslotAvailability.Available: return true;
             case Enums.TimeslotAvailability.Unavailable: return false;
             default: return true;
         }
+    }
+    
+    /// <summary>
+    /// Return TRUE if there is a matching indefinite availability for the timeslotId, and it is unavailable
+    /// </summary>
+    private bool IsIndefiniteUnavailable(int tsId)
+    {
+        if (!IndefiniteAvailability.TryGetValue(tsId, out var avaDto))
+        {
+            return false;
+        }
+
+        return avaDto.IsIndefinite && avaDto.Availability == Enums.TimeslotAvailability.Unavailable;
+
     }
 
     public async Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model)

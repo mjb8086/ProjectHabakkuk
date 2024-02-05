@@ -42,7 +42,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     
     public async Task<IActionResult> SetIndefAvailability()
     {
-        return View(await _availabilityMgmt.GetAvailabilityModelForWeek(1));
+        return View(await _availabilityMgmt.GetAvailabilityModelForIndef());
     }
 
     [HttpPost]

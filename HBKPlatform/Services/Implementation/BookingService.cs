@@ -119,7 +119,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var tsAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
         
         // If the ts is unavailable, return true
-        if (tsAvaLookup.TryGetValue(timeslotId, out var ava) && ava == Enums.TimeslotAvailability.Unavailable) return true;
+        if (tsAvaLookup.TryGetValue(timeslotId, out var ava) && ava.Availability == Enums.TimeslotAvailability.Unavailable) return true;
         
         // TODO: If new appointment statuses are added, update predicate
         var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();

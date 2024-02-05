@@ -12,12 +12,12 @@ td.ava-ts.available {
    background-color: #00c600; 
 }
 
-td.ava-ts.unavailable {
-    background-color: #c0402a;
+td.ava-ts.indefinite {
+    background-color: #f4907e;
 }
 
-td.ava-ts.unavailable.indefinite {
-    background-color: #f4907e;
+td.ava-ts.unavailable {
+    background-color: #c0402a;
 }
 
 td.dayCell {

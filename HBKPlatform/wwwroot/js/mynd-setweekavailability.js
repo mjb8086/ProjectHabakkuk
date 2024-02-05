@@ -16,6 +16,19 @@ $(document).ready(function () {
         allTs.attr("data-available", "true");
     }
     
+    function toggleIndefinite(self, isUnavailable)
+    {
+        if (self.dataset.isindef !== "true") return;
+        if(self.classList.contains("indefinite"))
+        {
+            self.classList.remove("indefinite");
+        }
+        else
+        {
+            self.classList.add("indefinite");
+        }
+    }
+    
     // Listeners
     allTs.on('click', function (e) {
         $('.changeBtn').prop('disabled', false);
@@ -30,6 +43,11 @@ $(document).ready(function () {
             this.dataset.available = "true";
             this.classList.remove("unavailable");
             this.classList.add("available");
+        }
+        
+        if(isIndefView && this.classList.contains("available"))
+        {
+            this.classList.remove("indefinite");
         }
     });
     

@@ -8,18 +8,18 @@ namespace HBKPlatform.Repository.Implementation;
 
 public class AvailabilityRepository(ApplicationDbContext _db) : IAvailabilityRepository
 {
-    public async Task<Dictionary<int, Enums.TimeslotAvailability>> GetAvailabilityLookupForWeek(int clinicId, int pracId, int weekNum)
+    public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetAvailabilityLookupForWeek(int clinicId, int pracId, int weekNum)
     {
         return await _db.TimeslotAvailabilities.Include("Timeslot")
             .Where(x => x.Timeslot.ClinicId == clinicId && x.WeekNum == weekNum && x.PractitionerId == pracId)
-            .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
+            .ToDictionaryAsync(x => x.TimeslotId, x => new TimeslotAvailabilityDto() {Availability = x.Availability});
     }
     
-    public async Task<Dictionary<int, Enums.TimeslotAvailability>> GetAvailabilityLookupForIndef(int clinicId, int pracId)
+    public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetAvailabilityLookupForIndef(int clinicId, int pracId)
     {
         return await _db.TimeslotAvailabilities.Include("Timeslot")
             .Where(x => x.Timeslot.ClinicId == clinicId && x.IsIndefinite && x.PractitionerId == pracId)
-            .ToDictionaryAsync(x => x.TimeslotId, x => x.Availability);
+            .ToDictionaryAsync(x => x.TimeslotId, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite});
     }
     
     public async Task<List<TimeslotAvailabilityDto>> GetAvailabilityLookupForWeeks(int clinicId, int pracId, int[] weekNums)
