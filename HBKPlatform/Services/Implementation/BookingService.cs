@@ -21,6 +21,9 @@ namespace HBKPlatform.Services.Implementation;
 public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, 
     IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime, IAvailabilityRepository _avaRepo) : IBookingService
 {
+    private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
+    private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
+    
     public async Task<List<TimeslotDto>> GetAllTimeslots()
     {
         return await _timeslotRepo.GetClinicTimeslots(_userService.GetClaimFromCookie("ClinicId"));
@@ -100,15 +103,16 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     private async Task<List<TimeslotDto>> ClashCheck(int clinicId, List<TimeslotDto> timeslots, int pracId)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-        var tsAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(clinicId, pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
+        _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(clinicId, pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
+        _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        
         // TODO: If new appointment statuses are added, update predicate
         var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
-        var unavailableTs = tsAvaLookup.Where(x => x.Availability == Enums.TimeslotAvailability.Unavailable).ToList();
         
         // If the ts is unavailable, return true
-        return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && !unavailableTs.Any(y => y.WeekNum == x.WeekNum && y.TimeslotId == x.Id)).ToList();
+        return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.Id)).ToList();
     }
-    
+
     /// <summary>
     /// Check whether the timeslot is free for the practitioner.
     /// </summary>
@@ -116,10 +120,11 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     private async Task<bool> ClashCheckSingle(int timeslotId, int clinicId, int pracId, int weekNum)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-        var tsAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
+        _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
+        _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
         
         // If the ts is unavailable, return true
-        if (tsAvaLookup.TryGetValue(timeslotId, out var ava) && ava.Availability == Enums.TimeslotAvailability.Unavailable) return true;
+        if (!IsAvailable(weekNum, timeslotId)) return true;
         
         // TODO: If new appointment statuses are added, update predicate
         var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
@@ -133,6 +138,28 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         }
         return false;
     }
+    
+    /// <summary>
+    /// Determine whether the timeslot is available. Check both definite (weekly) and indefinite timeslots.
+    /// Assumes these lookups are populated already.
+    /// </summary>
+    private bool IsAvailable(int weekNum, int tsId)
+    {
+        // first check definite (weekly) timeslots
+        TimeslotAvailabilityDto weekAva;
+        if ((weekAva = _weeklyAvaLookup.FirstOrDefault(y => y.WeekNum == weekNum && y.TimeslotId == tsId)) != null)
+        {
+            return weekAva.Availability == Enums.TimeslotAvailability.Available;
+        }
+        // then indefinite
+        if (_indefAvaLookup.TryGetValue(tsId, out var ava))
+        {
+            return ava.Availability == Enums.TimeslotAvailability.Available;
+        }
+        // else we know it is available
+        return true;
+    }
+    
 
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)
     {

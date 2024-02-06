@@ -12,6 +12,7 @@ $(document).ready(function () {
     function revertAll()
     {
         allTs.removeClass("unavailable");
+        if(isIndefView) allTs.removeClass("indefinite");
         allTs.addClass("available");
         allTs.attr("data-available", "true");
     }

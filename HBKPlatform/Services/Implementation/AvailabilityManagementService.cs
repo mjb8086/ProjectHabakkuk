@@ -10,8 +10,8 @@ namespace HBKPlatform.Services.Implementation;
 public class AvailabilityManagementService(IUserService _userService, IAvailabilityRepository _availabilityRepo, 
     IConfigurationService _configService, ITimeslotRepository _timeslotRepo) : IAvailabilityManagementService
 {
-    private Dictionary<int, TimeslotAvailabilityDto> CurrentAvailability;
-    private Dictionary<int, TimeslotAvailabilityDto> IndefiniteAvailability;
+    private List<TimeslotAvailabilityDto> _currentAvailability;
+    private Dictionary<int, TimeslotAvailabilityDto> _indefiniteAvailability;
     
     public async Task<AvailabilityManagementIndex> GetAvailabilityManagementIndexModel()
     {
@@ -41,8 +41,8 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
-        CurrentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
-        IndefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _currentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
+        _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
         
         return new AvailabilityModel()
         {
@@ -63,7 +63,8 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
         // identical for indef model construction
-        CurrentAvailability = IndefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _currentAvailability = _indefiniteAvailability.Values.ToList();
         
         return new AvailabilityModel()
         {
@@ -76,7 +77,8 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     /// </summary>
     public Dictionary<Enums.Day, List<AvailabilityLite>> BuildAvaLiteDict(List<TimeslotDto> allTimeslots)
     {
-        if (CurrentAvailability == null) throw new NullReferenceException("Current availability is not populated.");
+        if (_currentAvailability == null) throw new NullReferenceException("Current availability is not populated.");
+        if (_indefiniteAvailability == null) throw new NullReferenceException("Indefinite availability is not populated.");
         var dailyTimeslotLookup = new Dictionary<Enums.Day, List<AvailabilityLite>>();
         foreach (var day in new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday})
         {
@@ -97,7 +99,8 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     /// </summary>
     private bool IsAvailable(int tsId)
     {
-        if (!CurrentAvailability.TryGetValue(tsId, out var avaDto))
+        var avaDto = _currentAvailability.FirstOrDefault(x => x.TimeslotId == tsId);
+        if (avaDto == null)
         {
             return true;
         }
@@ -115,7 +118,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     /// </summary>
     private bool IsIndefiniteUnavailable(int tsId)
     {
-        if (!IndefiniteAvailability.TryGetValue(tsId, out var avaDto))
+        if (!_indefiniteAvailability.TryGetValue(tsId, out var avaDto))
         {
             return false;
         }
