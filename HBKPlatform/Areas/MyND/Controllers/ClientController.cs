@@ -47,8 +47,8 @@ public class ClientController(IClientDetailsService _cdSrv) : Controller
     [HttpPost]
     public async Task<IActionResult> DoEditClient(int clientId, [FromForm] ClientDto client)
     {
-        if (!ModelState.IsValid) throw new Exception("Model bad");
         client.Id = clientId;
+        if (!ModelState.IsValid) throw new Exception("Model bad");
         await _cdSrv.UpdateClientDetails(client);
         TempData["Message"] = "Successfully updated client details";
         return RedirectToRoute(new { controller = "Client", action = "AllClients" });

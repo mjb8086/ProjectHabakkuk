@@ -1,4 +1,3 @@
-@using System.Text.Encodings.Web
 @{
     Layout = "_Layout";
 }
@@ -10,6 +9,11 @@
     }
 }
 <div id="myNdNav" class="subNav">
-    <a asp-area="MyND" asp-controller="Reception" asp-action="Index" class="@GetActiveClass("Reception")" >Reception</a> <a asp-area="MyND" asp-controller="Appointment" asp-action="Index" class="@GetActiveClass("Appointment")">Appointments</a> <a asp-area="MyND" asp-controller="Record" asp-action="Index" class="@GetActiveClass("ClientRecord")">Client Records</a> <a asp-area="MyND" asp-controller="Client" asp-action="Index" class="@GetActiveClass("ClientDetail")">Client Details</a> <a asp-area="MyND" asp-controller="Messaging" asp-action="Index" class="@GetActiveClass("Messaging")">Messaging</a> <a asp-area="MyND" asp-controller="Configuration" asp-action="Index" class="@GetActiveClass("Configuration")">System Configuration</a>
+    <a asp-area="MyND" asp-controller="Reception" asp-action="Index" class="@GetActiveClass("Reception")" >Reception</a>
+    <a asp-area="MyND" asp-controller="Appointment" asp-action="Index" class="@GetActiveClass("Appointment")">Appointments</a>
+    <a asp-area="MyND" asp-controller="Record" asp-action="Index" class="@GetActiveClass("ClientRecord")">Client Records</a>
+    <a asp-area="MyND" asp-controller="Client" asp-action="Index" class="@GetActiveClass("ClientDetail")">Client Details</a>
+    <a asp-area="MyND" asp-controller="Messaging" asp-action="Index" class="@GetActiveClass("Messaging")">Messaging</a>
+    <a asp-area="MyND" asp-controller="Configuration" asp-action="Index" class="@GetActiveClass("Configuration")">System Configuration</a>
 </div>
 @RenderBody()

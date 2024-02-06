@@ -2,7 +2,18 @@
     Layout = "_Layout";
 }
 
-<div>
-    <a asp-area="Client" asp-controller="Reception" asp-action="Index">Reception</a> <a asp-area="Client" asp-controller="Appointment" asp-action="Index">Appointments</a> <a asp-area="Client" asp-controller="Messaging" asp-action="Index">Messaging</a>
+@functions
+{
+    public string GetActiveClass(string navPath){
+        if (ViewBag.CurrentNav == null) return "";
+        return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
+    }
+}
+
+<div class="subNav">
+    <a asp-area="Client" asp-controller="Reception" asp-action="Index" class="@GetActiveClass("Reception")">Reception</a>
+    <a asp-area="Client" asp-controller="Appointment" asp-action="Index" class="@GetActiveClass("Appointments")">Appointments</a>
+    <a asp-area="Client" asp-controller="Messaging" asp-action="Index" class="@GetActiveClass("Messaging")">Messaging</a>
+    <a asp-area="Client" asp-controller="MyDetails" asp-action="Index" class="@GetActiveClass("MyDetails")">My Details</a>
 </div>
 @RenderBody()

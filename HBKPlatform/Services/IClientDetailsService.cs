@@ -10,4 +10,6 @@ public interface IClientDetailsService
     public Task UpdateClientDetails(ClientDto client);
     public Task CreateClient(ClientDto client);
     public ClientDetailsIndex GetClientDetailsIndex();
+    public Task<ClientDto> GetClientAsClient();
+    public Task UpdateClientDetailsAsClient(ClientDto client);
 }

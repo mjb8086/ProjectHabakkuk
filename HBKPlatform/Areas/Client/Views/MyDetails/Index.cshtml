@@ -1,0 +1,59 @@
+@using HBKPlatform.Globals
+@model HBKPlatform.Models.DTO.ClientDto
+@{
+    Layout = "_Client";
+    ViewBag.Title = "Update My Contact Details";
+    ViewBag.Modules = "client-edit.js";
+    ViewBag.CurrentNav = "MyDetails";
+}
+
+<h1>Update my details</h1>
+
+<form id="treatmentDetails" asp-area="Client" asp-controller="MyDetails" asp-action="DoEditDetails"  method="post"> 
+<fieldset>
+    <label for="title" class="form-textfield">Title</label>
+    <select id="title" asp-for="Title" 
+            asp-items="Html.GetEnumSelectList<Enums.Title>()">
+    </select> 
+</fieldset>
+
+<fieldset>
+    <label for="sex" class="form-textfield">Sex</label>
+    <select id="sex" asp-for="Sex" 
+            asp-items="Html.GetEnumSelectList<Enums.Sex>()">
+    </select> 
+</fieldset>
+    
+<fieldset>
+  <label for="forename" class="form-textfield">Forename</label>
+  <input type="text" name="forename" id="forename" value="@Model.Forename"/>
+  <label for="surname" class="form-textfield">Surname</label>
+  <input type="text" name="surname" id="surname" value="@Model.Surname"/>
+</fieldset>
+
+<fieldset>
+  <label for="address" class="form-textfield">Address</label>
+  <textarea name="address" id="address">
+@Model.Address
+  </textarea> 
+</fieldset>
+
+<fieldset>
+    <label for="dateOfBirth" class="form-textfield">Date of birth</label>
+    <input asp-for="DateOfBirth" name="dateOfBirth" id="dateOfBirth" value="@(Model.Id > 0 ? Model.DateOfBirth.ToString("yyyy-MM-dd") : "1970-01-01")"/>
+</fieldset>
+  
+<fieldset>
+    <label for="telephone" class="form-textfield">Telephone</label>
+    <input type="text" name="telephone" id="telephone" value="@Model.Telephone"/>
+</fieldset>
+  
+<fieldset>
+    <label for="email" class="form-textfield">Email</label>
+    <input type="text" name="email" id="email" value="@Model.Email"/>
+</fieldset>
+  
+<fieldset>
+  <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/> <button id="btnGoBack">Go Back</button>
+</fieldset>
+</form>
