@@ -1,0 +1,17 @@
+
+@{
+    ViewData["Title"] = "MCP Index";
+    ViewBag.CurrentNav = "Index";
+    Layout = "_McpShared";
+}
+
+<h1>Master Control Panel (SuperAdmin)</h1>
+
+<h2>Quick Actions</h2>
+<ol>
+    <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="RegisterClinic">Register a new clinic.</a></li>
+    <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="ListClinics">View, delete or modify existing clinics.</a></li>
+    <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="PasswordReset">Password reset.</a></li>
+    <li>View audit logs.</li>
+    <li>View system health.</li>
+</ol>

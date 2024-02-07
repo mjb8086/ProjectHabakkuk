@@ -1,0 +1,17 @@
+@{
+    Layout = "_Layout";
+}
+@functions
+{
+    private string GetActiveClass(string navPath){
+        if (ViewBag.CurrentNav == null) return "";
+        return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
+    }
+}
+<div id="myNdNav" class="subNav">
+    <a asp-area="MCP" asp-controller="MCP" asp-action="Index" class="@GetActiveClass("Index")" >Index</a>
+    <a asp-area="MCP" asp-controller="ClinicManagement" asp-action="Index" class="@GetActiveClass("ClinicManagement")">Clinic Management</a>
+    <a asp-area="MCP" asp-controller="Auditing" asp-action="Index" class="@GetActiveClass("Audit")">Auditing</a>
+    <a asp-area="MCP" asp-controller="Configuration" asp-action="Index" class="@GetActiveClass("Configuration")">Configuration</a>
+</div>
+@RenderBody()

@@ -37,23 +37,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        /*
-        modelBuilder.Entity<PractitionerSpecialty>()
-            .HasOne(ps => ps.Practitioner)
-            .WithMany(ps => ps.PractitionerSpecialties)
-            .HasForeignKey(ps => ps.PracIdx)
+        
+        // Manual relationships
+        modelBuilder.Entity<Clinic>()
+            .HasOne(c => c.LeadPractitioner)
+            .WithOne(p => p.Clinic)
+            .HasForeignKey<Clinic>(c => c.LeadPractitionerId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        modelBuilder.Entity<PractitionerSpecialty>()
-            .HasOne(ps => ps.Specialty)
-            .WithMany(ps => ps.PractitionerSpecialties)
-            .HasForeignKey(ps => ps.SpecIdx)
-            .OnDelete(DeleteBehavior.Cascade);
-        modelBuilder.Entity<Review>()
-            .HasOne(p => p.Practitioner)
-            .WithMany(b => b.Reviews);
-
-*/
         // Ensure inherited entities are flattened into one table.
         modelBuilder.Entity<HbkBaseEntity>().UseTpcMappingStrategy();
 

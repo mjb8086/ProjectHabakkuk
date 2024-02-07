@@ -1,9 +1,11 @@
-using HBKPlatform.Database;
+using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View.MCP;
 
 namespace HBKPlatform.Repository;
 
 public interface IClinicRepository
 {
-    public Task<Clinic> GetClinicAlone(int clinicIdx);
-    public Task<Clinic> GetCompleteClinic(int clinicIdx);
+    public Task<ClinicDto> GetClinicAlone(int clinicId);
+    public Task<List<ClinicDetailsLite>> GetClinicDetailsLite();
+    public Task UpdateClinicDetails(ClinicDto clinic);
 }

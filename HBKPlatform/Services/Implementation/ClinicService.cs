@@ -3,6 +3,7 @@ using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
+using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor) : IClinicService
+public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor, IClinicRepository _clinicRepo) : IClinicService
 {
     public async Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId)
     {
@@ -69,4 +70,22 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
 
         return data;
     }
+
+    /* MCP Methods */
+    public async Task<ClinicDto> GetClinicModel(int clinicId)
+    {
+        return await _clinicRepo.GetClinicAlone(clinicId);
+    }
+
+    public async Task<ListClinics> GetListClinicsView()
+    {
+        return new ListClinics() { Clinics = await _clinicRepo.GetClinicDetailsLite() };
+    }
+
+    public async Task UpdateClinic(ClinicDto model)
+    {
+        await _clinicRepo.UpdateClinicDetails(model);
+    }
+    
+    
 }

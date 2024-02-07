@@ -1,0 +1,11 @@
+#btnSave {
+    font-size: 1.2em;
+}
+
+label {
+    display: block;
+}
+
+input[type='text'] {
+    min-width: 400px;
+}

@@ -54,7 +54,7 @@
                         @if (User.IsInRole("SuperAdmin"))
                         {
                             <li class="nav-item">
-                                <a class="navbar-light" asp-area="MasterControlPanel" asp-controller="MCP" asp-action="Index">Admin</a>
+                                <a class="navbar-light" asp-area="MCP" asp-controller="MCP" asp-action="Index">MCP</a>
                             </li>
                         }
                         @if (User.IsInRole("Practitioner"))

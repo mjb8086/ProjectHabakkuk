@@ -56,5 +56,12 @@ public static class Enums
     {
         Male, Female, Other, NotSpecified, YesPlease
     }
+    
+     public enum LicenceStatus
+     {
+         Trial,
+         Active,
+         Suspended
+     }
      
 }

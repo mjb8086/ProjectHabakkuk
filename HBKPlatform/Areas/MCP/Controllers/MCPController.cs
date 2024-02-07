@@ -1,8 +1,7 @@
-using HBKPlatform.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HBKPlatform.Areas.MasterControlPanel.Controllers;
+namespace HBKPlatform.Areas.MCP.Controllers;
 
 /// <summary>
 /// HBKPlatform MCP Controller.
@@ -12,18 +11,11 @@ namespace HBKPlatform.Areas.MasterControlPanel.Controllers;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-[Area("MasterControlPanel")]
+[Area("MCP")]
 [Route(("mcp"))]
 [Authorize]
 public class MCPController : Controller
 {
-    private readonly ApplicationDbContext _context;
-
-    public MCPController(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     // GET: Index
     public async Task<IActionResult> Index()
     {

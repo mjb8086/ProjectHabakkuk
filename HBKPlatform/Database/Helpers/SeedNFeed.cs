@@ -16,12 +16,12 @@ namespace HBKPlatform.Database.Helpers
                provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
             {
                 var roleStore = new RoleStore<IdentityRole>(ctx);
-                IdentityRole sysOp, pracRole, clientRole;
+                IdentityRole superAdminRole, pracRole, clientRole;
 
-                if ((sysOp = ctx.Roles.FirstOrDefault(r => r.Name == "SuperAdmin")) == null)
+                if ((superAdminRole = ctx.Roles.FirstOrDefault(r => r.Name == "SuperAdmin")) == null)
                 {
-                    sysOp = new IdentityRole() { Name = "SuperAdmin", NormalizedName = "SuperAdmin".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString()};
-                    await roleStore.CreateAsync(sysOp);
+                    superAdminRole = new IdentityRole() { Name = "SuperAdmin", NormalizedName = "SuperAdmin".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString()};
+                    await roleStore.CreateAsync(superAdminRole);
                 }
                 
                 if ((pracRole = ctx.Roles.FirstOrDefault(r => r.Name == "Practitioner")) == null)
@@ -117,23 +117,42 @@ namespace HBKPlatform.Database.Helpers
                     var clinic = new Clinic()
                     {
                         EmailAddress = "foo@bar.com",
-                        LicenceStatus = LicenceStatus.Active,
+                        LicenceStatus = Enums.LicenceStatus.Active,
                         OrgName = "Hill Valley Clinic",
                         OrgTagline = "Timely treatment or your time back.",
                         Telephone = "0898 333 201",
-                        Practitioner = prac1,
-                        Clients = new List<Client>() {client1, client2}
+                        LeadPractitioner = prac1,
+                        Clients = new List<Client>() {client1, client2},
+                        RegistrationDate = DateTime.UtcNow
                     };
-                    
+
+                    var suEmail = "mjb+sudo1@nowdoctor.co.uk";
+                    var superUser = new User()
+                    {
+                        Email = suEmail,
+                        NormalizedEmail = suEmail.ToUpper(),
+                        UserName = suEmail,
+                        NormalizedUserName = suEmail.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = false,
+                        PhoneNumber = "0898 333 201",
+                        PhoneNumberConfirmed = true,
+                    };
+                    superUser.PasswordHash = passwordHasher.HashPassword(client1User, "changeme123");
+
+                    ctx.Add(superUser);
                     ctx.Add(clinic);
                     ctx.SaveChanges();
+
+                    var roles = new List<IdentityUserRole<string>>
+                    {
+                        new IdentityUserRole<string>() { UserId = user1.Id, RoleId = pracRole.Id },
+                        new IdentityUserRole<string>() { UserId = client1User.Id, RoleId = clientRole.Id },
+                        new IdentityUserRole<string>() { UserId = client2User.Id, RoleId = clientRole.Id },
+                        new IdentityUserRole<string>() { UserId = superUser.Id, RoleId = superAdminRole.Id }
+                    };
                     
-                    var pracUserRole = new IdentityUserRole<string>() { UserId = user1.Id, RoleId = pracRole.Id };
-                    var client1UserRole = new IdentityUserRole<string>() { UserId = client1User.Id, RoleId = clientRole.Id };
-                    var client2UserRole = new IdentityUserRole<string>() { UserId = client2User.Id, RoleId = clientRole.Id };
-                    ctx.Add(pracUserRole);
-                    ctx.Add(client1UserRole);
-                    ctx.Add(client2UserRole);
+                    ctx.AddRange(roles);
 
                     var conversation = new List<ClientMessage>();
                     conversation.Add(new ClientMessage()

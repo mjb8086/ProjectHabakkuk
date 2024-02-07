@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database;
 
@@ -9,6 +10,7 @@ namespace HBKPlatform.Database;
 /// </summary>
 public class Clinic : HbkBaseEntity
 {
+    // Columns
     public string OrgName { get; set; }
     public string? OrgTagline { get; set; }
     [DataType(DataType.MultilineText)]
@@ -16,16 +18,13 @@ public class Clinic : HbkBaseEntity
     public string Telephone { get; set; }
     [DataType(DataType.EmailAddress)] 
     public string EmailAddress { get; set; }
-    public LicenceStatus LicenceStatus { get; set; }
-
-    public Practitioner Practitioner { get; set; }
+    public Enums.LicenceStatus LicenceStatus { get; set; }
+    public DateTime RegistrationDate { get; set; }
+    
+    public int LeadPractitionerId { get; set; }
+    
+    // EF Navigations
+    public Practitioner LeadPractitioner { get; set; }
     public virtual ICollection<Client> Clients { get; set; }
     public ClinicHomepage ClinicHomepage { get; set; }
-}
-
-public enum LicenceStatus
-{
-    Trial,
-    Active,
-    Suspended
 }
