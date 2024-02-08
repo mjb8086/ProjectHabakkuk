@@ -1,5 +1,5 @@
 @using HBKPlatform.Globals
-@model HBKPlatform.Models.DTO.ClinicDto;
+@model HBKPlatform.Models.DTO.ClinicDetailsDto;
 @{
     ViewData["Title"] = "MCP Clinic Details";
     ViewBag.CurrentNav = "ClinicManagement";
@@ -53,11 +53,11 @@
 </form>
 
 <h2>Lead Practitioner</h2>
-<p>@Model.LeadPrac.Name</p>
+<p>@Model.LeadPracFullName</p>
 
 <h2>Options</h2>
 <ol>
-    <li><a>Send password reset to lead practitioner @Model.LeadPrac.Name</a></li>
+    <li><a>Send password reset to lead practitioner @Model.LeadPracFullName</a></li>
     <li><a>Delete clinic</a></li>
     <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="ListClinics">Return to clinic list.</a></li>
 </ol>

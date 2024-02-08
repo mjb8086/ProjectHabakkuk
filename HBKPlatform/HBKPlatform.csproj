@@ -57,6 +57,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
+    <PackageReference Include="PasswordGenerator" Version="2.1.0" />
   </ItemGroup>
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Shared\Account\_ViewImports.cshtml" />

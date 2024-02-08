@@ -5,7 +5,8 @@ namespace HBKPlatform.Repository;
 
 public interface IClinicRepository
 {
-    public Task<ClinicDto> GetClinicAlone(int clinicId);
+    public Task<ClinicDetailsDto> GetClinicAlone(int clinicId);
     public Task<List<ClinicDetailsLite>> GetClinicDetailsLite();
     public Task UpdateClinicDetails(ClinicDto clinic);
+    public Task RegisterClinic(ClinicRegistrationDto clinic);
 }

@@ -57,7 +57,7 @@ namespace HBKPlatform.Database.Helpers
                         Title = Enums.Title.Dr,
                         Bio = "inventor of the flux capacitor",
                         Location = "hill valley",
-                        DateOfBirth = new DateTime(1932, 07, 08).ToUniversalTime(),
+                        DateOfBirth = new DateOnly(1932, 07, 08),
                         Img = new string("samples/brown.jpg"),
                         User = user1
                     };

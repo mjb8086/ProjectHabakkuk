@@ -50,5 +50,15 @@ public class ClinicManagementController(IClinicService _clinicService) : Control
     {
         return View();
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> DoRegisterClinic([FromForm] ClinicRegistrationDto model)
+    {
+        if (!ModelState.IsValid) throw new Exception("Model Bad");
+        await _clinicService.RegisterClinic(model);
+        TempData["Message"] = "Successfully registered new clinic and created lead practitioner user.";
+        return RedirectToRoute(new { controller = "ClinicManagement", action = "ListClinics" });
+    }
+    
 
 }

@@ -22,7 +22,7 @@ namespace HBKPlatform.Database
         public string? Location { get; set; }
         public string? Bio { get; set; }
         [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
+        public DateOnly DateOfBirth { get; set; }
         public string? Img { get; set; }
         public Enums.Sex Sex { get; set; }
 

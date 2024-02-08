@@ -12,7 +12,8 @@ public interface IClinicService
     public Task<InboxModel> GetInboxModel();
     public Task<ClientClinicData> GetClientClinicData();
     public Task<ReceptionModel> GetReceptionModel();
-    public Task<ClinicDto> GetClinicModel(int clinicId);
+    public Task<ClinicDetailsDto> GetClinicModel(int clinicId);
     public Task<ListClinics> GetListClinicsView();
     public Task UpdateClinic(ClinicDto model);
+    public Task RegisterClinic(ClinicRegistrationDto model);
 }

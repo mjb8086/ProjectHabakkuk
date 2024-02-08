@@ -72,7 +72,7 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
     }
 
     /* MCP Methods */
-    public async Task<ClinicDto> GetClinicModel(int clinicId)
+    public async Task<ClinicDetailsDto> GetClinicModel(int clinicId)
     {
         return await _clinicRepo.GetClinicAlone(clinicId);
     }
@@ -85,6 +85,11 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
     public async Task UpdateClinic(ClinicDto model)
     {
         await _clinicRepo.UpdateClinicDetails(model);
+    }
+
+    public async Task RegisterClinic(ClinicRegistrationDto model)
+    {
+        await _clinicRepo.RegisterClinic(model);
     }
     
     

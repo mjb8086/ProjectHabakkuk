@@ -1,7 +1,9 @@
 using HBKPlatform.Database;
+using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace HBKPlatform.Repository.Implementation;
 
@@ -13,15 +15,15 @@ namespace HBKPlatform.Repository.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClinicRepository(ApplicationDbContext _db) : IClinicRepository
+public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, UserManager<User> _userMgr) : IClinicRepository
 {
     /// <summary>
     /// Get a Clinic.
     /// </summary>
     /// <returns>Clinic</returns>
-    public async Task<ClinicDto> GetClinicAlone(int clinicIdx)
+    public async Task<ClinicDetailsDto> GetClinicAlone(int clinicIdx)
     {
-        return await _db.Clinics.Include("LeadPractitioner").Select(x => new ClinicDto()
+        return await _db.Clinics.Include("LeadPractitioner").Select(x => new ClinicDetailsDto()
         {
             OrgName = x.OrgName,
             OrgTagline = x.OrgTagline,
@@ -31,7 +33,8 @@ public class ClinicRepository(ApplicationDbContext _db) : IClinicRepository
             Telephone = x.Telephone,
             RegistrationDate = x.RegistrationDate,
             StreetAddress = x.StreetAddress,
-            LeadPrac = new PracDetailsLite() { Name = $"{x.LeadPractitioner.Title} {x.LeadPractitioner.Forename} {x.LeadPractitioner.Surname}", Id = x.LeadPractitionerId }
+            LeadPracFullName  = $"{x.LeadPractitioner.Title} {x.LeadPractitioner.Forename} {x.LeadPractitioner.Surname}",
+            PractitionerId = x.LeadPractitionerId
         }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Could not find clinic ID {clinicIdx}");
     }
 
@@ -50,6 +53,50 @@ public class ClinicRepository(ApplicationDbContext _db) : IClinicRepository
         dbClinic.EmailAddress = clinic.Email;
         dbClinic.StreetAddress = clinic.StreetAddress;
         await _db.SaveChangesAsync();
+    }
+
+    public async Task RegisterClinic(ClinicRegistrationDto clinic)
+    {
+        var user = new User()
+        {
+            Email = clinic.LeadPracEmail,
+            NormalizedEmail = clinic.LeadPracEmail.ToUpper(),
+            UserName = clinic.LeadPracEmail,
+            NormalizedUserName = clinic.LeadPracEmail.ToUpper(),
+            EmailConfirmed = true,
+            LockoutEnabled = false,
+            PhoneNumber = "",
+            PhoneNumberConfirmed = true,
+        };
+        
+        var pwdGen = new PasswordGenerator.Password(DefaultSettings.DEFAULT_PASSWORD_LENGTH);
+        var pwd = pwdGen.Next();
+        // TODO: REMOVE THIS!!!
+        Console.WriteLine($"DEBUG: PASSWORD IS ====>\n{pwd}\n");
+        user.PasswordHash = passwordHasher.HashPassword(user, pwd);
+        
+        var dbClinic = new Clinic()
+        {
+            OrgName = clinic.OrgName,
+            OrgTagline = clinic.OrgTagline,
+            EmailAddress = clinic.Email,
+            DateCreated = DateTime.UtcNow,
+            LicenceStatus = clinic.LicenceStatus,
+            Telephone = clinic.Telephone,
+            LeadPractitioner = new Practitioner()
+            {
+                Title = clinic.LeadPracTitle,
+                Forename = clinic.LeadPracForename,
+                Surname = clinic.LeadPracSurname,
+                DateOfBirth = clinic.LeadPracDOB,
+                User = user
+            }
+        };
+        await _db.AddAsync(dbClinic);
+        // todo - make resilient?
+        await _db.SaveChangesAsync();
+        await _userMgr.AddToRoleAsync(user, "Practitioner");
+        
     }
     
 }
