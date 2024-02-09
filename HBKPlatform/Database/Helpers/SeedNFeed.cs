@@ -121,8 +121,8 @@ namespace HBKPlatform.Database.Helpers
                         OrgName = "Hill Valley Clinic",
                         OrgTagline = "Timely treatment or your time back.",
                         Telephone = "0898 333 201",
-                        LeadPractitioner = prac1,
                         Clients = new List<Client>() {client1, client2},
+                        Practitioners = new List<Practitioner>() {prac1},
                         RegistrationDate = DateTime.UtcNow
                     };
 
@@ -142,6 +142,9 @@ namespace HBKPlatform.Database.Helpers
 
                     ctx.Add(superUser);
                     ctx.Add(clinic);
+                    ctx.SaveChanges();
+
+                    clinic.LeadPractitioner = prac1;
                     ctx.SaveChanges();
 
                     var roles = new List<IdentityUserRole<string>>
@@ -217,8 +220,8 @@ namespace HBKPlatform.Database.Helpers
                     ctx.AddRange(timeslots);
                     ctx.SaveChanges();
 
-                    var appointments = new[] { 
-                        new Appointment()
+                    var appointments = new Appointment[] { 
+                        new ()
                         {
                             Client = client1,
                             Clinic = clinic,
@@ -228,7 +231,7 @@ namespace HBKPlatform.Database.Helpers
                             Treatment = treatment1,
                             WeekNum = 4
                         },
-                        new Appointment()
+                        new ()
                         {
                             Client = client1,
                             Clinic = clinic,
@@ -239,7 +242,7 @@ namespace HBKPlatform.Database.Helpers
                             Treatment = treatment1,
                             WeekNum = 30
                         },
-                        new Appointment()
+                        new ()
                         {
                             Client = client1,
                             Clinic = clinic,
@@ -250,7 +253,6 @@ namespace HBKPlatform.Database.Helpers
                             Treatment = treatment2,
                             WeekNum = 30
                         }
-                        
                     };
                     
                     ctx.AddRange(appointments);
@@ -265,7 +267,7 @@ namespace HBKPlatform.Database.Helpers
 
                     var ta = new List<TimeslotAvailability>()
                     {
-                        new TimeslotAvailability()
+                        new()
                         {
                             Timeslot = timeslots[100],
                             Practitioner = prac1,

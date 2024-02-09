@@ -21,7 +21,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           if (string.IsNullOrWhiteSpace(messageBody)) return;
           
           var clientIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClientId");
-          var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
+          var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("LeadPractitionerId");
           var clinicIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
           int clientId, pracId, clinicId;
           Enums.MessageOrigin messageOrigin;
@@ -83,7 +83,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
      public async Task<ClientMessageConversationModel> GetConversationPractitioner(int clientId, int max)
      {
           // Get logged in user and find his pracId ... TODO: Make this uniform or have a user cache!
-          var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
+          var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("LeadPractitionerId");
           
           // TODO: Security and access checks
           if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))

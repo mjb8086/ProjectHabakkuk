@@ -1,6 +1,8 @@
 using System.Data;
 using HBKPlatform.Database;
+using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Repository.Implementation;
@@ -13,7 +15,7 @@ namespace HBKPlatform.Repository.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClientRepository(ApplicationDbContext _db) :IClientRepository
+public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, UserManager<User> _userMgr) :IClientRepository
 {
     public ClientDto GetClientDetails(int clientId)
     {
@@ -45,7 +47,8 @@ public class ClientRepository(ApplicationDbContext _db) :IClientRepository
 
     public async Task Create(ClientDto client)
     {
-        await _db.AddAsync(new Database.Client()
+        bool willHaveUser = client.HasUserAccount && !string.IsNullOrWhiteSpace(client.Email);
+        var dbClient = new Database.Client()
         {
             Title = client.Title,
             Forename = client.Forename,
@@ -56,14 +59,37 @@ public class ClientRepository(ApplicationDbContext _db) :IClientRepository
             Sex = client.Sex,
             DateOfBirth = client.DateOfBirth,
             Img = client.Img
-        });
-        // Todo - register new user and send email, will require user service...
+        };
+        
+        if (willHaveUser)
+        {
+            var user = new User()
+            {
+                Email = client.Email,
+                NormalizedEmail = client.Email.ToUpper(), // previous check ensures this is not null
+                UserName = client.Email,
+                NormalizedUserName = client.Email.ToUpper(),
+                EmailConfirmed = true,
+                LockoutEnabled = false,
+                PhoneNumber = client.Telephone,
+                PhoneNumberConfirmed = true,
+            };
+            var pwdGen = new PasswordGenerator.Password(DefaultSettings.DEFAULT_PASSWORD_LENGTH);
+            var pwd = pwdGen.Next();
+            // TODO: REMOVE THIS!!! In place until we have an email client
+            Console.WriteLine($"DEBUG: PASSWORD IS ====>\n{pwd}\n");
+            user.PasswordHash = passwordHasher.HashPassword(user, pwd);
+            dbClient.User = user;
+        }
+        
+        await _db.AddAsync(dbClient);
         await _db.SaveChangesAsync();
+        if (willHaveUser) await _userMgr.AddToRoleAsync(dbClient.User, "Client");
     }
 
     public async Task Update(ClientDto client)
     {
-        var dbClient = await _db.Clients.FirstOrDefaultAsync(x => client.Id == x.Id) 
+        var dbClient = await _db.Clients.Include("User").FirstOrDefaultAsync(x => client.Id == x.Id) 
                        ?? throw new KeyNotFoundException($"ClientID {client.Id} not found.");
         dbClient.Title = client.Title;
         dbClient.Forename = client.Forename;
@@ -73,9 +99,13 @@ public class ClientRepository(ApplicationDbContext _db) :IClientRepository
         dbClient.Sex = client.Sex;
         dbClient.DateOfBirth = client.DateOfBirth;
         dbClient.Img = client.Img;
+
+        if (!(string.IsNullOrEmpty(dbClient.UserId) || string.IsNullOrEmpty(client.Email)))
+        {
+            dbClient.User.Email = client.Email;
+        }
         
         await _db.SaveChangesAsync();
-            // todo - user service update email
     }
 
     public int GetClientCount(int clinicId)

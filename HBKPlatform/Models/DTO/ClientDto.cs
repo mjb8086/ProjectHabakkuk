@@ -20,8 +20,7 @@ public class ClientDto
     public string? Img { get; set; }
     public string Telephone { get; set; }
     public string Address { get; set; }
-    [Required]
-    public string Email { get; set; } // Sourced from User object
+    public string? Email { get; set; } // Sourced from User object
     public bool HasUserAccount { get; set; }
 
     public int ClinicId { get; set; }

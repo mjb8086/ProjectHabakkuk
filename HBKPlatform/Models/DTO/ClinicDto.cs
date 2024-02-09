@@ -11,7 +11,7 @@ public class ClinicDto
     public string Email { get; set; }
     public string? StreetAddress { get; set; }
     public Enums.LicenceStatus LicenceStatus { get; set; }
-    public int PractitionerId { get; set; }
+    public int LeadPractitionerId { get; set; }
     public DateTime RegistrationDate { get; set; }
 }
 

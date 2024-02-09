@@ -15,6 +15,7 @@
 
 @{
     // Note - on EDIT jquery will override the route and method parameters
+    // Model.Id > 0 indicates that we are in Edit mode.
 }
 <form id="treatmentDetails" asp-area="MyND" asp-controller="Client" asp-action="DoAddClient"  method="post"> 
 <fieldset>
@@ -64,8 +65,25 @@
 <fieldset>
     <label class="form-textfield">Has user account?</label>
     <p>@(Model.HasUserAccount ? "Yes" : "No")</p>
+    <p>Todo: If none, have a button to create.</p>
 </fieldset>
-} 
+}
+else
+{
+    <fieldset>
+      <legend>Create User Account?</legend>
+        <div>
+           <input type="radio" id="createAcctYes" name="hasUserAccount" value="true" checked />
+           <label for="createAcctYes">Yes</label>
+        </div>
+
+        <div>
+            <input type="radio" id="createAcctNo" name="hasUserAccount" value="false" />
+            <label for="createAcctNo" >No</label>
+        </div>
+        
+    </fieldset>
+}
   
 <fieldset>
   <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/> <button id="btnGoBack">Go Back</button>

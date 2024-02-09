@@ -32,7 +32,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     {
         var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
         
         var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
         var dateRangeStr = currentWeek == weekNum
@@ -58,7 +58,7 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     public async Task<AvailabilityModel> GetAvailabilityModelForIndef()
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
         
         var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
 
@@ -129,28 +129,28 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
 
     public async Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model)
     {
-        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, clinicId, model.Updated);
     }
 
     public async Task RevertAvailabilityForWeek(int weekNum)
     {
-        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId, clinicId);
     }
     
     public async Task UpdateAvailabilityForIndef(UpdatedAvailability model)
     {
-        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         await _availabilityRepo.UpdateAvailabilityForIndef(pracId, clinicId, model.Updated);
     }
 
     public async Task RevertAvailabilityForIndef()
     {
-        var pracId = _userService.GetClaimFromCookie("PractitionerId");
+        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         await _availabilityRepo.RevertAvailabilityForIndef(pracId, clinicId);
     }

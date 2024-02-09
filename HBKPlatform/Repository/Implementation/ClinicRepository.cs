@@ -34,7 +34,7 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
             RegistrationDate = x.RegistrationDate,
             StreetAddress = x.StreetAddress,
             LeadPracFullName  = $"{x.LeadPractitioner.Title} {x.LeadPractitioner.Forename} {x.LeadPractitioner.Surname}",
-            PractitionerId = x.LeadPractitionerId
+            LeadPractitionerId = x.LeadPractitionerId.HasValue ? x.LeadPractitionerId.Value : -1  // Enforce integrity elsewhere
         }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Could not find clinic ID {clinicIdx}");
     }
 
@@ -75,6 +75,15 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         Console.WriteLine($"DEBUG: PASSWORD IS ====>\n{pwd}\n");
         user.PasswordHash = passwordHasher.HashPassword(user, pwd);
         
+        var prac = new Practitioner()
+        {
+            Title = clinic.LeadPracTitle,
+            Forename = clinic.LeadPracForename,
+            Surname = clinic.LeadPracSurname,
+            DateOfBirth = clinic.LeadPracDOB,
+            User = user
+        };
+        
         var dbClinic = new Clinic()
         {
             OrgName = clinic.OrgName,
@@ -83,20 +92,14 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
             RegistrationDate = DateTime.UtcNow,
             LicenceStatus = clinic.LicenceStatus,
             Telephone = clinic.Telephone,
-            LeadPractitioner = new Practitioner()
-            {
-                Title = clinic.LeadPracTitle,
-                Forename = clinic.LeadPracForename,
-                Surname = clinic.LeadPracSurname,
-                DateOfBirth = clinic.LeadPracDOB,
-                User = user
-            }
+            Practitioners = new List<Practitioner>() {prac}
         };
         await _db.AddAsync(dbClinic);
         // todo - make resilient?
         await _db.SaveChangesAsync();
         await _userMgr.AddToRoleAsync(user, "Practitioner");
-        
+        dbClinic.LeadPractitioner = prac;
+        await _db.SaveChangesAsync();
     }
     
 }

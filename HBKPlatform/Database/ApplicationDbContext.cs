@@ -39,11 +39,17 @@ public class ApplicationDbContext : IdentityDbContext<User>
         base.OnModelCreating(modelBuilder);
         
         // Manual relationships
+        // Configure one-to-many relationship between Clinic and Practitioner
+        modelBuilder.Entity<Practitioner>()
+            .HasOne(p => p.Clinic)
+            .WithMany(c => c.Practitioners)
+            .HasForeignKey(p => p.ClinicId);
+
+        // Configure one-to-one relationship between Clinic and LeadPractitioner
         modelBuilder.Entity<Clinic>()
             .HasOne(c => c.LeadPractitioner)
-            .WithOne(p => p.Clinic)
-            .HasForeignKey<Clinic>(c => c.LeadPractitionerId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .WithOne()
+            .HasForeignKey<Clinic>(c => c.LeadPractitionerId);
 
         // Ensure inherited entities are flattened into one table.
         modelBuilder.Entity<HbkBaseEntity>().UseTpcMappingStrategy();
@@ -66,7 +72,6 @@ public class ApplicationDbContext : IdentityDbContext<User>
         modelBuilder.Entity<IdentityRole>().ToTable("application_roles");
         modelBuilder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
         modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
-         
     }
     
     /// <summary>

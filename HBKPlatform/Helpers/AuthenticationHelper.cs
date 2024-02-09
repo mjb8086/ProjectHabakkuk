@@ -13,7 +13,7 @@ public class AuthenticationHelper
         return new[]
         {
             new Claim("ClinicId", userDto.ClinicId.ToString()), 
-            new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
+            new Claim("LeadPractitionerId", userDto.PractitionerId?.ToString() ?? ""),
             new Claim("ClientId", userDto.ClientId?.ToString() ?? "")
         };
     }
