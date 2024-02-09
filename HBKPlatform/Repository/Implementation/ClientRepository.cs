@@ -38,7 +38,8 @@ public class ClientRepository(ApplicationDbContext _db) :IClientRepository
 
     public async Task<List<ClientDetailsLite>> GetLiteDetails(int clinicId)
     {
-        return await _db.Clients.Select(x => new ClientDetailsLite() { Id = x.Id, Name = $"{x.Forename} {x.Surname}" })
+        return await _db.Clients.Where(x => x.ClinicId == clinicId)
+            .Select(x => new ClientDetailsLite() { Id = x.Id, Name = $"{x.Forename} {x.Surname}" })
             .ToListAsync();
     }
 

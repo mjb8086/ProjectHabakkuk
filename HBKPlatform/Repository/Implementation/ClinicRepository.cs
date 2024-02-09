@@ -23,7 +23,7 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
     /// <returns>Clinic</returns>
     public async Task<ClinicDetailsDto> GetClinicAlone(int clinicIdx)
     {
-        return await _db.Clinics.Include("LeadPractitioner").Select(x => new ClinicDetailsDto()
+        return await _db.Clinics.Include("LeadPractitioner").Where(x => x.Id == clinicIdx).Select(x => new ClinicDetailsDto()
         {
             OrgName = x.OrgName,
             OrgTagline = x.OrgTagline,
@@ -80,7 +80,7 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
             OrgName = clinic.OrgName,
             OrgTagline = clinic.OrgTagline,
             EmailAddress = clinic.Email,
-            DateCreated = DateTime.UtcNow,
+            RegistrationDate = DateTime.UtcNow,
             LicenceStatus = clinic.LicenceStatus,
             Telephone = clinic.Telephone,
             LeadPractitioner = new Practitioner()

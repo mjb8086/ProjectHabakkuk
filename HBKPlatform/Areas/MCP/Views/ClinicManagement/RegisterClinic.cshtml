@@ -45,8 +45,7 @@
     <h3>Lead Practitioner Details</h3>
     <fieldset>
         <label for="pracTitle" class="form-textfield">Title</label>
-        <select id="pracTitle" asp-for="LeadPracTitle" 
-                asp-items="Html.GetEnumSelectList<Enums.Title>()">
+        <select id="pracTitle" asp-for="LeadPracTitle" asp-items="Html.GetEnumSelectList<Enums.Title>()">
         </select> 
     </fieldset>
     
@@ -62,7 +61,7 @@
     
     <fieldset>
         <label for="dateOfBirth" class="form-textfield">Date of birth</label>
-        <input asp-for="LeadPracDOB" name="dateOfBirth" id="dateOfBirth" value="1970-01-01"/>
+        <input asp-for="LeadPracDOB" name="dateOfBirth" id="dateOfBirth" value="1970-01-01" type="date"/>
     </fieldset>
     
     <fieldset>
