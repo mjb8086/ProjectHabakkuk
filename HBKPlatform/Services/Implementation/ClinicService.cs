@@ -62,7 +62,7 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
     public async Task<ReceptionModel> GetReceptionModel()
     {
         var data = new ReceptionModel();
-        var pracIdClaim = httpContextAccessor.HttpContext.User.FindFirst("LeadPractitionerId");
+        var pracIdClaim = httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
         if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
         {
             data.NumUnreadMessages = await _db.ClientMessages.CountAsync(x => x.PractitionerId == pracId && x.MessageOrigin == Enums.MessageOrigin.Client && x.MessageStatusPractitioner == Enums.MessageStatus.Unread);

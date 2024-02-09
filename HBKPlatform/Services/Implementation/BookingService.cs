@@ -205,7 +205,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
-        var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("LeadPractitionerId"));
+        var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"));
         return new UpcomingAppointmentsView()
         {
             UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))).ToList(),
@@ -235,7 +235,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? clientId)
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
         pracId = pracId < 1 ? _cacheService.GetDefaultPracIdForClinic(clinicId) : pracId;
         var treatments = await _cacheService.GetTreatments(clinicId);
         var treatmentTitle = treatments.TryGetValue(treatmentId, out var treatment) ? treatment.Title : "";
@@ -267,7 +267,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     public async Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId)
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
 
         return await DoBooking(clinicId, timeslotId, pracId, weekNum, clientId, treatmentId);
     }
@@ -316,7 +316,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     public async Task<BookClientTreatment> GetBookClientTreatmentView()
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var pracId = _userService.GetClaimFromCookie("LeadPractitionerId");
+        var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         
         var treatments = await _cacheService.GetTreatments(clinicId);
