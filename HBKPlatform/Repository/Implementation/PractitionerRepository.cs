@@ -1,6 +1,6 @@
 ﻿using HBKPlatform.Database;
-using HBKPlatform.Helpers;
-using HBKPlatform.Models.View;
+using HBKPlatform.Models.DTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Repository.Implementation;
 
@@ -12,12 +12,18 @@ namespace HBKPlatform.Repository.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class PractitionerRepository(ApplicationDbContext applicationDbContext) : IPractitionerRepository
+public class PractitionerRepository(ApplicationDbContext _db) : IPractitionerRepository
 {
     public Practitioner GetPractitioner(int mciIdx)
     {
-        var practitioner =  applicationDbContext.Practitioners.First(x => x.Id.Equals(mciIdx));
+        var practitioner =  _db.Practitioners.First(x => x.Id.Equals(mciIdx));
         return practitioner;
+    }
+
+    public async Task<List<PracDetailsLite>> GetClinicPracs(int clinicId)
+    {
+        return await _db.Practitioners.Where(x => x.ClinicId == clinicId)
+            .Select(x => new PracDetailsLite() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}"}).ToListAsync();
     }
 
 }

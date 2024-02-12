@@ -1,4 +1,5 @@
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ public class ClinicManagementController(IClinicService _clinicService) : Control
 
     public async Task<IActionResult> PasswordReset()
     {
-        return View();
+        return View(await _clinicService.GetUacView());
     }
     
     public async Task<IActionResult> RegisterClinic()
@@ -59,6 +60,17 @@ public class ClinicManagementController(IClinicService _clinicService) : Control
         TempData["Message"] = "Successfully registered new clinic and created lead practitioner user.";
         return RedirectToRoute(new { controller = "ClinicManagement", action = "ListClinics" });
     }
-    
+
+    [HttpPost]
+    public async Task<IActionResult> DoUacAction([FromForm] UserAccountFunctions model)
+    {
+       return Ok();
+    }
+
+    public async Task<IActionResult> GetClinicPracs(int clinicId)
+    {
+        return Ok(await _clinicService.GetClinicPracs(clinicId));
+    }
+
 
 }

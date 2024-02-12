@@ -2,10 +2,10 @@ using HBKPlatform.Database;
 using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
-using HBKPlatform.Models.View;
 using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Services.Implementation;
@@ -19,7 +19,7 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor, IClinicRepository _clinicRepo) : IClinicService
+public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor, IClinicRepository _clinicRepo, IPractitionerRepository _pracRepo) : IClinicService
 {
     public async Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId)
     {
@@ -90,6 +90,23 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
     public async Task RegisterClinic(ClinicRegistrationDto model)
     {
         await _clinicRepo.RegisterClinic(model);
+    }
+
+    public async Task<UserAccountFunctions> GetUacView()
+    {
+        var clinics = await _clinicRepo.GetClinicDetailsLite();
+        return new UserAccountFunctions()
+        {
+            Clinics = clinics.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToList(),
+        };
+    }
+
+    public async Task<ClinicPracs> GetClinicPracs(int clinicId)
+    {
+        return new ClinicPracs()
+        {
+            Pracs = await _pracRepo.GetClinicPracs(clinicId)
+        };
     }
     
     
