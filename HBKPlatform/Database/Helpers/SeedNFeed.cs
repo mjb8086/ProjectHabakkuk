@@ -178,7 +178,7 @@ namespace HBKPlatform.Database.Helpers
                     var clientRecord1 = new ClientRecord()
                     {
                         Clinic = clinic, Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
-                        Title = "Bad news for the bowels", NoteBody = "bother shifting the goods"
+                        Title = "Bad news for the bowels", NoteBody = "bother shifting the goods", Practitioner = prac1
                     };
                     ctx.Add(clientRecord1);
 
@@ -274,21 +274,21 @@ namespace HBKPlatform.Database.Helpers
                             Availability = Enums.TimeslotAvailability.Unavailable,
                             WeekNum = 20
                         },
-                        new TimeslotAvailability()
+                        new ()
                         {
                             Timeslot = timeslots[101],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
                             WeekNum = 20
                         },
-                        new TimeslotAvailability()
+                        new ()
                         {
                             Timeslot = timeslots[102],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
                             WeekNum = 20
                         },
-                        new TimeslotAvailability()
+                        new ()
                         {
                             Timeslot = timeslots[104],
                             Practitioner = prac1,

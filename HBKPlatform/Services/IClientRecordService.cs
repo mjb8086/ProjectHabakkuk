@@ -8,6 +8,7 @@ public interface IClientRecordService
 {
     public Task<ClientRecordsIndex> GetClientRecordsIndex();
     public Task<ClientRecords> GetClientRecords(int clientId);
-    public Task<ClientRecordDto> GetClientRecord(int? recordId, int? clientId);
-    public Task CreateRecord(ClientRecordDto recordDto);
+    public Task<FullClientRecordDto> GetClientRecord(int? recordId, int? clientId);
+    public Task <FullClientRecordDto> CreateRecord(ClientRecordDto recordDto);
+    public Task<FullClientRecordDto> UpdateRecord(UpdateRecordLite recordDto);
 }

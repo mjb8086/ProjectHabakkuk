@@ -2,24 +2,22 @@
 import Globals from './globals.js';
 
 $(document).ready(function () {
-// Broken, probably need to use Webpack. Deep Sigh.
-    /*
-const quill = new Quill('#clientRecord', {
-    modules: {
-        toolbar: true
-    },
-    theme: 'snow'
-});
-*/
-
 // Functions
 function updateNote(id) {
     $.ajax({
-        url: `${Globals.BaseUrl}/mynd/record/updaterecordbody?recordId=${id}`,
+        url: `${Globals.BaseUrl}/mynd/record/updaterecord`,
         contentType: "application/json",
         method: "PUT",
-        data: JSON.stringify({noteBody: $("#noteBody").val()}),
-        success: function (data) { $("#noteBody").val(data); Globals.HBKFlasher("Successfully saved note."); }
+        data: JSON.stringify({
+            noteTitle: $("#noteTitle").val(),
+            noteBody: $("#noteBody").val(),
+            id: id
+        }),
+        success: function (data) { 
+            $("#noteBody").val(data.noteBody);
+            $("#noteTitle").val(data.title);
+            Globals.HBKFlasher("Successfully saved note."); 
+        }
     });
 };
     function createNote(clientId) {
@@ -34,7 +32,10 @@ function updateNote(id) {
                 isPriority: false,
                 clientId: clientId
             }),
-            success: function (data) { Globals.HBKFlasher("New note created.") }
+            success: function (data) { 
+                Globals.HBKFlasher("New note created."); 
+                $('#btnSave').attr('data-id', data.id);
+            }
         });
     };
     function deleteNote(noteId, clientId) {

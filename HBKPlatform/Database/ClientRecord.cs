@@ -15,6 +15,7 @@ namespace HBKPlatform.Database;
 public class ClientRecord : HbkBaseEntity
 {
     public int ClinicId { get; set; }
+    public int PractitionerId { get; set; }
     public int ClientId { get; set; }
     public int? AppointmentId { get; set; }
     public Enums.RecordVisibility RecordVisibility { get; set; }
@@ -24,6 +25,7 @@ public class ClientRecord : HbkBaseEntity
 
     // EF Navigations
     public virtual Clinic Clinic { get; set; }
+    public virtual Practitioner Practitioner { get; set; }
     public virtual Client Client { get; set; }
     public virtual Appointment Appointment { get; set; }
 }

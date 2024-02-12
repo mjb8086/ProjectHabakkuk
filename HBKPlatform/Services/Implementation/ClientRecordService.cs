@@ -33,7 +33,7 @@ public class ClientRecordService(IUserService _userService, ICacheService _cache
         };
     }
 
-    public async Task<ClientRecordDto> GetClientRecord(int? recordId, int? clientId)
+    public async Task<FullClientRecordDto> GetClientRecord(int? recordId, int? clientId)
     {
         if (recordId.HasValue)
         {
@@ -43,7 +43,7 @@ public class ClientRecordService(IUserService _userService, ICacheService _cache
         }
         if (clientId.HasValue)// is create mode, return blank model.
         {
-            return new ClientRecordDto()
+            return new FullClientRecordDto()
             {
                 ClientId = clientId.Value, 
                 ClientName = _cache.GetClientName(clientId.Value)
@@ -53,9 +53,15 @@ public class ClientRecordService(IUserService _userService, ICacheService _cache
         throw new InvalidOperationException("Missing data");
     }
 
-    public async Task CreateRecord(ClientRecordDto recordDto)
+    public async Task<FullClientRecordDto> CreateRecord(ClientRecordDto recordDto)
     {
         recordDto.ClinicId = _userService.GetClaimFromCookie("ClinicId");
-        await _recordRepo.CreateRecord(recordDto);
+        recordDto.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
+        return await _recordRepo.CreateRecord(recordDto);
+    }
+
+    public async Task<FullClientRecordDto> UpdateRecord(UpdateRecordLite recordDto)
+    {
+        return await _recordRepo.UpdateRecordLite(recordDto);
     }
 }
