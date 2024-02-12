@@ -15,7 +15,7 @@ namespace HBKPlatform.Repository.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, UserManager<User> _userMgr) :IClientRepository
+public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, UserManager<User> _userMgr, IClinicRepository _clinicRepo) :IClientRepository
 {
     public ClientDto GetClientDetails(int clientId)
     {
@@ -63,6 +63,7 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         
         if (willHaveUser)
         {
+            if (await _clinicRepo.IsEmailInUse(client.Email)) throw new InvalidOperationException("Email address already in use");
             var user = new User()
             {
                 Email = client.Email,
@@ -102,6 +103,7 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
 
         if (!(string.IsNullOrEmpty(dbClient.UserId) || string.IsNullOrEmpty(client.Email)))
         {
+            if (await _clinicRepo.IsEmailInUse(client.Email)) throw new InvalidOperationException("Email address already in use");
             dbClient.User.Email = client.Email;
         }
         
@@ -112,4 +114,5 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
     {
         return _db.Clients.Count(x => x.ClinicId == clinicId);
     }
+
 }

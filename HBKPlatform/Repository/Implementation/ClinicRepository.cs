@@ -57,6 +57,9 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
 
     public async Task RegisterClinic(ClinicRegistrationDto clinic)
     {
+        if (await IsEmailInUse(clinic.LeadPracEmail)) 
+            throw new InvalidOperationException("Email address already in use");
+        
         var user = new User()
         {
             Email = clinic.LeadPracEmail,
@@ -100,6 +103,12 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         await _userMgr.AddToRoleAsync(user, "Practitioner");
         dbClinic.LeadPractitioner = prac;
         await _db.SaveChangesAsync();
+    }
+    
+    public async Task<bool> IsEmailInUse(string email)
+    {
+        return await _db.Users.AnyAsync(x =>
+            x.Email != null && x.Email.ToLower() == email || x.UserName != null && x.UserName.ToLower() == email);
     }
     
 }
