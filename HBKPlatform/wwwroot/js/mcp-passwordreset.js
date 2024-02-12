@@ -1,12 +1,32 @@
 import Globals from './globals.js';
 
 $(document).ready(function () {
+    // Model
+    var pracData = {};
+    
+    // Elements
+    const ls = $("#lockoutStatus");
+    const psel = $("#pracSelect");
+    const csel = $("#clinicSelect");
+    
     // Functions
-    function updatePracList(pracs) {
-        $('#pracSelect').empty();
-        pracs.forEach(function(e) {
-            $('#pracSelect').append($('<option>',{text: e.name, value: e.id}));
+    function updatePracList(pracData) {
+        psel.empty();
+        Object.keys(pracData).forEach(function(e) {
+            psel.append($('<option>',{text: pracData[e].name, value: e}));
         });
+    }
+    
+    function displayLockout(pracId) {
+       if(pracData[pracId].hasLockout) {
+            ls.text("Lockout");
+            ls.removeClass('active');
+            ls.addClass('inactive');
+       } else {
+            ls.text("Unlocked (Active)");
+            ls.removeClass('inactive');
+            ls.addClass('active');
+        }
     }
     
     function fetchClinicPracs(id) {
@@ -15,17 +35,23 @@ $(document).ready(function () {
             contentType: "application/json",
             method: "get",
             success: function (data) {
-                updatePracList(data.pracs);
+                pracData = data.pracs;
+                updatePracList(pracData);
             }
         });
     }
     
     // Listeners
-    $("#clinicSelect").on('change', function (e) {
+    csel.on('change', function (e) {
         fetchClinicPracs(e.currentTarget.value);
         $('#doIt').removeAttr("disabled");
-        $('#pracSelect').removeAttr("disabled");
+        psel.removeAttr("disabled");
+        psel.change();
     });
     
-    $('#clinicSelect').change();
+    psel.on('change', function (e) {
+       displayLockout(psel.val());
+    });
+    
+    csel.change();
 });

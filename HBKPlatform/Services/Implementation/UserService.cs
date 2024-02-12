@@ -1,6 +1,8 @@
 using HBKPlatform.Database;
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Repository;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Services.Implementation;
@@ -14,7 +16,7 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpContext) : IUserService
+public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpContext, IUserRepository _userRepo) : IUserService
 {
     /// <summary>
     /// use this to set the user's associated prac Id or client Id
@@ -23,7 +25,7 @@ public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpCon
     public async Task<UserDto> GetClientOrPracIdForUserId(string userId)
     {
         var user = new UserDto();
-        var client = await _db.Clients.FirstOrDefaultAsync(x => x.UserId == userId);
+        var client = await _db.Clients.FirstOrDefaultAsync(x => x.UserId == userId);    // TODO: Put these in repositories
         Practitioner prac;
 
         if (client != null)
@@ -39,6 +41,16 @@ public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpCon
 
         return user;
     }
+    
+    private async Task<string> GetPracUserId(int pracId)
+    {
+        var client = await _db.Practitioners.FirstOrDefaultAsync(x => x.Id == pracId);
+        if (string.IsNullOrWhiteSpace(client.UserId))
+        {
+            throw new NullReferenceException("UserID is null");
+        }
+        return client.UserId;
+    }
 
     /// <summary>
     /// Get the specified claim from the cookie, converts to integer
@@ -52,6 +64,21 @@ public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpCon
             return val;
         }
         return 0;
+    }
+    
+    // MCP Methods
+    public async Task DoUacAction(UacRequest model)
+    {
+        var userId = await GetPracUserId(model.PractitionerId);
+        switch (model.Action)
+        {
+            case UacAction.PasswordReset:
+                await _userRepo.ResetPasswordForUser(userId);
+            break;
+            case UacAction.ToggleLockout:
+                await _userRepo.ToggleLockout(userId);
+            break;
+        }
     }
     
 }

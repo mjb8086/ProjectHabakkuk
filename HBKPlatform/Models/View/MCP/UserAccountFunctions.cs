@@ -6,6 +6,10 @@ namespace HBKPlatform.Models.View.MCP;
 public class UserAccountFunctions
 {
     public List<SelectListItem> Clinics { get; set; }
+}
+
+public class UacRequest
+{
     public int ClinicId { get; set; }
     public int PractitionerId { get; set; }
     public UacAction Action { get; set; }
@@ -20,5 +24,5 @@ public enum UacAction
 
 public struct ClinicPracs
 {
-    public List<PracDetailsLite> Pracs { get; set; }
+    public Dictionary<int, PracDetailsUac> Pracs { get; set; }
 }

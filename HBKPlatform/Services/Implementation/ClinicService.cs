@@ -103,11 +103,20 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
 
     public async Task<ClinicPracs> GetClinicPracs(int clinicId)
     {
+        var lockoutDict = await _pracRepo.GetPracLockoutStatusDict(clinicId);
+        var pracDetailsUac = new Dictionary<int, PracDetailsUac>();
+        
+        foreach (var prac in (await _pracRepo.GetClinicPracs(clinicId)))
+        {
+            prac.HasLockout = lockoutDict[prac.Id];
+            pracDetailsUac.Add(prac.Id, prac);
+        }
+        
         return new ClinicPracs()
         {
-            Pracs = await _pracRepo.GetClinicPracs(clinicId)
+            Pracs = pracDetailsUac
         };
     }
-    
-    
+
+
 }

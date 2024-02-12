@@ -9,11 +9,16 @@ public struct ClientDetailsLite
     public int ClinicId { get; set; }
 }
 
-public struct PracDetailsLite
+public class PracDetailsLite
 {
     public string Name { get; set; }
     public int Id { get; set; }
     public int ClinicId { get; set; }
+}
+
+public class PracDetailsUac : PracDetailsLite
+{
+   public bool HasLockout { get; set; } 
 }
 
 public struct ClientRecordLite

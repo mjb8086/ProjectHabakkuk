@@ -1,0 +1,31 @@
+/* overrides */
+html {
+    background: repeating-linear-gradient( 45deg, #fdba39, #fdba39 10px, #bf1717 10px, #bf1717 20px ); 
+}
+div#mainPageBody { background-color: #b3b3b3;}
+footer { color: white; text-shadow: 2px 2px 3px black;}
+
+/* forms */
+form#uac select {
+    min-width: 300px;
+    height: 35px;
+}
+
+input[type="submit"]
+{
+    width: 80px;
+    height: 30px;
+    float: right;
+}
+
+div#uacWrapper {
+   max-width: 450px; 
+}
+
+div#lockoutStatus.inactive {
+    color: #bf0000;
+}
+
+div#lockoutStatus.active {
+    color: green;
+}

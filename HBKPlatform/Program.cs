@@ -45,6 +45,7 @@ builder.Services.AddScoped<ITimeslotRepository, TimeslotRepository>();
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();

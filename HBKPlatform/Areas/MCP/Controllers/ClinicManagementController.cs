@@ -16,7 +16,7 @@ namespace HBKPlatform.Areas.MCP.Controllers;
 /// </summary>
 [Area("MCP")]
 [Authorize]
-public class ClinicManagementController(IClinicService _clinicService) : Controller
+public class ClinicManagementController(IClinicService _clinicService, IUserService _userService) : Controller
 {
     public async Task<IActionResult> Index()
     {
@@ -62,9 +62,12 @@ public class ClinicManagementController(IClinicService _clinicService) : Control
     }
 
     [HttpPost]
-    public async Task<IActionResult> DoUacAction([FromForm] UserAccountFunctions model)
+    public async Task<IActionResult> DoUacAction([FromForm] UacRequest model)
     {
-       return Ok();
+        if (!ModelState.IsValid) throw new Exception("Someone set us up the model");
+        await _userService.DoUacAction(model);
+        TempData["Message"] = $"Successfully completed action {model.Action}.";
+        return RedirectToRoute(new { controller = "ClinicManagement", action = "PasswordReset" });
     }
 
     public async Task<IActionResult> GetClinicPracs(int clinicId)

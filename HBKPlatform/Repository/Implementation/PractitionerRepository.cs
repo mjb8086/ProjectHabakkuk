@@ -20,10 +20,16 @@ public class PractitionerRepository(ApplicationDbContext _db) : IPractitionerRep
         return practitioner;
     }
 
-    public async Task<List<PracDetailsLite>> GetClinicPracs(int clinicId)
+    public async Task<List<PracDetailsUac>> GetClinicPracs(int clinicId)
     {
         return await _db.Practitioners.Where(x => x.ClinicId == clinicId)
-            .Select(x => new PracDetailsLite() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}"}).ToListAsync();
+            .Select(x => new PracDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}"}).ToListAsync();
+    }
+
+    public async Task<Dictionary<int, bool>> GetPracLockoutStatusDict(int clinicId)
+    {
+        return await _db.Practitioners.Include("User").Where(x => x.UserId != null)
+            .ToDictionaryAsync(x => x.Id, x => x.User.LockoutEnabled);
     }
 
 }

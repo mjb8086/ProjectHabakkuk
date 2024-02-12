@@ -11,9 +11,7 @@ namespace HBKPlatform.Areas.MCP.Controllers;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-[Area("MCP")]
-[Route(("mcp"))]
-[Authorize]
+[Area("MCP"), Route(("mcp")), Authorize]
 public class MCPController : Controller
 {
     // GET: Index
