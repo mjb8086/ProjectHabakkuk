@@ -27,7 +27,7 @@ public class ClinicRegistrationDto : ClinicDto
     public Enums.Title LeadPracTitle { get; set; }
     public string LeadPracForename { get; set; }
     public string LeadPracSurname { get; set; }
-    public DateOnly LeadPracDOB { get; set; }
+    public DateTime LeadPracDOB { get; set; }
     public string LeadPracEmail { get; set; }
 
 }

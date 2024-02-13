@@ -21,7 +21,7 @@ div#mainPageBody {
     background: #ececec;
     padding: 10px;
     border-radius: 5px;
-    box-shadow: 0px 0px 4px #686868;
+    box-shadow: 0 0 4px #686868;
 }
 h1, h2, h3, mci-body-font {
     font-family: cabin, Verdana, Geneva, Tahoma, sans-serif !important;

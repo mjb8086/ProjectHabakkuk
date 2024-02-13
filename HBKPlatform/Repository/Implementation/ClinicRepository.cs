@@ -83,7 +83,7 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
             Title = clinic.LeadPracTitle,
             Forename = clinic.LeadPracForename,
             Surname = clinic.LeadPracSurname,
-            DateOfBirth = clinic.LeadPracDOB,
+            DateOfBirth = DateOnly.FromDateTime(clinic.LeadPracDOB),
             User = user
         };
         

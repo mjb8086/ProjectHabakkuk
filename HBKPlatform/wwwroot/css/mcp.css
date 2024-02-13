@@ -3,7 +3,15 @@ html {
     background: repeating-linear-gradient( 45deg, #ffc960, #ffc960 10px, #861616 10px, #861616 20px );
 }
 div#mainPageBody { background-color: #b3b3b3;}
-footer { color: white; text-shadow: 2px 2px 3px black;}
+footer { 
+    color: white; 
+    text-shadow: 1px 1px 3px black;
+    margin: 20px;
+    background: #b3b3b3;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 4px #686868;
+}
 
 /* forms */
 form#uac select {
