@@ -1,6 +1,6 @@
 /* overrides */
 html {
-    background: repeating-linear-gradient( 45deg, #fdba39, #fdba39 10px, #bf1717 10px, #bf1717 20px ); 
+    background: repeating-linear-gradient( 45deg, #ffc960, #ffc960 10px, #861616 10px, #861616 20px );
 }
 div#mainPageBody { background-color: #b3b3b3;}
 footer { color: white; text-shadow: 2px 2px 3px black;}

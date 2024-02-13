@@ -61,6 +61,29 @@ namespace HBKPlatform.Database.Helpers
                         Img = new string("samples/brown.jpg"),
                         User = user1
                     };
+                    
+                    var prac2 = new Practitioner()
+                    {
+                        Forename = "Another",
+                        Surname = "Prac",
+                        Title = Enums.Title.Dr,
+                        Bio = "layabout",
+                        Location = "the pub",
+                        DateOfBirth = new DateOnly(1992, 07, 08),
+                        Img = new string("samples/second.jpg"),
+                        User =  new ()
+                        {
+                            Email = "another@hillvalley.com",
+                            NormalizedEmail = "another@hillvalley.com".ToUpper(),
+                            UserName = "another@hillvalley.com",
+                            NormalizedUserName = "another@hillvalley.com".ToUpper(),
+                            EmailConfirmed = true,
+                            LockoutEnabled = false,
+                            PhoneNumber = "0898 333 201",
+                            PhoneNumberConfirmed = true,
+                        }
+                    };
+                    prac2.User.PasswordHash = passwordHasher.HashPassword(prac2.User, "88milesperhour");
 
                     var client1Email = "mmf@hillvalleyhigh.com";
                     var client1User = new User()
@@ -122,7 +145,7 @@ namespace HBKPlatform.Database.Helpers
                         OrgTagline = "Timely treatment or your time back.",
                         Telephone = "0898 333 201",
                         Clients = new List<Client>() {client1, client2},
-                        Practitioners = new List<Practitioner>() {prac1},
+                        Practitioners = new List<Practitioner>() {prac1, prac2},
                         RegistrationDate = DateTime.UtcNow
                     };
 

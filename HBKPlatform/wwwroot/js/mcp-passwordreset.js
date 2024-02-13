@@ -3,21 +3,35 @@ import Globals from './globals.js';
 $(document).ready(function () {
     // Model
     var pracData = {};
+    var isDisabled = true;
     
     // Elements
-    const ls = $("#lockoutStatus");
-    const psel = $("#pracSelect");
     const csel = $("#clinicSelect");
+    const psel = $("#pracSelect");
+    const ls = $("#lockoutStatus");
     
     // Functions
-    function updatePracList(pracData) {
+    function updatePracList(myPracData) {
         psel.empty();
-        Object.keys(pracData).forEach(function(e) {
-            psel.append($('<option>',{text: pracData[e].name, value: e}));
+        var isFirst = true;
+        const pracKeys = Object.keys(myPracData);
+        pracKeys.forEach(function(e) {
+           if (isFirst) {
+               psel.append($('<option>',{text: myPracData[e].name, value: e, selected: "selected"}));
+               isFirst = false;
+           } else {
+               psel.append($('<option>',{text: myPracData[e].name, value: e}));
+           }
         });
+        displayLockout(myPracData[pracKeys[0]].id);
     }
     
     function displayLockout(pracId) {
+        if(!pracData[pracId]) { 
+            console.error(`pracID ${pracId} not in pracdata`);
+            return;
+        }
+        console.log(`FOUND: ${JSON.stringify(pracData[pracId])}`);
        if(pracData[pracId].hasLockout) {
             ls.text("Lockout");
             ls.removeClass('active');
@@ -35,6 +49,7 @@ $(document).ready(function () {
             contentType: "application/json",
             method: "get",
             success: function (data) {
+                console.log(`Finished fetching prac data, result: ${JSON.stringify(data)} `);
                 pracData = data.pracs;
                 updatePracList(pracData);
             }
@@ -43,15 +58,17 @@ $(document).ready(function () {
     
     // Listeners
     csel.on('change', function (e) {
-        fetchClinicPracs(e.currentTarget.value);
-        $('#doIt').removeAttr("disabled");
-        psel.removeAttr("disabled");
-        psel.change();
+        fetchClinicPracs(e.target.value);
+        if (isDisabled) {
+            $('#doIt').removeAttr("disabled");
+            psel.removeAttr("disabled");
+            isDisabled = false;
+        }
     });
     
     psel.on('change', function (e) {
-       displayLockout(psel.val());
+       displayLockout(e.target.value);
     });
     
-    csel.change();
+    csel.trigger("change");
 });
