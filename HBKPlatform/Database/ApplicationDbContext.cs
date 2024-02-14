@@ -6,6 +6,7 @@
 * Authored: 10/09/2022
 ******************************/
 
+using System.Security.Claims;
 using HBKPlatform.Database.Helpers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -95,11 +96,10 @@ public class ApplicationDbContext : IdentityDbContext<User>
             .Where(e => e.State == EntityState.Added);
 
         // is the HTTP context available
-        string? userName = null;
+        string? userId = null;
         if (_httpCtx.HttpContext != null)
         {
-            var user = _httpCtx.HttpContext.User;
-            userName = user?.Identity?.Name;
+            userId = _httpCtx.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
         }
 
         foreach (var entry in modifiedEntries)
@@ -107,14 +107,14 @@ public class ApplicationDbContext : IdentityDbContext<User>
             if (entry.Entity is HbkBaseEntity entity)
             {
                 entity.DateModified = DateTime.UtcNow;
-                entity.ModifyActioner = userName;
+                entity.ModifyActioner =  userId;
             }
         }
         foreach (var entry in createdEntries)
         {
             if (entry.Entity is HbkBaseEntity entity)
             {
-                entity.CreateActioner = userName;
+                entity.CreateActioner =  userId;
             }
         }
     }
