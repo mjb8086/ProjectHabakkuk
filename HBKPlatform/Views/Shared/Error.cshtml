@@ -3,13 +3,19 @@
     ViewData["Title"] = "Error";
 }
 
-<h1 class="text-danger">Ah bollocks.</h1>
-<h2 class="text-danger">An error occurred while processing your request. Please contact support who will be "happy" to help you.</h2>
+<h1 class="text-danger">Apologies.</h1>
+<h2 class="text-danger">An error occurred while processing this request. If it persists, please contact support.</h2>
 
 @if (Model.ShowRequestId)
 {
-    <p>
+<p>
         <strong>Request ID:</strong> <code>@Model.RequestId</code>
-    </p>
+</p>
 }
 
+@if (!string.IsNullOrWhiteSpace(Model.ErrorCode))
+{
+<p>
+        <strong>HTTP response code:</strong> <code>@Model.ErrorCode</code>
+</p>
+}

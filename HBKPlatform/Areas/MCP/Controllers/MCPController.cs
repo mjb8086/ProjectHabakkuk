@@ -11,11 +11,17 @@ namespace HBKPlatform.Areas.MCP.Controllers;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-[Area("MCP"), Route(("mcp")), Authorize(Roles="SuperAdmin")]
+[Area("MCP"), Authorize(Roles="SuperAdmin")]
 public class MCPController : Controller
 {
-    // GET: Index
+    [Route("mcp")]
     public async Task<IActionResult> Index()
+    {
+        return View();
+    }
+    
+    [Route("mcp/status")]
+    public async Task<IActionResult> Status()
     {
         return View();
     }

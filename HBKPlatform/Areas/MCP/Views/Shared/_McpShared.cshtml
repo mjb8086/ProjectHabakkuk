@@ -14,5 +14,6 @@
     <a asp-area="MCP" asp-controller="ClinicManagement" asp-action="Index" class="@GetActiveClass("ClinicManagement")">Clinic Management</a>
     <a asp-area="MCP" class="@GetActiveClass("Audit")">Auditing</a>
     <a asp-area="MCP" class="@GetActiveClass("Configuration")">Configuration</a>
+    <a asp-area="MCP" asp-controller="MCP" asp-action="Status" class="@GetActiveClass("SystemStatus")">System Status</a>
 </div>
 @RenderBody()
