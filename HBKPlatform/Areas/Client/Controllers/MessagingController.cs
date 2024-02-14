@@ -13,8 +13,7 @@ namespace HBKPlatform.Client.Controllers;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-[Area("Client")]
-[Authorize]
+[Area("Client"), Authorize(Roles="Client")]
 public class MessagingController
     (IClientMessagingService _clientMessagingService, ICacheService _cache, IHttpContextAccessor _httpContextAccessor) : Controller
 {

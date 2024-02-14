@@ -16,8 +16,7 @@ namespace HBKPlatform.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 
-[Area("MyND")]
-[Authorize]
+[Area("MyND"), Authorize(Roles="Practitioner")]
 public class AppointmentController(ITreatmentService _treatmentService, IBookingService _bookingService, IAvailabilityManagementService _availabilityMgmt): Controller
 {
     public async Task<IActionResult> Index()

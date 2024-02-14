@@ -14,8 +14,7 @@ namespace HBKPlatform.Areas.Client.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 
-[Area(("Client"))]
-[Authorize]
+[Area("Client"), Authorize(Roles="Client")]
 public class MyDetailsController(IClientDetailsService _cdSrv) : Controller
 {
     public async Task<IActionResult> Index()

@@ -7,53 +7,57 @@
     Layout = "_McpShared";
 }
 <h1>View or modify clinic</h1>
+<div id="uacWrapper">
 <form id="treatmentDetails" asp-area="MCP" asp-controller="ClinicManagement" asp-action="DoUpdateClinic" asp-route-clinicId="@Model.Id" method="post"> 
     <fieldset>
-        <label for="orgName" class="form-textfield">Organisation Name</label>
+        <legend for="orgName" class="form-textfield">Organisation Name</legend>
         <input type="text" id="orgName" asp-for="OrgName" value="@Model.OrgName" placeholder="Sample Clinic" >
     </fieldset>
 
     <fieldset>
-        <label for="orgTagline" class="form-textfield">Organisation Tagline</label>
+        <legend for="orgTagline" class="form-textfield">Organisation Tagline</legend>
         <input type="text" id="orgTagline" asp-for="OrgTagline" value="@Model.OrgTagline" placeholder="Sample Slogan" >
     </fieldset>
 
     <fieldset>
-        <label for="licence" class="form-textfield">Licence Status</label>
+        <legend for="licence" class="form-textfield">Licence Status</legend>
         <select id="licence" asp-for="LicenceStatus" 
                 asp-items="Html.GetEnumSelectList<Enums.LicenceStatus>()">
         </select> 
     </fieldset>
     
     <fieldset>
-        <label for="orgEmail" class="form-textfield">Organisation Email</label>
+        <legend for="orgEmail" class="form-textfield">Organisation Email</legend>
         <input type="text" id="orgEmail" asp-for="Email" value="@Model.Email" placeholder="billg@microsoft.com" >
     </fieldset>
 
     <fieldset>
-        <label for="telephone" class="form-textfield">Telephone</label>
+        <legend for="telephone" class="form-textfield">Telephone</legend>
         <input type="text" name="telephone" id="telephone" value="@Model.Telephone"/>
     </fieldset>
   
     <fieldset>
-      <label for="address" class="form-textfield">Address</label>
+      <legend for="address" class="form-textfield">Address</legend>
       <textarea name="streetAddress" id="address">
 @Model.StreetAddress
       </textarea> 
     </fieldset>
 
     <fieldset>
-        <label for="regDate" class="form-textfield">Registration Date</label>
+        <legend for="regDate" class="form-textfield">Registration Date</legend>
         <input type="text" asp-for="RegistrationDate" name="" id="regDate" value="@(Model.RegistrationDate.ToString("yyyy-MM-dd"))" disabled="disabled" />
     </fieldset>
   
     <fieldset>
+        <legend class="form-textfield">Lead Practitioner</legend>
+        <p>@Model.LeadPracFullName</p>
+    </fieldset>
+    
+    <fieldset>
         <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/>
     </fieldset>
 </form>
-
-<h2>Lead Practitioner</h2>
-<p>@Model.LeadPracFullName</p>
+</div>
 
 <h2>Options</h2>
 <ol>

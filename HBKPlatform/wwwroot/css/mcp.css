@@ -4,8 +4,6 @@ html {
 }
 div#mainPageBody { background-color: #b3b3b3;}
 footer { 
-    color: white; 
-    text-shadow: 1px 1px 3px black;
     margin: 20px;
     background: #b3b3b3;
     padding: 10px;

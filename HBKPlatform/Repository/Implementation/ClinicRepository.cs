@@ -95,8 +95,10 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
             RegistrationDate = DateTime.UtcNow,
             LicenceStatus = clinic.LicenceStatus,
             Telephone = clinic.Telephone,
+            StreetAddress = clinic.StreetAddress,
             Practitioners = new List<Practitioner>() {prac}
         };
+        
         await _db.AddAsync(dbClinic);
         // todo - make resilient?
         await _db.SaveChangesAsync();

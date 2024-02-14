@@ -14,8 +14,7 @@ namespace HBKPlatform.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 
-[Area(("MyND"))]
-[Authorize]
+[Area("MyND"), Authorize(Roles="Practitioner")]
 public class ClientController(IClientDetailsService _cdSrv) : Controller
 {
     public IActionResult Index()

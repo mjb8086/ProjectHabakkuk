@@ -7,36 +7,37 @@
     Layout = "_McpShared";
 }
 <h1>New clinic</h1>
+<div id="uacWrapper">
 <form id="treatmentDetails" asp-area="MCP" asp-controller="ClinicManagement" asp-action="DoRegisterClinic" method="post"> 
     <fieldset>
-        <label for="orgName" class="form-textfield">Organisation Name</label>
+        <legend for="orgName" class="form-textfield">Organisation Name</legend>
         <input type="text" id="orgName" asp-for="OrgName" value="" placeholder="Pearce & Pearce" >
     </fieldset>
 
     <fieldset>
-        <label for="orgTagline" class="form-textfield">Organisation Tagline</label>
+        <legend for="orgTagline" class="form-textfield">Organisation Tagline</legend>
         <input type="text" id="orgTagline" asp-for="OrgTagline" value="" placeholder="Merges and Executions" >
     </fieldset>
 
     <fieldset>
-        <label for="licence" class="form-textfield">Licence Status</label>
+        <legend for="licence" class="form-textfield">Licence Status</legend>
         <select id="licence" asp-for="LicenceStatus" 
                 asp-items="Html.GetEnumSelectList<Enums.LicenceStatus>()">
         </select> 
     </fieldset>
     
     <fieldset>
-        <label for="orgEmail" class="form-textfield">Organisation Email</label>
+        <legend for="orgEmail" class="form-textfield">Organisation Email</legend>
         <input type="text" id="orgEmail" asp-for="Email" value="" placeholder="billg@microsoft.com" >
     </fieldset>
 
     <fieldset>
-        <label for="telephone" class="form-textfield">Telephone</label>
+        <legend for="telephone" class="form-textfield">Telephone</legend>
         <input type="text" name="telephone" id="telephone" value=""/>
     </fieldset>
   
     <fieldset>
-      <label for="address" class="form-textfield">Address</label>
+      <legend for="address" class="form-textfield">Address</legend>
       <textarea name="streetAddress" id="address">
 
       </textarea> 
@@ -44,28 +45,28 @@
 
     <h3>Lead Practitioner Details</h3>
     <fieldset>
-        <label for="pracTitle" class="form-textfield">Title</label>
+        <legend for="pracTitle" class="form-textfield">Title</legend>
         <select id="pracTitle" asp-for="LeadPracTitle" asp-items="Html.GetEnumSelectList<Enums.Title>()">
         </select> 
     </fieldset>
     
     <fieldset>
-        <label for="pracForename" class="form-textfield">Forename</label>
+        <legend for="pracForename" class="form-textfield">Forename</legend>
         <input type="text" id="pracForename" asp-for="LeadPracForename" placeholder="Patrick">
     </fieldset>
     
     <fieldset>
-        <label for="pracSurname" class="form-textfield">Surname</label>
+        <legend for="pracSurname" class="form-textfield">Surname</legend>
         <input type="text" id="pracSurname" asp-for="LeadPracSurname" placeholder="Bateman" >
     </fieldset>
     
     <fieldset>
-        <label for="dateOfBirth" class="form-textfield">Date of birth</label>
+        <legend for="dateOfBirth" class="form-textfield">Date of birth</legend>
         <input asp-for="LeadPracDOB" id="dateOfBirth" value="1970-01-01" type="date"/>
     </fieldset>
     
     <fieldset>
-        <label for="pracEmail" class="form-textfield">Email</label>
+        <legend for="pracEmail" class="form-textfield">Email</legend>
         <input type="text" id="pracEmail" asp-for="LeadPracEmail" placeholder="bateman@pandp.com" >
     </fieldset>
     
@@ -73,3 +74,4 @@
         <input type="submit" id="btnSave" value="Register clinic" />
     </fieldset>
 </form>
+</div>

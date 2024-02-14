@@ -13,8 +13,7 @@ namespace HBKPlatform.Controllers;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-[Area("MyND")]
-[Authorize]
+[Area("MyND"), Authorize(Roles="Practitioner")]
 public class ReceptionController(IClinicService _clinicService): Controller
 {
     public async Task<IActionResult> Index()

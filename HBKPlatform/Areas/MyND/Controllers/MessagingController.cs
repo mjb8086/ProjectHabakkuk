@@ -13,8 +13,7 @@ namespace HBKPlatform.Controllers;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-[Area("MyND")]
-[Authorize]
+[Area("MyND"), Authorize(Roles="Practitioner")]
 public class MessagingController
     (IClientMessagingService _clientMessagingService, IClinicService _clinicService) : Controller
 {

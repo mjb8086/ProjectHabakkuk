@@ -14,8 +14,7 @@ namespace HBKPlatform.Areas.MCP.Controllers;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-[Area("MCP")]
-[Authorize]
+[Area("MCP"), Authorize(Roles="SuperAdmin")]
 public class ClinicManagementController(IClinicService _clinicService, IUserService _userService) : Controller
 {
     public async Task<IActionResult> Index()

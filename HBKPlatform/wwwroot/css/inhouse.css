@@ -23,9 +23,14 @@ div#mainPageBody {
     border-radius: 5px;
     box-shadow: 0 0 4px #686868;
 }
-h1, h2, h3, mci-body-font {
+h1, h2, h3 {
     font-family: cabin, Verdana, Geneva, Tahoma, sans-serif !important;
 }
+
+a:link{color:#0e54ca}
+a:active{color:#0e54ca}
+a:visited{color:#0e54ca}
+a:hover{color: #12708b}
 
 /* Global Header */
 
