@@ -1,0 +1,27 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace HBKPlatform.Areas.MCP.Controllers;
+
+/// <summary>
+/// HBKPlatform MCP auditing Controller.
+/// 
+/// Author: Mark Brown
+/// Authored: 14/02/2024
+/// 
+/// © 2024 NowDoctor Ltd.
+/// </summary>
+[Area("MCP"), Authorize(Roles="SuperAdmin")]
+public class AuditingController : Controller
+{
+    public async Task<IActionResult> Index()
+    {
+        return View();
+    }
+    
+    public async Task<IActionResult> WhoIsOnline()
+    {
+        return View();
+    }
+
+}
