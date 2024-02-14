@@ -16,9 +16,11 @@ namespace HBKPlatform.Database;
 public class ApplicationDbContext : IdentityDbContext<User>
 
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+    private IHttpContextAccessor _httpCtx;
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpCtx)
         : base(options)
     {
+        _httpCtx = httpCtx;
     }
 
     // Define tables
@@ -83,22 +85,50 @@ public class ApplicationDbContext : IdentityDbContext<User>
     /// <summary>
     /// Automatically update DateModified for all entities that inherit from BaseEntity.
     /// </summary>
-    public override int SaveChanges()
+    void UpdateEntries()
     {
         ChangeTracker.DetectChanges();
 
-        var entries = ChangeTracker.Entries()
+        var modifiedEntries = ChangeTracker.Entries()
             .Where(e => e.State == EntityState.Modified);
+        var createdEntries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added);
 
-        foreach (var entry in entries)
+        // is the HTTP context available
+        string? userName = null;
+        if (_httpCtx.HttpContext != null)
+        {
+            var user = _httpCtx.HttpContext.User;
+            userName = user?.Identity?.Name;
+        }
+
+        foreach (var entry in modifiedEntries)
         {
             if (entry.Entity is HbkBaseEntity entity)
             {
                 entity.DateModified = DateTime.UtcNow;
+                entity.ModifyActioner = userName;
             }
-            // TODO: user IDs will be inserted to Actioner fields here, if they exist
         }
-
+        foreach (var entry in createdEntries)
+        {
+            if (entry.Entity is HbkBaseEntity entity)
+            {
+                entity.CreateActioner = userName;
+            }
+        }
+    }
+    
+    public override int SaveChanges()
+    {
+        UpdateEntries();
         return base.SaveChanges();
+    }
+    
+    
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        UpdateEntries();
+        return base.SaveChangesAsync(cancellationToken);
     }
 }

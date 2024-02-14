@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 // BEGIN Builder.
 var builder = WebApplication.CreateBuilder(args);
 
-Console.WriteLine($"NowDoctor Ltd. Presents:\n{Consts.HBK_NAME}\nVersion v{Consts.VERSION}. Starting up...");
+Console.WriteLine($"NowDoctor Ltd. Presents:\n{Consts.HBK_NAME}\nVersion {Consts.VERSION}. Starting up...");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(

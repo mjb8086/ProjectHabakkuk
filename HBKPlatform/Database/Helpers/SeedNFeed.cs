@@ -13,7 +13,7 @@ namespace HBKPlatform.Database.Helpers
         public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             using (var ctx = new ApplicationDbContext(
-               provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>()))
+               provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), new HttpContextAccessor()))
             {
                 var roleStore = new RoleStore<IdentityRole>(ctx);
                 IdentityRole superAdminRole, pracRole, clientRole;
