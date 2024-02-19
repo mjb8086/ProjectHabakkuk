@@ -34,11 +34,10 @@ public class TreatmentRepository(ApplicationDbContext _db) : ITreatmentRepositor
     {
         var query = _db.Treatments.Where(x => x.ClinicId == clinicId);
         query = clientOnly ? query.Where(x => x.TreatmentRequestability == Enums.TreatmentRequestability.ClientAndPrac) : query;
-        var treatments = await query.Select(x => new TreatmentLite()
+        return await query.Select(x => new TreatmentLite()
         {
             Id = x.Id, Cost = x.Cost, Requestability = x.TreatmentRequestability, Title = x.Title
         }).ToListAsync();
-        return treatments != null  && treatments.Any() ? treatments : new List<TreatmentLite>();
     }
 
     public async Task CreateTreatment(TreatmentDto treatmentDto)

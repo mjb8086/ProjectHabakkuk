@@ -82,7 +82,7 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
     {
         return treatmentId.HasValue ? 
             View("TreatmentCreate", await _treatmentService.GetTreatment(treatmentId.Value)) : 
-            View("TreatmentCreate", new TreatmentDto());
+            View("TreatmentCreate", new TreatmentDto() {Requestability = Enums.TreatmentRequestability.ClientAndPrac});
     }
 
     [HttpPost]

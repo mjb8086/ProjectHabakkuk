@@ -103,7 +103,7 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
 
         if (!(string.IsNullOrEmpty(dbClient.UserId) || string.IsNullOrEmpty(client.Email)))
         {
-            if (await _clinicRepo.IsEmailInUse(client.Email)) throw new InvalidOperationException("Email address already in use");
+            if (await _clinicRepo.IsEmailInUse(client.Email, dbClient.User.Email)) throw new InvalidOperationException("Email address already in use");
             dbClient.User.Email = client.Email;
         }
         

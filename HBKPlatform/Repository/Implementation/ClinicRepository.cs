@@ -107,10 +107,11 @@ public class ClinicRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         await _db.SaveChangesAsync();
     }
     
-    public async Task<bool> IsEmailInUse(string email)
+    public async Task<bool> IsEmailInUse(string newEmail, string? currentEmail = null)
     {
+        if (newEmail == currentEmail) return false;
         return await _db.Users.AnyAsync(x =>
-            x.Email != null && x.Email.ToLower() == email || x.UserName != null && x.UserName.ToLower() == email);
+            x.Email != null && x.Email.ToLower() == newEmail || x.UserName != null && x.UserName.ToLower() == newEmail);
     }
     
 }
