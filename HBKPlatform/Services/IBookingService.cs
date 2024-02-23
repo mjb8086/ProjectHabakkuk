@@ -7,8 +7,6 @@ namespace HBKPlatform.Services;
 
 public interface IBookingService
 {
-    public Task<List<TimeslotDto>> GetAllTimeslots();
-    public Task<TimeslotManagementView> GetTimeslotMgmtView();
     public Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId);
     public Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId);
     public Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId);

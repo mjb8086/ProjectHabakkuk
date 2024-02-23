@@ -23,19 +23,9 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
     private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
     
-    public async Task<List<TimeslotDto>> GetAllTimeslots()
-    {
-        return await _timeslotRepo.GetClinicTimeslots();
-    }
-    
-    public async Task<TimeslotManagementView> GetTimeslotMgmtView()
-    {
-        return new TimeslotManagementView() { Timeslots = await GetAllTimeslots() };
-    }
-    
     private async Task<List<TimeslotDto>> GetTimeslotsForBooking()
     {
-        var allTimeslots = await GetAllTimeslots();
+        var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks")).Value);
         var now = _dateTime.Now;

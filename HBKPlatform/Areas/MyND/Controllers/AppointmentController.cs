@@ -24,11 +24,6 @@ public class AppointmentController(ITreatmentService _treatmentService, IBooking
         return View(await _bookingService.GetMyNDUpcomingAppointmentsView());
     }
 
-    public async Task<IActionResult> TimeslotManagement()
-    {
-        return View(await _bookingService.GetTimeslotMgmtView());
-    }
-    
     public async Task<IActionResult> AvailabilityManagement()
     {
         return View(await _availabilityMgmt.GetAvailabilityManagementIndexModel());
