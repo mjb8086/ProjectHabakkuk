@@ -11,15 +11,12 @@ namespace HBKPlatform.Database;
 public class Clinic : HbkBaseEntity
 {
     // Columns
-    public string OrgName { get; set; }
-    public string? OrgTagline { get; set; }
+    public string Description { get; set; }
     [DataType(DataType.MultilineText)]
     public string? StreetAddress { get; set; }
     public string Telephone { get; set; }
     [DataType(DataType.EmailAddress)] 
     public string EmailAddress { get; set; }
-    public Enums.LicenceStatus LicenceStatus { get; set; }
-    public DateTime RegistrationDate { get; set; }
     
     public int? LeadPractitionerId { get; set; }
     
@@ -27,5 +24,4 @@ public class Clinic : HbkBaseEntity
     public Practitioner LeadPractitioner { get; set; }
     public virtual ICollection<Practitioner> Practitioners { get; set; }
     public virtual ICollection<Client> Clients { get; set; }
-    public ClinicHomepage ClinicHomepage { get; set; }
 }

@@ -14,9 +14,9 @@ namespace HBKPlatform.Repository.Implementation;
 /// </summary>
 public class SettingRepository (ApplicationDbContext _db) : ISettingRepository
 {
-    public async Task<List<SettingDto>> GetAllClinicSettings(int clinicId)
+    public async Task<List<SettingDto>> GetAllTenancySettings()
     {
-        return await _db.Settings.Where(x => x.ClinicId == clinicId).Select(x => new SettingDto()
+        return await _db.Settings.Select(x => new SettingDto()
         {
             Id = x.Id,
             Key = x.Key,

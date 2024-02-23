@@ -31,7 +31,6 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     public async Task<AvailabilityModel> GetAvailabilityModelForWeek(int weekNum)
     {
         var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         
         var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
@@ -39,10 +38,10 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
             ? DateTimeHelper.GetDateRangeStringForThisWeek(dbStartDate)
             : DateTimeHelper.GetDateRangeStringFromWeekNum(dbStartDate, weekNum);
         
-        var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
+        var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
 
-        _currentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
-        _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _currentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
+        _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef( pracId);
         
         return new AvailabilityModel()
         {
@@ -57,13 +56,12 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     /// </summary>
     public async Task<AvailabilityModel> GetAvailabilityModelForIndef()
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         
-        var allTimeslots = await _timeslotRepo.GetClinicTimeslots(clinicId);
+        var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
 
         // identical for indef model construction
-        _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(pracId);
         _currentAvailability = _indefiniteAvailability.Values.ToList();
         
         return new AvailabilityModel()
@@ -130,29 +128,25 @@ public class AvailabilityManagementService(IUserService _userService, IAvailabil
     public async Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model)
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, clinicId, model.Updated);
+        await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, model.Updated);
     }
 
     public async Task RevertAvailabilityForWeek(int weekNum)
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId, clinicId);
+        await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId);
     }
     
     public async Task UpdateAvailabilityForIndef(UpdatedAvailability model)
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        await _availabilityRepo.UpdateAvailabilityForIndef(pracId, clinicId, model.Updated);
+        await _availabilityRepo.UpdateAvailabilityForIndef(pracId, model.Updated);
     }
 
     public async Task RevertAvailabilityForIndef()
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        await _availabilityRepo.RevertAvailabilityForIndef(pracId, clinicId);
+        await _availabilityRepo.RevertAvailabilityForIndef(pracId);
     }
     
 }

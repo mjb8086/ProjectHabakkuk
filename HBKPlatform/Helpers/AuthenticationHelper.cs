@@ -14,7 +14,8 @@ public class AuthenticationHelper
         {
             new Claim("ClinicId", userDto.ClinicId.ToString()), 
             new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
-            new Claim("ClientId", userDto.ClientId?.ToString() ?? "")
+            new Claim("ClientId", userDto.ClientId?.ToString() ?? ""),
+            new Claim("TenancyId", userDto.TenancyId.ToString())
         };
     }
 }

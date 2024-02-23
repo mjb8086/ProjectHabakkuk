@@ -17,7 +17,8 @@ namespace HBKPlatform.Repository.Implementation;
 /// </summary>
 public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageRepository
 {
-    public async Task SaveMessage(int practitionerId, int clientId, int clinicId, string messageBody, Enums.MessageOrigin messageOrigin)
+    public async Task SaveMessage(int practitionerId, int clientId, string messageBody,
+        Enums.MessageOrigin messageOrigin)
     {
         // PreviousMessageId - null on first message
         var message = new ClientMessage()
@@ -28,7 +29,6 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
             PreviousMessageId = null,
             PractitionerId = practitionerId,
             ClientId = clientId,
-            ClinicId = clinicId,
             MessageOrigin = messageOrigin,
             MessageBody = messageBody
         };
@@ -37,10 +37,10 @@ public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageR
         _db.SaveChanges();
     }
 
-    public async Task<ClientMessageConversationModel> GetConversation(int practitionerId, int clientId, int clinicId, int next = 10)
+    public async Task<ClientMessageConversationModel> GetConversation(int practitionerId, int clientId, int next = 10)
     {
         var convo = new ClientMessageConversationModel();
-        var messages = await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == practitionerId && clinicId == clinicId && x.MessageStatusPractitioner != Enums.MessageStatus.Deleted)
+        var messages = await _db.ClientMessages.Where(x => x.ClientId == clientId && x.PractitionerId == practitionerId  && x.MessageStatusPractitioner != Enums.MessageStatus.Deleted)
             .OrderBy(x => x.Id).Take(next).ToListAsync();
 
         // TODO: reconsider use of previous and next message Id... may not be needed

@@ -4,5 +4,5 @@ namespace HBKPlatform.Repository;
 
 public interface ISettingRepository
 {
-    public Task<List<SettingDto>> GetAllClinicSettings(int clinicId);
+    public Task<List<SettingDto>> GetAllTenancySettings();
 }

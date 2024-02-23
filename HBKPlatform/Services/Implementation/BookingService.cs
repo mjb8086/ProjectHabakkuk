@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using System.Data;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
@@ -26,7 +25,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     
     public async Task<List<TimeslotDto>> GetAllTimeslots()
     {
-        return await _timeslotRepo.GetClinicTimeslots(_userService.GetClaimFromCookie("ClinicId"));
+        return await _timeslotRepo.GetClinicTimeslots();
     }
     
     public async Task<TimeslotManagementView> GetTimeslotMgmtView()
@@ -34,15 +33,11 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         return new TimeslotManagementView() { Timeslots = await GetAllTimeslots() };
     }
     
-    public async Task<TimeslotDto> GetTimeslot(int timeslotId)
-    {
-        return await _timeslotRepo.GetTimeslot(timeslotId);
-    }
-    private async Task<List<TimeslotDto>> GetTimeslotsForBooking(int clinicId)
+    private async Task<List<TimeslotDto>> GetTimeslotsForBooking()
     {
         var allTimeslots = await GetAllTimeslots();
-        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate", clinicId)).Value;
-        var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks", clinicId)).Value);
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks")).Value);
         var now = _dateTime.Now;
         var thisWeek = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
@@ -81,11 +76,11 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         // Do clash checking - only show free and available timeslots in the future
         // Get treatment Id
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        var treatments = await _cacheService.GetTreatments(clinicId);
-        var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
+        var treatments = await _cacheService.GetTreatments();
+        var pracId = _cacheService.GetLeadPracId(clinicId);
         
-        var availableTs =  await GetTimeslotsForBooking(clinicId);
-        availableTs = (await ClashCheck(clinicId, availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        var availableTs =  await GetTimeslotsForBooking();
+        availableTs = (await ClashCheck(availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
         if (treatments.TryGetValue(treatmentId, out var treatment))
         {
@@ -100,11 +95,11 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         throw new MissingPrimaryKeyException($"Treatment ID {treatmentId} does not exist");
     }
 
-    private async Task<List<TimeslotDto>> ClashCheck(int clinicId, List<TimeslotDto> timeslots, int pracId)
+    private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-        _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(clinicId, pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
-        _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
+        _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(pracId);
         
         // TODO: If new appointment statuses are added, update predicate
         var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
@@ -117,11 +112,11 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     /// Check whether the timeslot is free for the practitioner.
     /// </summary>
     /// <returns>TRUE - timeslot clashes with another appointment, or is set to unavailable.</returns>
-    private async Task<bool> ClashCheckSingle(int timeslotId, int clinicId, int pracId, int weekNum)
+    private async Task<bool> ClashCheckSingle(int timeslotId, int pracId, int weekNum)
     {
         var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-        _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(clinicId, pracId, weekNum);
-        _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(clinicId, pracId);
+        _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
+        _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(pracId);
         
         // If the ts is unavailable, return true
         if (!IsAvailable(weekNum, timeslotId)) return true;
@@ -163,10 +158,9 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
 
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var appointments = await _appointmentRepo.GetAppointmentsForClient(clientId);
-        var treatments = await _cacheService.GetTreatments(clinicId);
-        var dbStartDate = await _config.GetSettingOrDefault("DbStartDate", clinicId);
+        var treatments = await _cacheService.GetTreatments();
+        var dbStartDate = await _config.GetSettingOrDefault("DbStartDate");
         
         foreach (var appointment in appointments)
         {
@@ -181,11 +175,9 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     
     public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId)
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        
         var appointments = await _appointmentRepo.GetAppointmentsForPractitioner(pracId);
-        var treatments = await _cacheService.GetTreatments(clinicId);
-        var dbStartDate = await _config.GetSettingOrDefault("DbStartDate", clinicId);
+        var treatments = await _cacheService.GetTreatments();
+        var dbStartDate = await _config.GetSettingOrDefault("DbStartDate");
         
         foreach (var appointment in appointments)
         {
@@ -236,8 +228,8 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
-        pracId = pracId < 1 ? _cacheService.GetDefaultPracIdForClinic(clinicId) : pracId;
-        var treatments = await _cacheService.GetTreatments(clinicId);
+        pracId = pracId < 1 ? _cacheService.GetLeadPracId(clinicId) : pracId;
+        var treatments = await _cacheService.GetTreatments();
         var treatmentTitle = treatments.TryGetValue(treatmentId, out var treatment) ? treatment.Title : "";
         var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
@@ -259,23 +251,22 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var clientId = _userService.GetClaimFromCookie("ClientId");
-        var pracId = _cacheService.GetDefaultPracIdForClinic(clinicId);
+        var pracId = _cacheService.GetLeadPracId(clinicId);
 
-        return await DoBooking(clinicId, timeslotId, pracId, weekNum, clientId, treatmentId);
+        return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId);
     }
 
     public async Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId)
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
 
-        return await DoBooking(clinicId, timeslotId, pracId, weekNum, clientId, treatmentId);
+        return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId);
     }
     
-    private async Task<BookingConfirm> DoBooking(int clinicId, int timeslotId, int pracId, int weekNum, int clientId, int treatmentId)
+    private async Task<BookingConfirm> DoBooking(int timeslotId, int pracId, int weekNum, int clientId, int treatmentId)
     {
         // first check for no clashes
-        if (await ClashCheckSingle(timeslotId, clinicId, pracId, weekNum))
+        if (await ClashCheckSingle(timeslotId, pracId, weekNum))
         {
             throw new InvalidOperationException("Another appointment has already been booked into the timeslot.");
         }
@@ -286,7 +277,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
             await _appointmentRepo.CreateAppointment(new AppointmentDto()
             {
                 ClientId = clientId, PractitionerId = pracId, TreatmentId = treatmentId, WeekNum = weekNum,
-                TimeslotId = timeslotId, ClinicId = clinicId
+                TimeslotId = timeslotId
             });
         }
         catch (Exception e)
@@ -296,7 +287,7 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
         }
 
         // todo: notify, email
-        var treatments = await _cacheService.GetTreatments(clinicId);
+        var treatments = await _cacheService.GetTreatments();
         var treatmentTitle = treatments.TryGetValue(treatmentId, out var treatment) ? treatment.Description : "";
         var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
@@ -315,14 +306,13 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
 
     public async Task<BookClientTreatment> GetBookClientTreatmentView()
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         
-        var treatments = await _cacheService.GetTreatments(clinicId);
-        var clients = await _cacheService.GetClinicClientDetailsLite(clinicId);
-        var timeslots = await GetTimeslotsForBooking(clinicId);
-        timeslots = (await ClashCheck(clinicId, timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+        var treatments = await _cacheService.GetTreatments();
+        var clients = await _cacheService.GetClinicClientDetailsLite();
+        var timeslots = await GetTimeslotsForBooking();
+        timeslots = (await ClashCheck(timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
         var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
         var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);
@@ -337,10 +327,9 @@ public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _use
 
     public async Task<BookingCancel> GetBookingCancelView(int appointmentId)
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
         var appointment = await _appointmentRepo.GetAppointment(appointmentId);
         var timeslot = await _timeslotRepo.GetTimeslot(appointment.TimeslotId);
-        var treatments = await _cacheService.GetTreatments(clinicId);
+        var treatments = await _cacheService.GetTreatments();
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
 
         return new BookingCancel()

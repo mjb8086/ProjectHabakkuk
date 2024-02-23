@@ -5,7 +5,7 @@ namespace HBKPlatform.Services;
 
 public interface IUserService
 {
-    public Task<UserDto> GetClientOrPracIdForUserId(string userId);
+    public Task<UserDto> GetLoginUserDto(string userId);
     public int GetClaimFromCookie(string claim);
     public Task DoUacAction(UacRequest model);
 }

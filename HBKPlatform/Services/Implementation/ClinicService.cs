@@ -1,5 +1,6 @@
 using HBKPlatform.Database;
 using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
@@ -12,14 +13,14 @@ namespace HBKPlatform.Services.Implementation;
 
 /// <summary>
 /// HBKPlatform Clinic service.
-/// Middleware for controller and database functionality.
+/// Serves up controller and database functionality.
 /// 
 /// Author: Mark Brown
 /// Authored: 13/12/2023
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor, IClinicRepository _clinicRepo, IPractitionerRepository _pracRepo) : IClinicService
+public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttpContextAccessor httpContextAccessor, IClinicRepository _clinicRepo, IPractitionerRepository _pracRepo, ITimeslotRepository _timeslotRepo) : IClinicService
 {
     public async Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId)
     {
@@ -30,16 +31,7 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
 
     public async Task<InboxModel> GetInboxModel()
     {
-        var inboxModel = new InboxModel();
-        inboxModel.ClientDetails = new List<ClientDetailsLite>();
-        
-        var clinicIdClaim = httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
-        if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
-        {
-            inboxModel.ClientDetails = await _cache.GetClinicClientDetailsLite(clinicId);
-        }
-
-        return inboxModel;
+        return new () { ClientDetails = await _cache.GetClinicClientDetailsLite() };
     }
 
     public async Task<ClientClinicData> GetClientClinicData()
@@ -49,8 +41,7 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
         if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
         {
             // Currently assumes 1 prac per clinic
-            var clientDetailsLite = _cache.GetClientDetailsLite(clientId);
-            var pracDetails = await _cache.GetClinicPracDetailsLite(clientDetailsLite.ClinicId);
+            var pracDetails = await _cache.GetClinicPracDetailsLite();
             data.PracId = pracDetails.First().Id;
             data.MyPracName = pracDetails.First().Name;
             data.NumUnreadMessages = await _db.ClientMessages.CountAsync(x => x.PractitionerId == data.PracId && x.ClientId == clientId && x.MessageOrigin == Enums.MessageOrigin.Practitioner && x.MessageStatusClient == Enums.MessageStatus.Unread);
@@ -69,53 +60,6 @@ public class ClinicService(ApplicationDbContext _db, ICacheService _cache, IHttp
         }
 
         return data;
-    }
-
-    /* MCP Methods */
-    public async Task<ClinicDetailsDto> GetClinicModel(int clinicId)
-    {
-        return await _clinicRepo.GetClinicAlone(clinicId);
-    }
-
-    public async Task<ListClinics> GetListClinicsView()
-    {
-        return new ListClinics() { Clinics = await _clinicRepo.GetClinicDetailsLite() };
-    }
-
-    public async Task UpdateClinic(ClinicDto model)
-    {
-        await _clinicRepo.UpdateClinicDetails(model);
-    }
-
-    public async Task RegisterClinic(ClinicRegistrationDto model)
-    {
-        await _clinicRepo.RegisterClinic(model);
-    }
-
-    public async Task<UserAccountFunctions> GetUacView()
-    {
-        var clinics = await _clinicRepo.GetClinicDetailsLite();
-        return new UserAccountFunctions()
-        {
-            Clinics = clinics.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToList(),
-        };
-    }
-
-    public async Task<ClinicPracs> GetClinicPracs(int clinicId)
-    {
-        var lockoutDict = await _pracRepo.GetPracLockoutStatusDict(clinicId);
-        var pracDetailsUac = new Dictionary<int, PracDetailsUac>();
-        
-        foreach (var prac in (await _pracRepo.GetClinicPracs(clinicId)))
-        {
-            prac.HasLockout = lockoutDict[prac.Id];
-            pracDetailsUac.Add(prac.Id, prac);
-        }
-        
-        return new ClinicPracs()
-        {
-            Pracs = pracDetailsUac
-        };
     }
 
 

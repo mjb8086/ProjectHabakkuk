@@ -20,7 +20,7 @@ public class ClientRecordService(IUserService _userService, ICacheService _cache
     {
         return new ClientRecordsIndex
         {
-            ClientDetails = await _cache.GetClinicClientDetailsLite(_userService.GetClaimFromCookie("ClinicId"))
+            ClientDetails = await _cache.GetClinicClientDetailsLite()
         };
     }
     public async Task<ClientRecords> GetClientRecords(int clientId)

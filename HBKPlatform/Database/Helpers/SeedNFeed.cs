@@ -1,22 +1,25 @@
 ﻿using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
+using HBKPlatform.Services.Implementation;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Database.Helpers
 {
-    
     // Sneed's
     public static class SeedNFeed //Formerly Chuck's
     {
-        public const int DEFAULT_DURATION = 30;
         public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
+            var tenancySrv = new TenancyService();
+            
             using (var ctx = new ApplicationDbContext(
-               provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), new HttpContextAccessor()))
+               provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), new HttpContextAccessor(), tenancySrv))
             {
                 var roleStore = new RoleStore<IdentityRole>(ctx);
-                IdentityRole superAdminRole, pracRole, clientRole;
+                IdentityRole? superAdminRole, pracRole, clientRole;
 
                 if ((superAdminRole = ctx.Roles.FirstOrDefault(r => r.Name == "SuperAdmin")) == null)
                 {
@@ -35,7 +38,48 @@ namespace HBKPlatform.Database.Helpers
                     await roleStore.CreateAsync(clientRole);
                 }
                     
-                if (!ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Clinics.Any()) {
+                if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Clinics.Any()) {
+
+                    var ndTenancy = new Tenancy()
+                    {
+                        OrgName = "NowDoctor Admin",
+                        ContactEmail = ".",
+                        LicenceStatus = Enums.LicenceStatus.Active,
+                        RegistrationDate = DateTime.UtcNow,
+                        OrgTagline = ""
+                    };
+                    
+                    var t = new Tenancy()
+                    {
+                        OrgName = "Hill Valley Medical, Inc",
+                        ContactEmail = "foo@bar.net",
+                        LicenceStatus = Enums.LicenceStatus.Active,
+                        RegistrationDate = DateTime.UtcNow,
+                        OrgTagline = "Timely treatment or your time back."
+                    };
+                    
+                    var suEmail = "mjb+sudo1@nowdoctor.co.uk";
+                    var superUser = new User()
+                    {
+                        Email = suEmail,
+                        NormalizedEmail = suEmail.ToUpper(),
+                        UserName = suEmail,
+                        NormalizedUserName = suEmail.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = false,
+                        PhoneNumber = "0898 333 201",
+                        PhoneNumberConfirmed = true,
+                        Tenancy = ndTenancy
+                    };
+                    superUser.PasswordHash = passwordHasher.HashPassword(superUser, "changeme123");
+                    
+                    await ctx.AddAsync(superUser);
+                    await ctx.AddAsync(ndTenancy);
+                    await ctx.AddAsync(t);
+                    await ctx.SaveChangesAsync();
+                    
+                    // Set tenancyId to demo tenancy to avoid FK violations on CREATE actions (see AppDbCtx).
+                    tenancySrv.SetTenancyId(t.Id);
                     
                     var user1 = new User()
                     {
@@ -47,6 +91,7 @@ namespace HBKPlatform.Database.Helpers
                         LockoutEnabled = false,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
+                        Tenancy = t
                     };
                     user1.PasswordHash = passwordHasher.HashPassword(user1, "88milesperhour");
                     
@@ -59,7 +104,8 @@ namespace HBKPlatform.Database.Helpers
                         Location = "hill valley",
                         DateOfBirth = new DateOnly(1932, 07, 08),
                         Img = new string("samples/brown.jpg"),
-                        User = user1
+                        User = user1,
+                        Tenancy = t
                     };
                     
                     var prac2 = new Practitioner()
@@ -71,6 +117,7 @@ namespace HBKPlatform.Database.Helpers
                         Location = "the pub",
                         DateOfBirth = new DateOnly(1992, 07, 08),
                         Img = new string("samples/second.jpg"),
+                        Tenancy = t,
                         User =  new ()
                         {
                             Email = "another@hillvalley.com",
@@ -81,6 +128,7 @@ namespace HBKPlatform.Database.Helpers
                             LockoutEnabled = false,
                             PhoneNumber = "0898 333 201",
                             PhoneNumberConfirmed = true,
+                            Tenancy = t
                         }
                     };
                     prac2.User.PasswordHash = passwordHasher.HashPassword(prac2.User, "88milesperhour");
@@ -96,6 +144,7 @@ namespace HBKPlatform.Database.Helpers
                         LockoutEnabled = false,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
+                        Tenancy = t
                     };
                     client1User.PasswordHash = passwordHasher.HashPassword(client1User, "toodamnloud");
                     
@@ -108,7 +157,8 @@ namespace HBKPlatform.Database.Helpers
                         DateOfBirth = new DateOnly(1962, 07, 08),
                         Img = new string("samples/marty.jpg"),
                         Telephone = "999",
-                        User = client1User
+                        User = client1User,
+                        Tenancy = t
                     };
                     
                     var client2Email = "biff@hillvalleyhigh.com";
@@ -122,6 +172,7 @@ namespace HBKPlatform.Database.Helpers
                         LockoutEnabled = false,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
+                        Tenancy = t
                     };
                     client2User.PasswordHash = passwordHasher.HashPassword(client1User, "ihatemanure");
                     
@@ -134,36 +185,20 @@ namespace HBKPlatform.Database.Helpers
                         DateOfBirth = new DateOnly(1962, 07, 08),
                         Img = "samples/biff.jpg",
                         Telephone = "299",
-                        User = client2User
+                        User = client2User,
+                        Tenancy = t
                     };
                     
                     var clinic = new Clinic()
                     {
                         EmailAddress = "foo@bar.com",
-                        LicenceStatus = Enums.LicenceStatus.Active,
-                        OrgName = "Hill Valley Clinic",
-                        OrgTagline = "Timely treatment or your time back.",
+                        Description = "Hill Valley Clinic",
                         Telephone = "0898 333 201",
                         Clients = new List<Client>() {client1, client2},
                         Practitioners = new List<Practitioner>() {prac1, prac2},
-                        RegistrationDate = DateTime.UtcNow
+                        Tenancy = t
                     };
 
-                    var suEmail = "mjb+sudo1@nowdoctor.co.uk";
-                    var superUser = new User()
-                    {
-                        Email = suEmail,
-                        NormalizedEmail = suEmail.ToUpper(),
-                        UserName = suEmail,
-                        NormalizedUserName = suEmail.ToUpper(),
-                        EmailConfirmed = true,
-                        LockoutEnabled = false,
-                        PhoneNumber = "0898 333 201",
-                        PhoneNumberConfirmed = true,
-                    };
-                    superUser.PasswordHash = passwordHasher.HashPassword(client1User, "changeme123");
-
-                    ctx.Add(superUser);
                     ctx.Add(clinic);
                     ctx.SaveChanges();
 
@@ -172,10 +207,10 @@ namespace HBKPlatform.Database.Helpers
 
                     var roles = new List<IdentityUserRole<string>>
                     {
-                        new IdentityUserRole<string>() { UserId = user1.Id, RoleId = pracRole.Id },
-                        new IdentityUserRole<string>() { UserId = client1User.Id, RoleId = clientRole.Id },
-                        new IdentityUserRole<string>() { UserId = client2User.Id, RoleId = clientRole.Id },
-                        new IdentityUserRole<string>() { UserId = superUser.Id, RoleId = superAdminRole.Id }
+                        new () { UserId = user1.Id, RoleId = pracRole.Id },
+                        new () { UserId = client1User.Id, RoleId = clientRole.Id },
+                        new () { UserId = client2User.Id, RoleId = clientRole.Id },
+                        new () { UserId = superUser.Id, RoleId = superAdminRole.Id }
                     };
                     
                     ctx.AddRange(roles);
@@ -184,24 +219,24 @@ namespace HBKPlatform.Database.Helpers
                     conversation.Add(new ClientMessage()
                     {
                         ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Client,
-                        MessageBody = "lost the plutonium sorry"
+                        MessageBody = "lost the plutonium sorry", Tenancy = t
                     });
                     conversation.Add(new ClientMessage()
                     {
                         ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
-                        MessageBody = "ah bollocks"
+                        MessageBody = "ah bollocks", Tenancy = t
                     });
                     conversation.Add(new ClientMessage()
                     {
                         ClientId = client2.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
-                        MessageBody = "don't steal that almanac you tool"
+                        MessageBody = "don't steal that almanac you tool", Tenancy = t
                     });
                     ctx.AddRange(conversation);
 
                     var clientRecord1 = new ClientRecord()
                     {
                         Clinic = clinic, Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
-                        Title = "Bad news for the bowels", NoteBody = "bother shifting the goods", Practitioner = prac1
+                        Title = "Bad news for the bowels", NoteBody = "bother shifting the goods", Practitioner = prac1, Tenancy = t
                     };
                     ctx.Add(clientRecord1);
 
@@ -211,7 +246,8 @@ namespace HBKPlatform.Database.Helpers
                         TreatmentRequestability = Enums.TreatmentRequestability.ClientAndPrac,
                         Title = "Checkup",
                         Description = "talk and pretend to do something",
-                        Cost = 15.50
+                        Cost = 15.50, 
+                        Tenancy = t
                     };
                     
                     var treatment2 = new Treatment()
@@ -220,25 +256,14 @@ namespace HBKPlatform.Database.Helpers
                         TreatmentRequestability = Enums.TreatmentRequestability.PracOnly,
                         Title = "Prac Only Test",
                         Description = "no book for client",
-                        Cost = 69.0
+                        Cost = 69.0,
+                        Tenancy = t
                     };
 
                     ctx.Add(treatment1);
                     ctx.Add(treatment2);
 
-                    var timeslots = new List<Timeslot>();
-                    var days = new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday};
-                    foreach (var day in days)
-                    {
-                        var time = new TimeOnly(08, 00, 00);
-                        var maxTime = new TimeOnly( 19, 00, 00);
-                        
-                        while (time <= maxTime)
-                        {
-                            timeslots.Add(new Timeslot() { Clinic = clinic, Description = $"{day} {time.ToShortTimeString()}", Day = day, Time = time, Duration = DEFAULT_DURATION});
-                            time = time.AddMinutes(DEFAULT_DURATION);
-                        }
-                    }
+                    var timeslots = TimeslotHelper.GenerateDefaultTimeslots(t);
                     
                     ctx.AddRange(timeslots);
                     ctx.SaveChanges();
@@ -247,34 +272,34 @@ namespace HBKPlatform.Database.Helpers
                         new ()
                         {
                             Client = client1,
-                            Clinic = clinic,
                             Practitioner = prac1,
                             Timeslot = timeslots[1],
                             Status = Enums.AppointmentStatus.Live,
                             Treatment = treatment1,
-                            WeekNum = 4
+                            WeekNum = 4,
+                            Tenancy = t
                         },
                         new ()
                         {
                             Client = client1,
-                            Clinic = clinic,
                             Practitioner = prac1,
                             Timeslot = timeslots[2],
                             Status = Enums.AppointmentStatus.CancelledByClient,
                             CancellationReason = "Someone else does it cheaper, sorry",
                             Treatment = treatment1,
-                            WeekNum = 30
+                            WeekNum = 30,
+                            Tenancy = t
                         },
                         new ()
                         {
                             Client = client1,
-                            Clinic = clinic,
                             Practitioner = prac1,
                             Timeslot = timeslots[2],
                             Status = Enums.AppointmentStatus.CancelledByPractitioner,
                             CancellationReason = "bollocks",
                             Treatment = treatment2,
-                            WeekNum = 30
+                            WeekNum = 30,
+                            Tenancy = t
                         }
                     };
                     
@@ -284,6 +309,7 @@ namespace HBKPlatform.Database.Helpers
                     {
                         Key = "DbStartDate",
                         Value = "2024-01-01",
+                        Tenancy = t,
                         Clinic = clinic
                     };
                     ctx.Add(startDate);
@@ -295,35 +321,37 @@ namespace HBKPlatform.Database.Helpers
                             Timeslot = timeslots[100],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20
+                            WeekNum = 20,
+                            Tenancy = t,
                         },
                         new ()
                         {
                             Timeslot = timeslots[101],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20
+                            WeekNum = 20,
+                            Tenancy = t
                         },
                         new ()
                         {
                             Timeslot = timeslots[102],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20
+                            WeekNum = 20,
+                            Tenancy = t
                         },
                         new ()
                         {
                             Timeslot = timeslots[104],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Available,
-                            WeekNum = 20
+                            WeekNum = 20,
+                            Tenancy = t
                         },
                     };
                     ctx.AddRange(ta);
                     ctx.SaveChanges();
-                    
                 }
-
             }
         }
     }

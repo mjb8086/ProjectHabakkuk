@@ -22,8 +22,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           
           var clientIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClientId");
           var pracIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("PractitionerId");
-          var clinicIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("ClinicId");
-          int clientId, pracId, clinicId;
+          int clientId, pracId;
           Enums.MessageOrigin messageOrigin;
 
           if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out clientId))
@@ -41,11 +40,6 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
                throw new InvalidOperationException("Message data is incomplete.");
           }
 
-          if (!(clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out clinicId)))
-          {
-               throw new InvalidOperationException("Clinic ID is required.");
-          }
-
           // Check that the users are part of the same clinic
           if (!(await _clinicService.VerifyClientAndPracClinicMembership(clientId, pracId)))
           {
@@ -54,7 +48,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
 
           // if that's okay, clean it and then save it.
           messageBody = messageBody.Trim();
-          await _clientMessageRepository.SaveMessage(pracId, clientId, clinicId, messageBody, messageOrigin);
+          await _clientMessageRepository.SaveMessage(pracId, clientId, messageBody, messageOrigin);
           
           // TODO: Send email and update total unread
      }
@@ -68,7 +62,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           if (clientIdClaim != null && int.TryParse(clientIdClaim.Value, out int clientId))
           {
                var clientDetailsLite = _cache.GetClientDetailsLite(clientId);
-               var model = await _clientMessageRepository.GetConversation(pracId, clientId, clientDetailsLite.ClinicId, max);
+               var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
                
                model.PractitionerId = pracId;
                model.CurrentConverser = Enums.MessageOrigin.Client;
@@ -89,7 +83,7 @@ public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, I
           if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
           {
                var pracDetailsLite = _cache.GetPracDetailsLite(pracId);
-               var model = await _clientMessageRepository.GetConversation(pracId, clientId, pracDetailsLite.ClinicId, max);
+               var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
                model.ClientId = clientId;
                model.CurrentConverser = Enums.MessageOrigin.Practitioner;
                model.Sender = pracDetailsLite.Name;

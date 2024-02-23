@@ -24,7 +24,7 @@ public class MessagingController
         if (clinicIdClaim != null && int.TryParse(clinicIdClaim.Value, out int clinicId))
         {
             // TODO crude - fix later when we have a direct client-prac relationship
-            var pracs = await _cache.GetClinicPracDetailsLite(clinicId);
+            var pracs = await _cache.GetClinicPracDetailsLite();
             return Redirect($"/client/messaging/conversation?pracId={pracs.First().Id}"); // also replace with controller-based routing when understood
         }
         return NotFound("No conversation exists");

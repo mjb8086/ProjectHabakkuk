@@ -8,8 +8,7 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
 {
     public async Task<AllClients> GetAllClientsView()
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        return new AllClients() { Clients = await _clientRepo.GetLiteDetails(clinicId)};
+        return new AllClients() { Clients = await _clientRepo.GetLiteDetails()};
     }
 
     public async Task<ClientDto> GetClient(int clientId)
@@ -45,7 +44,6 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
 
     public ClientDetailsIndex GetClientDetailsIndex()
     {
-        var clinicId = _userService.GetClaimFromCookie("ClinicId");
-        return new ClientDetailsIndex() { NumClients = _clientRepo.GetClientCount(clinicId) };
+        return new ClientDetailsIndex() { NumClients = _clientRepo.GetClientCount() };
     }
 }

@@ -8,6 +8,7 @@
 
 using System.Security.Claims;
 using HBKPlatform.Database.Helpers;
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -18,10 +19,13 @@ public class ApplicationDbContext : IdentityDbContext<User>
 
 {
     private IHttpContextAccessor _httpCtx;
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpCtx)
+    private ITenancyService _tenancySrv;
+    
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpCtx, ITenancyService tenancySrv)
         : base(options)
     {
         _httpCtx = httpCtx;
+        _tenancySrv = tenancySrv;
     }
 
     // Define tables
@@ -32,6 +36,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<Clinic> Clinics { get; set; } = default!;
     public DbSet<ClinicHomepage> ClinicHomepages { get; set; } = default!;
     public DbSet<Practitioner> Practitioners { get; set; } = default!;
+    public DbSet<Tenancy> Tenancies { get; set; } = default!;
     public DbSet<Timeslot> Timeslots { get; set; } = default!;
     public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
     public DbSet<Treatment> Treatments { get; set; } = default!;
@@ -40,6 +45,9 @@ public class ApplicationDbContext : IdentityDbContext<User>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        // Set query filter for tenancy
+        modelBuilder.Entity<HbkBaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
         
         // Manual relationships
         // Configure one-to-many relationship between Clinic and Practitioner
@@ -76,12 +84,16 @@ public class ApplicationDbContext : IdentityDbContext<User>
         modelBuilder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
         modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
     }
-    
+
     /// <summary>
     /// Set snake case on other entities.
     /// </summary>
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        // Configure logging for database commands
+//        optionsBuilder.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug)));
         optionsBuilder.UseSnakeCaseNamingConvention();
+    }
 
     /// <summary>
     /// Automatically update DateModified for all entities that inherit from BaseEntity.
@@ -115,10 +127,11 @@ public class ApplicationDbContext : IdentityDbContext<User>
             if (entry.Entity is HbkBaseEntity entity)
             {
                 entity.CreateActioner =  userId;
+                entity.TenancyId = _tenancySrv.TenancyId;
             }
         }
     }
-    
+
     public override int SaveChanges()
     {
         UpdateEntries();

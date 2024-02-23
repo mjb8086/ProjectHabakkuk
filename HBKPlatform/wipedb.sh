@@ -8,12 +8,13 @@ delete from client_records;
 delete from timeslot_availabilities;
 delete from timeslots;
 delete from clients;
-delete from practitioners;
 delete from clinics;
+delete from practitioners;
 delete from user_roles;
 delete from users;
 delete from user_claims;
 delete from appointments;
+delete from tenancies;
 
 EOF
 

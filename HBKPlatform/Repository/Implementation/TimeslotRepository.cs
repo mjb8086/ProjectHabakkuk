@@ -19,7 +19,6 @@ public class TimeslotRepository(ApplicationDbContext _db) : ITimeslotRepository
         return await _db.Timeslots.Where(x => x.Id == timeslotId).Select(x => new TimeslotDto()
         {
             Id = x.Id,
-            ClinicId = x.ClinicId,
             Description = x.Description,
             Duration = x.Duration,
             Day = x.Day,
@@ -27,12 +26,11 @@ public class TimeslotRepository(ApplicationDbContext _db) : ITimeslotRepository
         }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Could not find timeslot Id");
     }
 
-    public async Task<List<TimeslotDto>> GetClinicTimeslots(int clinicId)
+    public async Task<List<TimeslotDto>> GetClinicTimeslots()
     {
-        return await _db.Timeslots.Where(x => x.ClinicId == clinicId).OrderBy(x => x.Day).ThenBy(x => x.Time).Select(x => new TimeslotDto()
+        return await _db.Timeslots.OrderBy(x => x.Day).ThenBy(x => x.Time).Select(x => new TimeslotDto()
         {
             Id = x.Id,
-            ClinicId = x.ClinicId,
             Description = x.Description,
             Duration = x.Duration,
             Day = x.Day,
@@ -43,15 +41,25 @@ public class TimeslotRepository(ApplicationDbContext _db) : ITimeslotRepository
     public async Task Create(TimeslotDto timeslotDto)
     {
         // TODO: Check for clashes with other timeslots.
-        var timeslot = new Timeslot();
-        
-        timeslot.ClinicId = timeslotDto.ClinicId;
-        timeslot.Day = timeslotDto.Day;
-        timeslot.Description = timeslotDto.Description;
-        timeslot.Time = timeslotDto.Time;
-        timeslot.Duration = timeslotDto.Duration;
-
-        await _db.AddAsync(timeslot);
+        await _db.AddAsync(DtoToDb(timeslotDto));
         await _db.SaveChangesAsync();
+    }
+    
+    public async Task Create(List<Timeslot> timeslots)
+    {
+        // TODO: Check for clashes with other timeslots.
+        await _db.AddRangeAsync(timeslots);
+        await _db.SaveChangesAsync();
+    }
+
+    private Timeslot DtoToDb(TimeslotDto dto)
+    {
+        return new()
+        {
+            Day = dto.Day,
+            Description = dto.Description,
+            Time = dto.Time,
+            Duration = dto.Duration
+        };
     }
 }

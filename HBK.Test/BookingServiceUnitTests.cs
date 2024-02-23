@@ -47,9 +47,9 @@ public class BookingServiceUnitTests
         var mockTimeslotRepo = new Mock<ITimeslotRepository>();
         var mockConfigService = new Mock<IConfigurationService>();
         var mockDateTimeHelper = new Mock<IDateTimeWrapper>();
-        mockTimeslotRepo.Setup(x => x.GetClinicTimeslots(CLINIC_ID)).ReturnsAsync(timeslotList);
-        mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate", CLINIC_ID)).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
-        mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks", CLINIC_ID)).ReturnsAsync(new SettingDto() {Value = "2"});
+        mockTimeslotRepo.Setup(x => x.GetClinicTimeslots()).ReturnsAsync(timeslotList);
+        mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate")).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
+        mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = "2"});
         mockDateTimeHelper.Setup(x => x.Now).Returns(new DateTime(2024, 01, 17, 14, 00, 00));
 
         var bookingService = new BookingService(mockTimeslotRepo.Object, null, null, null, mockConfigService.Object, mockDateTimeHelper.Object, null);

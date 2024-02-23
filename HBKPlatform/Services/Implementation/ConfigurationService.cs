@@ -5,10 +5,9 @@ namespace HBKPlatform.Services.Implementation;
 
 public class ConfigurationService(ICacheService _cache, IUserService _userService) : IConfigurationService
 {
-   public async Task<SettingDto> GetSettingOrDefault(string key, int? clinicId)
+   public async Task<SettingDto> GetSettingOrDefault(string key)
    {
-      clinicId ??= _userService.GetClaimFromCookie("ClinicId");
-      var settings = await _cache.GetAllClinicSettings(clinicId.Value);
-      return settings.TryGetValue(key, out SettingDto setting) ? setting : DefaultSettings.DefaultSetting[key];
+      var settings = await _cache.GetAllTenancySettings();
+      return settings.TryGetValue(key, out SettingDto? setting) ? setting : DefaultSettings.DefaultSetting[key];
    }
 }

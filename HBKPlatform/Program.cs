@@ -3,6 +3,7 @@ using HBKPlatform.Database;
 using HBKPlatform.Database.Helpers;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
+using HBKPlatform.Middleware;
 using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
@@ -10,18 +11,12 @@ using HBKPlatform.Services.Implementation;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 // BEGIN Builder.
 var builder = WebApplication.CreateBuilder(args);
 
 Console.WriteLine($"NowDoctor Ltd. Presents:\n{Consts.HBK_NAME}\nVersion {Consts.VERSION}. Starting up...");
-
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(
-                builder.Configuration.GetConnectionString("HbkContext") ??
-                throw new InvalidOperationException("Connection string is invalid.")
-            )
-    );
 
 builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoleManager<RoleManager<IdentityRole>>()
@@ -43,6 +38,9 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<TenancyMiddleware>();
+builder.Services.AddScoped<ITenancyService, TenancyService>();
+builder.Services.AddScoped<IMcpRepository, McpRepository>();
 
 builder.Services.AddTransient<IClinicService, ClinicService>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -55,7 +53,30 @@ builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
 builder.Services.AddTransient<IDateTimeWrapper, DateTimeWrapper>();
 builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
 builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
+builder.Services.AddTransient<IMcpService, McpService>();
 
+/*
+var loggerFactory = LoggerFactory.Create(builder =>
+{
+    builder
+        .AddFilter((category, level) =>
+            category == DbLoggerCategory.Database.Command.Name
+            && level == LogLevel.Information)
+        .AddConsole();
+});
+*/
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(
+                builder.Configuration.GetConnectionString("HbkContext") ??
+                throw new InvalidOperationException("Connection string is invalid.")
+            )//.UseLoggerFactory(loggerFactory)
+    );
+
+var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory, parameterLoggingEnabled: true);
+
+// Routing config - enable lowercase URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // Add services to the container.
@@ -81,6 +102,7 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseMiddleware<TenancyMiddleware>();
 
 app.UseAuthorization();
 
@@ -94,17 +116,18 @@ app.MapRazorPages();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment()) // configure production
 {
+    app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
     builder.WebHost.UseUrls("http://*:80", "https://*.443");
-    app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
 }
-else // configure for dev environment
+else // configure for dev environment, enable all routes listing
 {
     app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
     app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
         string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
 }
+
 
 app.Run();

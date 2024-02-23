@@ -14,12 +14,9 @@ namespace HBKPlatform.Database;
 /// </summary>
 public class Timeslot: HbkBaseEntity
 {
-    public int ClinicId { get; set; }
     public Enums.Day Day { get; set; }
     public TimeOnly Time { get; set; }
     public int Duration { get; set; }
     public string Description { get; set; }
     
-    // EF Navigations
-    public Clinic Clinic { get; set; }
 }

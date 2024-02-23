@@ -15,7 +15,7 @@ namespace HBKPlatform.Areas.MCP.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 [Area("MCP"), Authorize(Roles="SuperAdmin")]
-public class ClinicManagementController(IClinicService _clinicService, IUserService _userService) : Controller
+public class ClinicManagementController(IMcpService _mcpService, IUserService _userService) : Controller
 {
     public async Task<IActionResult> Index()
     {
@@ -24,7 +24,7 @@ public class ClinicManagementController(IClinicService _clinicService, IUserServ
     
     public async Task<IActionResult> ViewClinic(int clinicId)
     {
-        return View(await _clinicService.GetClinicModel(clinicId));
+        return View(await _mcpService.GetClinicModel(clinicId));
     }
 
     [HttpPost]
@@ -32,18 +32,18 @@ public class ClinicManagementController(IClinicService _clinicService, IUserServ
     {
         model.Id = clinicId;
         if (!ModelState.IsValid) throw new Exception("Model Bad");
-        await _clinicService.UpdateClinic(model);
+        await _mcpService.UpdateClinic(model);
         return RedirectToRoute(new { controller = "ClinicManagement", action = "ViewClinic", clinicId=clinicId });
     }
     
     public async Task<IActionResult> ListClinics()
     {
-        return View(await _clinicService.GetListClinicsView());
+        return View(await _mcpService.GetListClinicsView());
     }
 
     public async Task<IActionResult> PasswordReset()
     {
-        return View(await _clinicService.GetUacView());
+        return View(await _mcpService.GetUacView());
     }
     
     public async Task<IActionResult> RegisterClinic()
@@ -55,7 +55,7 @@ public class ClinicManagementController(IClinicService _clinicService, IUserServ
     public async Task<IActionResult> DoRegisterClinic([FromForm] ClinicRegistrationDto model)
     {
         if (!ModelState.IsValid) throw new Exception("Model Bad");
-        await _clinicService.RegisterClinic(model);
+        await _mcpService.RegisterClinic(model);
         TempData["Message"] = "Successfully registered new clinic and created lead practitioner user.";
         return RedirectToRoute(new { controller = "ClinicManagement", action = "ListClinics" });
     }
@@ -71,7 +71,7 @@ public class ClinicManagementController(IClinicService _clinicService, IUserServ
 
     public async Task<IActionResult> GetClinicPracs(int clinicId)
     {
-        return Ok(await _clinicService.GetClinicPracs(clinicId));
+        return Ok(await _mcpService.GetClinicPracs(clinicId));
     }
 
 

@@ -4,5 +4,5 @@ namespace HBKPlatform.Services;
 
 public interface IConfigurationService
 {
-   public Task<SettingDto> GetSettingOrDefault(string key, int? clinicId = null);
+   public Task<SettingDto> GetSettingOrDefault(string key);
 }

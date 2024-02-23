@@ -82,7 +82,7 @@ namespace HBKPlatform.Areas.Account.Pages
                 var result = await signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    var userDto = await userService.GetClientOrPracIdForUserId(user.Id);
+                    var userDto = await userService.GetLoginUserDto(user.Id);
                     await signInManager.SignInWithClaimsAsync(user, Input.RememberMe, AuthenticationHelper.GetClaimsForUser(userDto));
                     logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);

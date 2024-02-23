@@ -14,10 +14,10 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): ICacheService
+public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, ITenancyService _tenancy): ICacheService
 {
     // Default policy: All values will be evicted after 1 day
-    private static readonly MemoryCacheEntryOptions _cacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(1));
+    private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(1));
     
     public string GetPracName(int pracId)
     {
@@ -30,21 +30,21 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
     }
 
     /// <summary>
-    /// Get the 'First' matching prac with a clinic Id.
-    /// Deprecate once we have a 'lead' prac implemented in a multi practitioner clinic.
+    /// Get the lead practitioner Id for a clinic
     /// </summary>
-    public int GetDefaultPracIdForClinic(int clinicId)
+    public int GetLeadPracId(int clinicId)
     {
-        string key = $"DefaultPrac-c{clinicId}";
+        string key = $"LeadPrac-t{clinicId}";
         if (_memoryCache.TryGetValue(key, out int pracId)) return pracId;
         
-        var prac = _db.Practitioners.FirstOrDefault(x => x.ClinicId == clinicId);
-        if (prac == null) throw new KeyNotFoundException($"No practitioner for clinicId {clinicId} exists");
-        _memoryCache.Set(key, prac.Id, _cacheEntryOptions);
-        return prac.Id;
+        var clinic = _db.Clinics.FirstOrDefault(x => x.Id == clinicId);
+        if (clinic == null || !clinic.LeadPractitionerId.HasValue) 
+            throw new KeyNotFoundException($"No practitioner for clinicId {clinicId} exists");
+        _memoryCache.Set(key, clinic.LeadPractitionerId.Value, CacheEntryOptions);
+        return clinic.LeadPractitionerId.Value;
     }
 
-    // TODO: Refresh when all these details are updated in DB
+    /// TODO: Refresh when any of these details are updated in DB
     public PracDetailsLite GetPracDetailsLite(int pracId)
     {
         string key = $"Prac-{pracId}";
@@ -55,7 +55,7 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
         
         pracDetails = new PracDetailsLite()
             { Id = prac.Id, Name = $"{prac.Forename} {prac.Surname}", ClinicId = prac.ClinicId };
-        _memoryCache.Set(key, pracDetails, _cacheEntryOptions);
+        _memoryCache.Set(key, pracDetails, CacheEntryOptions);
         return pracDetails;
     }
     
@@ -69,90 +69,90 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache): 
         
         clientDetails = new ClientDetailsLite()
             { Id = client.Id, Name = $"{client.Forename} {client.Surname}", ClinicId = client.ClinicId };
-        _memoryCache.Set(key, clientDetails, _cacheEntryOptions);
+        _memoryCache.Set(key, clientDetails, CacheEntryOptions);
         return clientDetails;
     }
 
-    public async Task<List<PracDetailsLite>> GetClinicPracDetailsLite(int clinicId)
+    public async Task<List<PracDetailsLite>> GetClinicPracDetailsLite()
     {
-        string key = $"ClinicPracs-{clinicId}";
-        if (_memoryCache.TryGetValue(key, out List<PracDetailsLite> pracDetails)) return pracDetails;
+        string key = $"Pracs-t{_tenancy.TenancyId}";
+        if (_memoryCache.TryGetValue(key, out List<PracDetailsLite>? pracDetails)) return pracDetails;
         
-        var practitioners = await _db.Practitioners.Where(x => x.ClinicId == clinicId).ToListAsync();
-        
-        pracDetails = practitioners.Select(x => new PracDetailsLite()
-            { Id = x.Id, Name = $"{x.Title} {x.Forename} {x.Surname}", ClinicId = x.ClinicId }).ToList();
-        _memoryCache.Set(key,  pracDetails, _cacheEntryOptions);
-        return  pracDetails;
+        pracDetails = await _db.Practitioners.Select(x => new PracDetailsLite()
+            { Id = x.Id, Name = $"{x.Title} {x.Forename} {x.Surname}", ClinicId = x.ClinicId }).ToListAsync();
+        _memoryCache.Set(key,  pracDetails, CacheEntryOptions);
+        return pracDetails;
     }
 
-    public async Task<List<ClientDetailsLite>> GetClinicClientDetailsLite(int clinicId)
+    public async Task<List<ClientDetailsLite>> GetClinicClientDetailsLite()
     {
-        string key = $"ClinicClients-{clinicId}";
-        if (_memoryCache.TryGetValue(key, out List<ClientDetailsLite> clientDetails)) return clientDetails;
+        string key = $"ClinicClients-t{_tenancy.TenancyId}";
+        if (_memoryCache.TryGetValue(key, out List<ClientDetailsLite>? clientDetails)) return clientDetails;
         
-        var clients = await _db.Clients.Where(x => x.ClinicId == clinicId).ToListAsync();
-        
-        clientDetails = clients.Select(x => new ClientDetailsLite()
-            { Id = x.Id, Name = $"{x.Forename} {x.Surname}", ClinicId = x.ClinicId }).ToList();
-        _memoryCache.Set(key,  clientDetails, _cacheEntryOptions);
-        return  clientDetails;
+        clientDetails = await _db.Clients.Select(x => new ClientDetailsLite()
+            { Id = x.Id, Name = $"{x.Forename} {x.Surname}", ClinicId = x.ClinicId }).ToListAsync();
+        _memoryCache.Set(key,  clientDetails, CacheEntryOptions);
+        return clientDetails;
     }
 
-    // TODO: Refresh this when a new client is registered to the clinic
+    /// Deprecated?
     /// <summary>
+    /// TODO: Refresh this when a new client is registered to the clinic
     /// Security method, verify that the client Id specified is registered under the clinic.
     /// </summary>
     public async Task<bool> VerifyClientClinicMembership(int clientId, int clinicId)
     {
         const string key = "ClinicClientIdMap";
-        if (_memoryCache.TryGetValue(key, out Dictionary<int, int> clientIdMap))
+        if (_memoryCache.TryGetValue(key, out Dictionary<int, int>? clientIdMap))
         {
-            return clientIdMap[clientId] == clinicId;
+            return clientIdMap?[clientId] == clinicId;
         }
         
         clientIdMap = await _db.Clients.ToDictionaryAsync(x => x.Id, x => x.ClinicId);
-        _memoryCache.Set(key,  clientIdMap, _cacheEntryOptions);
+        _memoryCache.Set(key,  clientIdMap, CacheEntryOptions);
         return clientIdMap[clientId] == clinicId;
     }
 
-    // TODO: refresh cache when settings change
-    public async Task<Dictionary<string, SettingDto>> GetAllClinicSettings(int clinicId)
+    /// TODO: refresh cache when settings change
+    public async Task<Dictionary<string, SettingDto>> GetAllTenancySettings()
     {
-        string key = $"Settings-c{clinicId}";
-        if (_memoryCache.TryGetValue(key, out Dictionary<string, SettingDto> clinicSettings))
+        string key = $"Settings-t{_tenancy.TenancyId}";
+        if (_memoryCache.TryGetValue(key, out Dictionary<string, SettingDto>? tenancySettings))
         {
-            return clinicSettings;
+            return tenancySettings ?? new Dictionary<string, SettingDto>();
         }
         
         // Ensure duplicate keys may not be created per-Clinic in Settings Repo!!!
-        clinicSettings = await _db.Settings.Where(x => x.ClinicId == clinicId).Select(x => new SettingDto()
+        tenancySettings = await _db.Settings.Select(x => new SettingDto()
         {
             Id = x.Id,
             Key = x.Key,
             Value = x.Value,
             Value2 = x.Value2
         }).ToDictionaryAsync(x => x.Key);
-        _memoryCache.Set(key,  clinicSettings, _cacheEntryOptions);
-        return clinicSettings;
+        _memoryCache.Set(key,  tenancySettings, CacheEntryOptions);
+        return tenancySettings;
     }
 
-    public async Task<Dictionary<int, TreatmentDto>> GetTreatments(int clinicId)
+    /// <summary>
+    /// todo: refresh when treatments are changed
+    /// </summary>
+    public async Task<Dictionary<int, TreatmentDto>> GetTreatments()
     {
-        string key = $"Treatments-c{clinicId}";
-        if (_memoryCache.TryGetValue(key, out Dictionary<int, TreatmentDto> treatments))
+        string key = $"Treatments-t{_tenancy.TenancyId}";
+        if (_memoryCache.TryGetValue(key, out Dictionary<int, TreatmentDto>? treatments))
         {
-            return treatments;
+            return treatments ?? new Dictionary<int, TreatmentDto>();
         }
         
-        treatments = await _db.Treatments.Where(x => x.ClinicId == clinicId).Select(x => new TreatmentDto()
+        treatments = await _db.Treatments.Select(x => new TreatmentDto()
         {
             Id = x.Id,
             Title = x.Title,
             Cost = x.Cost,
             Requestability = x.TreatmentRequestability
         }).ToDictionaryAsync(x => x.Id);
-        _memoryCache.Set(key,  treatments, _cacheEntryOptions);
+        _memoryCache.Set(key,  treatments, CacheEntryOptions);
         return treatments;
     }
 

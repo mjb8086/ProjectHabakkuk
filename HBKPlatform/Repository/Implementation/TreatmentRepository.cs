@@ -30,10 +30,9 @@ public class TreatmentRepository(ApplicationDbContext _db) : ITreatmentRepositor
         }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Could not find treatment Id");
     }
     
-    public async Task<List<TreatmentLite>> GetClinicTreatments(int clinicId, bool clientOnly)
+    public async Task<List<TreatmentLite>> GetClinicTreatments(bool clientOnly)
     {
-        var query = _db.Treatments.Where(x => x.ClinicId == clinicId);
-        query = clientOnly ? query.Where(x => x.TreatmentRequestability == Enums.TreatmentRequestability.ClientAndPrac) : query;
+        var query = clientOnly ? _db.Treatments.Where(x => x.TreatmentRequestability == Enums.TreatmentRequestability.ClientAndPrac) : _db.Treatments;
         return await query.Select(x => new TreatmentLite()
         {
             Id = x.Id, Cost = x.Cost, Requestability = x.TreatmentRequestability, Title = x.Title

@@ -2,6 +2,7 @@ using System.Data;
 using HBKPlatform.Database;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +16,8 @@ namespace HBKPlatform.Repository.Implementation;
 /// 
 /// © 2023 NowDoctor Ltd.
 /// </summary>
-public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, UserManager<User> _userMgr, IClinicRepository _clinicRepo) :IClientRepository
+public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, 
+    UserManager<User> _userMgr, IUserRepository _userRepo, ITenancyService _tenancySrv) :IClientRepository
 {
     public ClientDto GetClientDetails(int clientId)
     {
@@ -38,9 +40,9 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         ).FirstOrDefault() ?? throw new MissingPrimaryKeyException($"Could not find client ID {clientId}");
     }
 
-    public async Task<List<ClientDetailsLite>> GetLiteDetails(int clinicId)
+    public async Task<List<ClientDetailsLite>> GetLiteDetails()
     {
-        return await _db.Clients.Where(x => x.ClinicId == clinicId)
+        return await _db.Clients
             .Select(x => new ClientDetailsLite() { Id = x.Id, Name = $"{x.Forename} {x.Surname}" })
             .ToListAsync();
     }
@@ -63,7 +65,7 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         
         if (willHaveUser)
         {
-            if (await _clinicRepo.IsEmailInUse(client.Email)) throw new InvalidOperationException("Email address already in use");
+            if (await _userRepo.IsEmailInUse(client.Email)) throw new InvalidOperationException("Email address already in use");
             var user = new User()
             {
                 Email = client.Email,
@@ -74,6 +76,7 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
                 LockoutEnabled = false,
                 PhoneNumber = client.Telephone,
                 PhoneNumberConfirmed = true,
+                TenancyId = _tenancySrv.TenancyId
             };
             var pwdGen = new PasswordGenerator.Password(DefaultSettings.DEFAULT_PASSWORD_LENGTH);
             var pwd = pwdGen.Next();
@@ -103,16 +106,16 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
 
         if (!(string.IsNullOrEmpty(dbClient.UserId) || string.IsNullOrEmpty(client.Email)))
         {
-            if (await _clinicRepo.IsEmailInUse(client.Email, dbClient.User.Email)) throw new InvalidOperationException("Email address already in use");
+            if (await _userRepo.IsEmailInUse(client.Email, dbClient.User.Email)) throw new InvalidOperationException("Email address already in use");
             dbClient.User.Email = client.Email;
         }
         
         await _db.SaveChangesAsync();
     }
 
-    public int GetClientCount(int clinicId)
+    public int GetClientCount()
     {
-        return _db.Clients.Count(x => x.ClinicId == clinicId);
+        return _db.Clients.Count();
     }
 
 }

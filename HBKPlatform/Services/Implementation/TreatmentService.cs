@@ -19,7 +19,7 @@ public class TreatmentService(IUserService _userService, ITreatmentRepository _t
     {
         return new TreatmentManagementView()
         {
-            Treatments = await _treatmentRepo.GetClinicTreatments(_userService.GetClaimFromCookie("ClinicId"))
+            Treatments = await _treatmentRepo.GetClinicTreatments()
         };
     }
 
@@ -49,7 +49,7 @@ public class TreatmentService(IUserService _userService, ITreatmentRepository _t
     {
         return new ClientTreatmentSelectView()
         {
-            Treatments = await _treatmentRepo.GetClinicTreatments(_userService.GetClaimFromCookie("ClinicId"), true)
+            Treatments = await _treatmentRepo.GetClinicTreatments(true)
         };
     }
     
