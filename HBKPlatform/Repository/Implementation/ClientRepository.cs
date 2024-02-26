@@ -87,6 +87,9 @@ public class ClientRepository(ApplicationDbContext _db, IPasswordHasher<User> pa
         }
         
         await _db.AddAsync(dbClient);
+        var clientPrac = new ClientPractitioner() { Client = dbClient, PractitionerId = client.PractitionerId };
+        await _db.AddAsync(clientPrac);
+        
         await _db.SaveChangesAsync();
         if (willHaveUser) await _userMgr.AddToRoleAsync(dbClient.User, "Client");
     }

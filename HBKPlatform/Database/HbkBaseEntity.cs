@@ -10,12 +10,12 @@ namespace HBKPlatform.Database
         public int Id { get; set; } 
         public int TenancyId { get; set; }
         [DataType(DataType.DateTime)]
+        
         public DateTime DateCreated { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime? DateModified { get; set; }
         public string? CreateActioner { get; set; }
         public string? ModifyActioner { get; set; }
-        
         public virtual Tenancy Tenancy { get; set; }
     }
 }

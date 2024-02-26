@@ -36,6 +36,7 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
     {
         // todo: security checks
         client.Id = _userService.GetClaimFromCookie("ClientId");
+        
         await _clientRepo.Update(client);
         _cacheService.ClearClientDetails(client.Id);
         _cacheService.ClearClinicClientDetails();
@@ -44,6 +45,8 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
     public async Task CreateClient(ClientDto client)
     {
         client.ClinicId = _userService.GetClaimFromCookie("ClinicId");
+        client.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
+        
         await _clientRepo.Create(client);
         _cacheService.ClearClinicClientDetails();
     }

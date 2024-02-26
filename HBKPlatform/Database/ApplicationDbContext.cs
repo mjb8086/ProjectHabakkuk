@@ -41,6 +41,8 @@ public class ApplicationDbContext : IdentityDbContext<User>
     public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
     public DbSet<Treatment> Treatments { get; set; } = default!;
     public DbSet<Setting> Settings { get; set; } = default!;
+    public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,6 +50,7 @@ public class ApplicationDbContext : IdentityDbContext<User>
         
         // Set query filter for tenancy
         modelBuilder.Entity<HbkBaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
+        modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
         
         // Manual relationships
         // Configure one-to-many relationship between Clinic and Practitioner

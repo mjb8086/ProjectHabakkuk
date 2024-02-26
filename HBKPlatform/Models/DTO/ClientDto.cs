@@ -24,4 +24,5 @@ public class ClientDto
     public bool HasUserAccount { get; set; }
 
     public int ClinicId { get; set; }
+    public int PractitionerId { get; set; }
 }

@@ -189,12 +189,40 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t
                     };
                     
+                    var client3Email = "les@primus.com";
+                    var client3User = new User()
+                    {
+                        Email = client3Email,
+                        NormalizedEmail = client3Email.ToUpper(),
+                        UserName = client3Email,
+                        NormalizedUserName = client3Email.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = false,
+                        PhoneNumber = "98989",
+                        PhoneNumberConfirmed = true,
+                        Tenancy = t
+                    };
+                    client3User.PasswordHash = passwordHasher.HashPassword(client1User, "johnthefisherman");
+                    
+                    var client3 = new Client()
+                    {
+                        Forename = "Les",
+                        Surname = "Claypool",
+                        Title = Enums.Title.Mr,
+                        Address = "Rancho Relaxo",
+                        DateOfBirth = new DateOnly(1968, 07, 08),
+                        Img = "samples/les.jpg",
+                        Telephone = "919191",
+                        User = client3User,
+                        Tenancy = t
+                    };
+                    
                     var clinic = new Clinic()
                     {
                         EmailAddress = "foo@bar.com",
                         Description = "Hill Valley Clinic",
                         Telephone = "0898 333 201",
-                        Clients = new List<Client>() {client1, client2},
+                        Clients = new List<Client>() {client1, client2, client3},
                         Practitioners = new List<Practitioner>() {prac1, prac2},
                         Tenancy = t
                     };
@@ -204,6 +232,15 @@ namespace HBKPlatform.Database.Helpers
 
                     clinic.LeadPractitioner = prac1;
                     ctx.SaveChanges();
+
+                    var clientPracs = new List<ClientPractitioner>()
+                    {
+                        new () {Client = client1, Practitioner = prac1, Tenancy = t},
+                        new () {Client = client2, Practitioner = prac1, Tenancy = t},
+                        new () {Client = client3, Practitioner = prac2, Tenancy = t},
+                    };
+
+                    ctx.AddRange(clientPracs);
 
                     var roles = new List<IdentityUserRole<string>>
                     {

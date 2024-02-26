@@ -32,6 +32,7 @@ namespace HBKPlatform.Database
         public User User { get; set; }
         
         public virtual ICollection<ClientMessage> ClientMessages { get; set; }
+        public virtual ICollection<ClientPractitioner> ClientPractitioners { get; set; }
     }
 
 }
