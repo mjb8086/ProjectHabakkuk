@@ -45,7 +45,6 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, I
         return clinic.LeadPractitionerId.Value;
     }
 
-    /// TODO: Refresh when any of these details are updated in DB
     public PracDetailsLite GetPracDetailsLite(int pracId)
     {
         string key = $"Prac-t{TenancyId}-{pracId}";
@@ -111,25 +110,6 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, I
         _memoryCache.Remove($"ClinicClients-t{TenancyId}");
     }
 
-    /// Deprecated?
-    /// <summary>
-    /// TODO: Refresh this when a new client is registered to the clinic
-    /// Security method, verify that the client Id specified is registered under the clinic.
-    /// </summary>
-    public async Task<bool> VerifyClientClinicMembership(int clientId, int clinicId)
-    {
-        string key = $"ClinicClientIdMap-t{TenancyId}";
-        if (_memoryCache.TryGetValue(key, out Dictionary<int, int>? clientIdMap))
-        {
-            return clientIdMap?[clientId] == clinicId;
-        }
-        
-        clientIdMap = await _db.Clients.ToDictionaryAsync(x => x.Id, x => x.ClinicId);
-        _memoryCache.Set(key,  clientIdMap, CacheEntryOptions);
-        return clientIdMap[clientId] == clinicId;
-    }
-
-    /// TODO: refresh cache when settings change
     public async Task<Dictionary<string, SettingDto>> GetAllTenancySettings()
     {
         string key = $"Settings-t{TenancyId}";
@@ -156,7 +136,7 @@ public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, I
     }
 
     /// <summary>
-    /// todo: refresh when treatments are changed
+    /// Essential: refresh when treatments are changed
     /// </summary>
     public async Task<Dictionary<int, TreatmentDto>> GetTreatments()
     {

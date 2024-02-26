@@ -54,6 +54,7 @@ builder.Services.AddTransient<IDateTimeWrapper, DateTimeWrapper>();
 builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
 builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
 builder.Services.AddTransient<IMcpService, McpService>();
+builder.Services.AddTransient<ISecurityService, SecurityService>();
 
 /*
 var loggerFactory = LoggerFactory.Create(builder =>

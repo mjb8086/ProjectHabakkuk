@@ -11,7 +11,6 @@ public interface ICacheService
     public ClientDetailsLite GetClientDetailsLite(int clientId);
     public Task<List<PracDetailsLite>> GetClinicPracDetailsLite();
     public Task<List<ClientDetailsLite>> GetClinicClientDetailsLite();
-    public Task<bool> VerifyClientClinicMembership(int clientId, int clinicId);
     public Task<Dictionary<string, SettingDto>> GetAllTenancySettings();
     public Task<Dictionary<int, TreatmentDto>> GetTreatments();
 

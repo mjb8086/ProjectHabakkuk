@@ -5,7 +5,7 @@ using HBKPlatform.Repository;
 namespace HBKPlatform.Services.Implementation;
 
 public class ClientDetailsService(IClientRepository _clientRepo, IUserService _userService, 
-    ICacheService _cacheService) : IClientDetailsService
+    ICacheService _cacheService, ISecurityService _securityService) : IClientDetailsService
 {
     public async Task<AllClients> GetAllClientsView()
     {
@@ -14,13 +14,11 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
 
     public async Task<ClientDto> GetClient(int clientId)
     {
-        // todo : security checks
         return _clientRepo.GetClientDetails(clientId);
     }
     
     public async Task<ClientDto> GetClientAsClient()
     {
-        // todo : security checks
         var clientId = _userService.GetClaimFromCookie("ClientId");
         return _clientRepo.GetClientDetails(clientId);
     }
@@ -34,10 +32,10 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
 
     public async Task UpdateClientDetailsAsClient(ClientDto client)
     {
-        // todo: security checks
         client.Id = _userService.GetClaimFromCookie("ClientId");
         
         await _clientRepo.Update(client);
+        // Housekeeping for the cache
         _cacheService.ClearClientDetails(client.Id);
         _cacheService.ClearClinicClientDetails();
     }
@@ -48,7 +46,9 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
         client.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
         
         await _clientRepo.Create(client);
+        // Housekeeping for the cache
         _cacheService.ClearClinicClientDetails();
+        _securityService.ClearClientPracOwnership();
     }
 
     public ClientDetailsIndex GetClientDetailsIndex()
