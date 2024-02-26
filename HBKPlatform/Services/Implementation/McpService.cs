@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HBKPlatform.Services.Implementation;
 
-public class McpService(IMcpRepository _mcpRepo, ITimeslotRepository _timeslotRepo): IMcpService
+public class McpService(IMcpRepository _mcpRepo, ITimeslotRepository _timeslotRepo, ICacheService _cacheService): IMcpService
 {
     
     /* MCP Methods */
@@ -56,6 +56,5 @@ public class McpService(IMcpRepository _mcpRepo, ITimeslotRepository _timeslotRe
             Pracs = pracDetailsUac
         };
     }
-    
 
 }

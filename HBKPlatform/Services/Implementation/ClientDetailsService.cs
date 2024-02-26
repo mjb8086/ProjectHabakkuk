@@ -4,7 +4,8 @@ using HBKPlatform.Repository;
 
 namespace HBKPlatform.Services.Implementation;
 
-public class ClientDetailsService(IClientRepository _clientRepo, IUserService _userService) : IClientDetailsService
+public class ClientDetailsService(IClientRepository _clientRepo, IUserService _userService, 
+    ICacheService _cacheService) : IClientDetailsService
 {
     public async Task<AllClients> GetAllClientsView()
     {
@@ -27,6 +28,8 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
     public async Task UpdateClientDetails(ClientDto client)
     {
         await _clientRepo.Update(client);
+        _cacheService.ClearClientDetails(client.Id);
+        _cacheService.ClearClinicClientDetails();
     }
 
     public async Task UpdateClientDetailsAsClient(ClientDto client)
@@ -34,12 +37,15 @@ public class ClientDetailsService(IClientRepository _clientRepo, IUserService _u
         // todo: security checks
         client.Id = _userService.GetClaimFromCookie("ClientId");
         await _clientRepo.Update(client);
+        _cacheService.ClearClientDetails(client.Id);
+        _cacheService.ClearClinicClientDetails();
     }
 
     public async Task CreateClient(ClientDto client)
     {
         client.ClinicId = _userService.GetClaimFromCookie("ClinicId");
         await _clientRepo.Create(client);
+        _cacheService.ClearClinicClientDetails();
     }
 
     public ClientDetailsIndex GetClientDetailsIndex()

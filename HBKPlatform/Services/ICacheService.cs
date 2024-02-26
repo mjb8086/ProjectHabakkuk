@@ -14,4 +14,13 @@ public interface ICacheService
     public Task<bool> VerifyClientClinicMembership(int clientId, int clinicId);
     public Task<Dictionary<string, SettingDto>> GetAllTenancySettings();
     public Task<Dictionary<int, TreatmentDto>> GetTreatments();
+
+
+    // Clearing methods - call after any DB update action on the entities.
+    public void ClearPracDetails(int pracId);
+    public void ClearClientDetails(int clientId);
+    public void ClearClinicClientDetails();
+    public void ClearSettings();
+    public void ClearTreatments();
+    public void ClearAll();
 }

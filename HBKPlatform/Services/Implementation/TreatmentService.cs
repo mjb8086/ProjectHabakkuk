@@ -13,7 +13,8 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class TreatmentService(IUserService _userService, ITreatmentRepository _treatmentRepo) : ITreatmentService
+public class TreatmentService(IUserService _userService, ITreatmentRepository _treatmentRepo, 
+    ICacheService _cacheService) : ITreatmentService
 {
     public async Task<TreatmentManagementView> GetTreatmentMgmtView()
     {
@@ -33,11 +34,13 @@ public class TreatmentService(IUserService _userService, ITreatmentRepository _t
     {
         // todo: confirm user is member of clinic
         await _treatmentRepo.Delete(treatmentId);
+        _cacheService.ClearTreatments();
     }
 
     public async Task UpdateTreatment(TreatmentDto treatment)
     {
         await _treatmentRepo.UpdateTreatment(treatment);
+        _cacheService.ClearTreatments();
     }
 
     public async Task<TreatmentDto> GetTreatment(int treatmentId)
