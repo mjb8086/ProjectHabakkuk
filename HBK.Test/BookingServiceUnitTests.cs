@@ -2,6 +2,7 @@ using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Repository;
+using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
 using Moq;
@@ -41,7 +42,7 @@ namespace HBK.Test
         }
 
         [Fact]
-        public async Task GetTimeslotsForBookingTest_1()
+        public void GetTimeslotsForBookingTest_1()
         {
             var timeslotList = GenerateTimeslots();
             var mockTimeslotRepo = new Mock<ITimeslotRepository>();
@@ -52,7 +53,7 @@ namespace HBK.Test
             mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = "2"});
             mockDateTimeHelper.Setup(x => x.Now).Returns(new DateTime(2024, 01, 17, 14, 00, 00));
 
-            var bookingService = new BookingService(mockTimeslotRepo.Object, null, null, null, mockConfigService.Object, mockDateTimeHelper.Object, null);
+            var bookingService = new BookingService(mockTimeslotRepo.Object, new Mock<UserService>().Object, new Mock<CacheService>().Object, new Mock<AppointmentRepository>().Object, mockConfigService.Object, mockDateTimeHelper.Object, new Mock<AvailabilityRepository>().Object);
             // todo: mock other dependencies
 //        var timeslots = bookingService.Get
         }
