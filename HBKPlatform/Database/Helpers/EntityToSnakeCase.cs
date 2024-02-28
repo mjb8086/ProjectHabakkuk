@@ -1,42 +1,43 @@
 using HBKPlatform.Helpers;
 using Microsoft.EntityFrameworkCore;
 
-namespace HBKPlatform.Database.Helpers;
-
-/// <summary>
-/// HBKPlatform Model Builder Extensions.
-/// Overrides for database construction.
-/// Author: MJB
-/// Authored: 10/12/2023
-/// </summary>
-public static class ModelBuilderExtensions
+namespace HBKPlatform.Database.Helpers
 {
-    public static void NameModelEntitiesInSnakeCase(this ModelBuilder modelBuilder)
+    /// <summary>
+    /// HBKPlatform Model Builder Extensions.
+    /// Overrides for database construction.
+    /// Author: MJB
+    /// Authored: 10/12/2023
+    /// </summary>
+    public static class ModelBuilderExtensions
     {
-        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        public static void NameModelEntitiesInSnakeCase(this ModelBuilder modelBuilder)
         {
-            // Replace table names
-            entity.SetTableName(entity.GetTableName().ToSnakeCase());
-
-            // Replace column names            
-            foreach (var property in entity.GetProperties())
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
             {
-                property.SetColumnName(property.GetColumnName().ToSnakeCase());
-            }
+                // Replace table names
+                entity.SetTableName(entity.GetTableName().ToSnakeCase());
 
-            foreach (var key in entity.GetKeys())
-            {
-                key.SetName(key.GetName().ToSnakeCase());
-            }
+                // Replace column names            
+                foreach (var property in entity.GetProperties())
+                {
+                    property.SetColumnName(property.GetColumnName().ToSnakeCase());
+                }
 
-            foreach (var key in entity.GetForeignKeys())
-            {
-                key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
-            }
+                foreach (var key in entity.GetKeys())
+                {
+                    key.SetName(key.GetName().ToSnakeCase());
+                }
 
-            foreach (var index in entity.GetIndexes())
-            {
-                index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
+                foreach (var key in entity.GetForeignKeys())
+                {
+                    key.SetConstraintName(key.GetConstraintName().ToSnakeCase());
+                }
+
+                foreach (var index in entity.GetIndexes())
+                {
+                    index.SetDatabaseName(index.GetDatabaseName().ToSnakeCase());
+                }
             }
         }
     }

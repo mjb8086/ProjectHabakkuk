@@ -1,6 +1,7 @@
-namespace HBKPlatform.Models.View.MyND;
-
-public class ReceptionModel
+namespace HBKPlatform.Models.View.MyND
 {
-    public int NumUnreadMessages { get; set; }
+    public class ReceptionModel
+    {
+        public int NumUnreadMessages { get; set; }
+    }
 }

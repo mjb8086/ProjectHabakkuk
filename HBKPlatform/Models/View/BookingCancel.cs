@@ -1,10 +1,11 @@
-namespace HBKPlatform.Models.View;
-
-public struct BookingCancel
+namespace HBKPlatform.Models.View
 {
-    public int AppointmentId { get; set; }
-    public string TreatmentTitle { get; set; }
-    public string DateString { get; set; }
-    public string PractitionerName { get; set; }
-    public string ClientName { get; set; }
+    public struct BookingCancel
+    {
+        public int AppointmentId { get; set; }
+        public string TreatmentTitle { get; set; }
+        public string DateString { get; set; }
+        public string PractitionerName { get; set; }
+        public string ClientName { get; set; }
+    }
 }

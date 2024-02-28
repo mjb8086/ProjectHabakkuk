@@ -1,10 +1,11 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Models.View.MyND;
-
-public class ClientRecords
+namespace HBKPlatform.Models.View.MyND
 {
-    public string ClientName { get; set; }
-    public int ClientId { get; set; }
-    public List<ClientRecordLite> ClientRecordList { get; set; }
+    public class ClientRecords
+    {
+        public string ClientName { get; set; }
+        public int ClientId { get; set; }
+        public List<ClientRecordLite> ClientRecordList { get; set; }
+    }
 }

@@ -1,8 +1,9 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Repository;
-
-public interface ISettingRepository
+namespace HBKPlatform.Repository
 {
-    public Task<List<SettingDto>> GetAllTenancySettings();
+    public interface ISettingRepository
+    {
+        public Task<List<SettingDto>> GetAllTenancySettings();
+    }
 }

@@ -1,69 +1,83 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
+using HBKPlatform.Database;
 using HBKPlatform.Globals;
 
-namespace HBKPlatform.Models.DTO;
-
-[DebuggerDisplay("WeekNum={WeekNum} Day={Day} Time={Time} Desc={Description}")]
-public class TimeslotDto
+namespace HBKPlatform.Models.DTO
 {
-    public int Id { get; set; }
-    public string Description { get; set; }
-    public int ClinicId { get; set; }
-    public Enums.Day Day { get; set; }
-    public TimeOnly Time { get; set; }
-    [Range(10,300)]
-    public int Duration { get; set; }
-    public int WeekNum { get; set; }
-
-    /// <summary>
-    /// Instantiates a duplicate of the current timeslotDto.
-    /// </summary>
-    /// <returns>A clone of the current timeslot with its members populated</returns>
-    public TimeslotDto Clone()
+    [DebuggerDisplay("WeekNum={WeekNum} Day={Day} Time={Time} Desc={Description}")]
+    public class TimeslotDto
     {
-        return new TimeslotDto()
+        public int Id { get; set; }
+        public string Description { get; set; }
+        public int ClinicId { get; set; }
+        public Enums.Day Day { get; set; }
+        public TimeOnly Time { get; set; }
+        [Range(10,300)]
+        public int Duration { get; set; }
+        public int WeekNum { get; set; }
+
+        /// <summary>
+        /// Instantiates a duplicate of the current timeslotDto.
+        /// </summary>
+        /// <returns>A clone of the current timeslot with its members populated</returns>
+        public TimeslotDto Clone()
         {
-            Id = this.Id,
-            Description = this.Description,
-            ClinicId = this.ClinicId,
-            Day = this.Day,
-            Time = this.Time,
-            Duration = this.Duration,
-            WeekNum = this.WeekNum
-        };
-    }
+            return new TimeslotDto()
+            {
+                Id = this.Id,
+                Description = this.Description,
+                ClinicId = this.ClinicId,
+                Day = this.Day,
+                Time = this.Time,
+                Duration = this.Duration,
+                WeekNum = this.WeekNum
+            };
+        }
 
-    public bool IsClash(TimeslotDto other)
-    {
+        public bool IsClash(TimeslotDto other)
+        {
 //        if (other.WeekNum == this.WeekNum && other.Day == this.Day && other.Time == this.Time) return true;
 //        if (other.WeekNum == 0 || this.WeekNum == 0) return true; // not strictly a clash but still bad
-        return (other.WeekNum == this.WeekNum && other.Day == this.Day &&
-                (this.Time < other.Time.AddMinutes(other.Duration) &&
-                 this.Time.AddMinutes(this.Duration) > other.Time));
-    }
+            return (other.WeekNum == this.WeekNum && other.Day == this.Day &&
+                    (this.Time < other.Time.AddMinutes(other.Duration) &&
+                     this.Time.AddMinutes(this.Duration) > other.Time));
+        }
     
-    public bool IsNotClashAny(List<TimeslotDto> others)
-    {
-        return !others.Any(x => x.IsClash(this));
-    }
-
-    private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>
-    {
-        public bool Equals(TimeslotDto x, TimeslotDto y)
+        public bool IsNotClashAny(List<TimeslotDto> others)
         {
-            if (ReferenceEquals(x, y)) return true;
-            if (ReferenceEquals(x, null)) return false;
-            if (ReferenceEquals(y, null)) return false;
-            if (x.GetType() != y.GetType()) return false;
-            return x.Id == y.Id && x.Description == y.Description && x.ClinicId == y.ClinicId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+            return !others.Any(x => x.IsClash(this));
         }
 
-        public int GetHashCode(TimeslotDto obj)
+        private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>
         {
-            return HashCode.Combine(obj.Id, obj.Description, obj.ClinicId, (int)obj.Day, obj.Time, obj.Duration, obj.WeekNum);
-        }
-    }
+            public bool Equals(TimeslotDto x, TimeslotDto y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (ReferenceEquals(x, null)) return false;
+                if (ReferenceEquals(y, null)) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return x.Id == y.Id && x.Description == y.Description && x.ClinicId == y.ClinicId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+            }
 
-    public static IEqualityComparer<TimeslotDto> TimeslotDtoComparer { get; } = new TimeslotDtoEqualityComparer();
+            public int GetHashCode(TimeslotDto obj)
+            {
+                return HashCode.Combine(obj.Id, obj.Description, obj.ClinicId, (int)obj.Day, obj.Time, obj.Duration, obj.WeekNum);
+            }
+        }
+
+        public static IEqualityComparer<TimeslotDto> TimeslotDtoComparer { get; } = new TimeslotDtoEqualityComparer();
+
+        public static TimeslotDto FromDbTimeslot(Timeslot timeslot)
+        {
+            return new()
+            {
+                Description = timeslot.Description,
+                Id = timeslot.Id,
+                Day = timeslot.Day,
+                Time = timeslot.Time
+            };
+        }
+
+    }
 }

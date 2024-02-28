@@ -2,27 +2,28 @@ using HBKPlatform.Database;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
-namespace HBKPlatform.Repository.Implementation;
-
-/// <summary>
-/// HBKPlatform setting repository.
-/// 
-/// Author: Mark Brown
-/// Authored: 12/01/2024
-/// 
-/// © 2024 NowDoctor Ltd.
-/// </summary>
-public class SettingRepository (ApplicationDbContext _db) : ISettingRepository
+namespace HBKPlatform.Repository.Implementation
 {
-    public async Task<List<SettingDto>> GetAllTenancySettings()
+    /// <summary>
+    /// HBKPlatform setting repository.
+    /// 
+    /// Author: Mark Brown
+    /// Authored: 12/01/2024
+    /// 
+    /// © 2024 NowDoctor Ltd.
+    /// </summary>
+    public class SettingRepository (ApplicationDbContext _db) : ISettingRepository
     {
-        return await _db.Settings.Select(x => new SettingDto()
+        public async Task<List<SettingDto>> GetAllTenancySettings()
         {
-            Id = x.Id,
-            Key = x.Key,
-            Value = x.Value,
-            Value2 = x.Value2
-        }).ToListAsync();
-    }
+            return await _db.Settings.Select(x => new SettingDto()
+            {
+                Id = x.Id,
+                Key = x.Key,
+                Value = x.Value,
+                Value2 = x.Value2
+            }).ToListAsync();
+        }
     
+    }
 }

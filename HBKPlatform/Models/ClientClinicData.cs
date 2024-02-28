@@ -1,8 +1,9 @@
-namespace HBKPlatform.Models;
-
-public class ClientClinicData
+namespace HBKPlatform.Models
 {
-    public int PracId { get; set; }
-    public string MyPracName { get; set; }
-    public int NumUnreadMessages { get; set; }
+    public class ClientClinicData
+    {
+        public int PracId { get; set; }
+        public string MyPracName { get; set; }
+        public int NumUnreadMessages { get; set; }
+    }
 }

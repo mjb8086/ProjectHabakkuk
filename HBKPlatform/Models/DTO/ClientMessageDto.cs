@@ -1,10 +1,11 @@
 using HBKPlatform.Globals;
 
-namespace HBKPlatform.Models.DTO;
-
-public class ClientMessageDto
+namespace HBKPlatform.Models.DTO
 {
-    public string MessageBody { get; set; }
-    public Enums.MessageStatus MessageStatus { get; set; }
-    public Enums.MessageOrigin MessageOrigin { get; set; }
+    public class ClientMessageDto
+    {
+        public string MessageBody { get; set; }
+        public Enums.MessageStatus MessageStatus { get; set; }
+        public Enums.MessageOrigin MessageOrigin { get; set; }
+    }
 }

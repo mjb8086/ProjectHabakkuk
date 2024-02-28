@@ -1,7 +1,8 @@
-namespace HBKPlatform.Services;
-
-public interface ISecurityService
+namespace HBKPlatform.Services
 {
-    public Task<bool> VerifyClientPracOwnership(int clientId, int pracId);
-    public void ClearClientPracOwnership();
+    public interface ISecurityService
+    {
+        public Task<bool> VerifyClientPracOwnership(int clientId, int pracId);
+        public void ClearClientPracOwnership();
+    }
 }

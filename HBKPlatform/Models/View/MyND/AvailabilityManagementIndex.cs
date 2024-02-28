@@ -1,6 +1,7 @@
-namespace HBKPlatform.Models.View.MyND;
-
-public struct AvailabilityManagementIndex()
+namespace HBKPlatform.Models.View.MyND
 {
-   public Dictionary<int, string> WeekDates { get; set; }
+   public struct AvailabilityManagementIndex()
+   {
+      public Dictionary<int, string> WeekDates { get; set; }
+   }
 }

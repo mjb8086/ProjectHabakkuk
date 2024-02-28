@@ -2,22 +2,23 @@ using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HBKPlatform.Controllers;
-
-/// <summary>
-/// HBKPlatform MyND Reception Controller.
-/// Default landing page and other related views.
-/// 
-/// Author: Mark Brown
-/// Authored: 13/12/2023
-/// 
-/// © 2023 NowDoctor Ltd.
-/// </summary>
-[Area("MyND"), Authorize(Roles="Practitioner")]
-public class ReceptionController(IClinicService _clinicService): Controller
+namespace HBKPlatform.Areas.MyND.Controllers
 {
-    public async Task<IActionResult> Index()
+    /// <summary>
+    /// HBKPlatform MyND Reception Controller.
+    /// Default landing page and other related views.
+    /// 
+    /// Author: Mark Brown
+    /// Authored: 13/12/2023
+    /// 
+    /// © 2023 NowDoctor Ltd.
+    /// </summary>
+    [Area("MyND"), Authorize(Roles="Practitioner")]
+    public class ReceptionController(IClinicService _clinicService): Controller
     {
-        return View(await _clinicService.GetReceptionModel());
+        public async Task<IActionResult> Index()
+        {
+            return View(await _clinicService.GetReceptionModel());
+        }
     }
 }

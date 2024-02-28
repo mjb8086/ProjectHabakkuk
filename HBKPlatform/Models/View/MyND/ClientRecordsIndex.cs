@@ -1,8 +1,9 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Models.View.MyND;
-
-public class ClientRecordsIndex
+namespace HBKPlatform.Models.View.MyND
 {
-    public List<ClientDetailsLite> ClientDetails;
+    public class ClientRecordsIndex
+    {
+        public List<ClientDetailsLite> ClientDetails;
+    }
 }

@@ -1,14 +1,15 @@
 using System.Text.RegularExpressions;
 
-namespace HBKPlatform.Helpers;
-
-public static class StringExtensions
+namespace HBKPlatform.Helpers
 {
-    public static string ToSnakeCase(this string input)
+    public static class StringExtensions
     {
-        if (string.IsNullOrEmpty(input)) { return input; }
+        public static string ToSnakeCase(this string input)
+        {
+            if (string.IsNullOrEmpty(input)) { return input; }
 
-        var startUnderscores = Regex.Match(input, @"^_+");
-        return startUnderscores + Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
+            var startUnderscores = Regex.Match(input, @"^_+");
+            return startUnderscores + Regex.Replace(input, @"([a-z0-9])([A-Z])", "$1_$2").ToLower();
+        }
     }
 }

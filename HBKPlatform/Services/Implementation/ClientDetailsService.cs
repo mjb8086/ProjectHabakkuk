@@ -2,57 +2,58 @@ using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
 
-namespace HBKPlatform.Services.Implementation;
-
-public class ClientDetailsService(IClientRepository _clientRepo, IUserService _userService, 
-    ICacheService _cacheService, ISecurityService _securityService) : IClientDetailsService
+namespace HBKPlatform.Services.Implementation
 {
-    public async Task<AllClients> GetAllClientsView()
+    public class ClientDetailsService(IClientRepository _clientRepo, IUserService _userService, 
+        ICacheService _cacheService, ISecurityService _securityService) : IClientDetailsService
     {
-        return new AllClients() { Clients = await _clientRepo.GetLiteDetails()};
-    }
+        public async Task<AllClients> GetAllClientsView()
+        {
+            return new AllClients() { Clients = await _clientRepo.GetLiteDetails()};
+        }
 
-    public async Task<ClientDto> GetClient(int clientId)
-    {
-        return _clientRepo.GetClientDetails(clientId);
-    }
+        public async Task<ClientDto> GetClient(int clientId)
+        {
+            return _clientRepo.GetClientDetails(clientId);
+        }
     
-    public async Task<ClientDto> GetClientAsClient()
-    {
-        var clientId = _userService.GetClaimFromCookie("ClientId");
-        return _clientRepo.GetClientDetails(clientId);
-    }
+        public async Task<ClientDto> GetClientAsClient()
+        {
+            var clientId = _userService.GetClaimFromCookie("ClientId");
+            return _clientRepo.GetClientDetails(clientId);
+        }
 
-    public async Task UpdateClientDetails(ClientDto client)
-    {
-        await _clientRepo.Update(client);
-        _cacheService.ClearClientDetails(client.Id);
-        _cacheService.ClearClinicClientDetails();
-    }
+        public async Task UpdateClientDetails(ClientDto client)
+        {
+            await _clientRepo.Update(client);
+            _cacheService.ClearClientDetails(client.Id);
+            _cacheService.ClearClinicClientDetails();
+        }
 
-    public async Task UpdateClientDetailsAsClient(ClientDto client)
-    {
-        client.Id = _userService.GetClaimFromCookie("ClientId");
+        public async Task UpdateClientDetailsAsClient(ClientDto client)
+        {
+            client.Id = _userService.GetClaimFromCookie("ClientId");
         
-        await _clientRepo.Update(client);
-        // Housekeeping for the cache
-        _cacheService.ClearClientDetails(client.Id);
-        _cacheService.ClearClinicClientDetails();
-    }
+            await _clientRepo.Update(client);
+            // Housekeeping for the cache
+            _cacheService.ClearClientDetails(client.Id);
+            _cacheService.ClearClinicClientDetails();
+        }
 
-    public async Task CreateClient(ClientDto client)
-    {
-        client.ClinicId = _userService.GetClaimFromCookie("ClinicId");
-        client.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
+        public async Task CreateClient(ClientDto client)
+        {
+            client.ClinicId = _userService.GetClaimFromCookie("ClinicId");
+            client.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
         
-        await _clientRepo.Create(client);
-        // Housekeeping for the cache
-        _cacheService.ClearClinicClientDetails();
-        _securityService.ClearClientPracOwnership();
-    }
+            await _clientRepo.Create(client);
+            // Housekeeping for the cache
+            _cacheService.ClearClinicClientDetails();
+            _securityService.ClearClientPracOwnership();
+        }
 
-    public ClientDetailsIndex GetClientDetailsIndex()
-    {
-        return new ClientDetailsIndex() { NumClients = _clientRepo.GetClientCount() };
+        public ClientDetailsIndex GetClientDetailsIndex()
+        {
+            return new ClientDetailsIndex() { NumClients = _clientRepo.GetClientCount() };
+        }
     }
 }

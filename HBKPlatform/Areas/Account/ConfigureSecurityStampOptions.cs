@@ -2,38 +2,39 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace HBKPlatform.Areas.Account;
-
-// rip of https://stackoverflow.com/a/76790172/11937530
-public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampValidatorOptions>
+namespace HBKPlatform.Areas.Account
 {
-    // Fixes claims going missing in the Identity token.
-    // every 30m the security stamp is refreshed, when this happens claims need reasserted
-    public void Configure(SecurityStampValidatorOptions options)
+    // rip of https://stackoverflow.com/a/76790172/11937530
+    public class ConfigureSecurityStampOptions : IConfigureOptions<SecurityStampValidatorOptions>
     {
-        options.ValidationInterval = TimeSpan.FromMinutes(10); // Default interval is 30 minutes
-
-        // When refreshing the principal, ensure custom claims that
-        // might have been set with an external identity continue
-        // to flow through to this new one.
-        options.OnRefreshingPrincipal = refreshingPrincipal =>
+        // Fixes claims going missing in the Identity token.
+        // every 30m the security stamp is refreshed, when this happens claims need reasserted
+        public void Configure(SecurityStampValidatorOptions options)
         {
-            ClaimsIdentity? newIdentity = refreshingPrincipal.NewPrincipal?.Identities.First();
-            ClaimsIdentity? currentIdentity = refreshingPrincipal.CurrentPrincipal?.Identities.First();
+            options.ValidationInterval = TimeSpan.FromMinutes(10); // Default interval is 30 minutes
 
-            if (currentIdentity is not null && newIdentity is not null)
+            // When refreshing the principal, ensure custom claims that
+            // might have been set with an external identity continue
+            // to flow through to this new one.
+            options.OnRefreshingPrincipal = refreshingPrincipal =>
             {
-                // Since this is refreshing an existing principal, we want to merge all claims.
-                // Only work with claims in current identity that are not already present in the new identity with the same Type and Value.
-                var currentClaimsNotInNewIdentity = currentIdentity.Claims.Where(c => !newIdentity.HasClaim(c.Type, c.Value));
+                ClaimsIdentity? newIdentity = refreshingPrincipal.NewPrincipal?.Identities.First();
+                ClaimsIdentity? currentIdentity = refreshingPrincipal.CurrentPrincipal?.Identities.First();
 
-                foreach (Claim claim in currentClaimsNotInNewIdentity)
+                if (currentIdentity is not null && newIdentity is not null)
                 {
-                    newIdentity.AddClaim(claim);
-                }
-            }
+                    // Since this is refreshing an existing principal, we want to merge all claims.
+                    // Only work with claims in current identity that are not already present in the new identity with the same Type and Value.
+                    var currentClaimsNotInNewIdentity = currentIdentity.Claims.Where(c => !newIdentity.HasClaim(c.Type, c.Value));
 
-            return Task.CompletedTask;
-        };
+                    foreach (Claim claim in currentClaimsNotInNewIdentity)
+                    {
+                        newIdentity.AddClaim(claim);
+                    }
+                }
+
+                return Task.CompletedTask;
+            };
+        }
     }
 }

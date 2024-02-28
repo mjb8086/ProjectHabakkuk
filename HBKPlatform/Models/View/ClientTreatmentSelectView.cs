@@ -1,8 +1,9 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Models.View;
-
-public class ClientTreatmentSelectView
+namespace HBKPlatform.Models.View
 {
-    public List<TreatmentLite> Treatments;
+    public class ClientTreatmentSelectView
+    {
+        public List<TreatmentLite> Treatments;
+    }
 }

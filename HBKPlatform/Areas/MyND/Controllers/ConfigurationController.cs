@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HBKPlatform.Controllers;
-
-[Area("MyND"), Authorize(Roles="Practitioner")]
-public class ConfigurationController : Controller
+namespace HBKPlatform.Areas.MyND.Controllers
 {
-   public IActionResult Index()
+   [Area("MyND"), Authorize(Roles="Practitioner")]
+   public class ConfigurationController : Controller
    {
-      return View();
+      public IActionResult Index()
+      {
+         return View();
+      }
    }
 }

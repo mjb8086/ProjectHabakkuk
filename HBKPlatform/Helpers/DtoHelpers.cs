@@ -1,39 +1,40 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Helpers;
-
-public class DtoHelpers
+namespace HBKPlatform.Helpers
 {
-    public static List<TimeslotLite> ConvertTimeslotsToLite(string dbStartDate, List<TimeslotDto> timeslots)
+    public class DtoHelpers
     {
-        var lites = new List<TimeslotLite>();
-        foreach (var timeslot in timeslots)
+        public static List<TimeslotLite> ConvertTimeslotsToLite(string dbStartDate, List<TimeslotDto> timeslots)
         {
-            if (timeslot.WeekNum < 1 ) continue;
-            lites.Add(new TimeslotLite()
+            var lites = new List<TimeslotLite>();
+            foreach (var timeslot in timeslots)
             {
-                Id = timeslot.Id,
-                Description = string.IsNullOrWhiteSpace(timeslot.Description) ? DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslot)) : timeslot.Description,
-                WeekNum = timeslot.WeekNum
-            });
+                if (timeslot.WeekNum < 1 ) continue;
+                lites.Add(new TimeslotLite()
+                {
+                    Id = timeslot.Id,
+                    Description = string.IsNullOrWhiteSpace(timeslot.Description) ? DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslot)) : timeslot.Description,
+                    WeekNum = timeslot.WeekNum
+                });
+            }
+            return lites;
         }
-        return lites;
-    }
 
-    public static List<TreatmentLite> ConvertTreatmentsToLite(IEnumerable<TreatmentDto> treatments)
-    {
-        var lites = new List<TreatmentLite>();
-        foreach (var treatment in treatments)
+        public static List<TreatmentLite> ConvertTreatmentsToLite(IEnumerable<TreatmentDto> treatments)
         {
-           lites.Add(new TreatmentLite()
-           {
-                Id = treatment.Id,
-                Title = treatment.Title,
-                Cost = treatment.Cost,
-                Requestability = treatment.Requestability
-           }); 
-        }
+            var lites = new List<TreatmentLite>();
+            foreach (var treatment in treatments)
+            {
+                lites.Add(new TreatmentLite()
+                {
+                    Id = treatment.Id,
+                    Title = treatment.Title,
+                    Cost = treatment.Cost,
+                    Requestability = treatment.Requestability
+                }); 
+            }
 
-        return lites;
+            return lites;
+        }
     }
 }

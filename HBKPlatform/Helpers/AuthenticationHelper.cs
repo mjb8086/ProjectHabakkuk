@@ -1,21 +1,22 @@
 using System.Security.Claims;
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Helpers;
-
-public class AuthenticationHelper
+namespace HBKPlatform.Helpers
 {
-    /// <summary>
-    /// Return an array that will map the claim name to the claim value
-    /// </summary>
-    public static Claim[] GetClaimsForUser(UserDto userDto)
+    public class AuthenticationHelper
     {
-        return new[]
+        /// <summary>
+        /// Return an array that will map the claim name to the claim value
+        /// </summary>
+        public static Claim[] GetClaimsForUser(UserDto userDto)
         {
-            new Claim("ClinicId", userDto.ClinicId.ToString()), 
-            new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
-            new Claim("ClientId", userDto.ClientId?.ToString() ?? ""),
-            new Claim("TenancyId", userDto.TenancyId.ToString())
-        };
+            return new[]
+            {
+                new Claim("ClinicId", userDto.ClinicId.ToString()), 
+                new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
+                new Claim("ClientId", userDto.ClientId?.ToString() ?? ""),
+                new Claim("TenancyId", userDto.TenancyId.ToString())
+            };
+        }
     }
 }

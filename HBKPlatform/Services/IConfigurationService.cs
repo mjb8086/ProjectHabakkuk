@@ -1,8 +1,9 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Services;
-
-public interface IConfigurationService
+namespace HBKPlatform.Services
 {
-   public Task<SettingDto> GetSettingOrDefault(string key);
+   public interface IConfigurationService
+   {
+      public Task<SettingDto> GetSettingOrDefault(string key);
+   }
 }

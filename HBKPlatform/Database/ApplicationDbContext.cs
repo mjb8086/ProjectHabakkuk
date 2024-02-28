@@ -13,138 +13,139 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace HBKPlatform.Database;
-
-public class ApplicationDbContext : IdentityDbContext<User>
-
+namespace HBKPlatform.Database
 {
-    private IHttpContextAccessor _httpCtx;
-    private ITenancyService _tenancySrv;
+    public class ApplicationDbContext : IdentityDbContext<User>
+
+    {
+        private IHttpContextAccessor _httpCtx;
+        private ITenancyService _tenancySrv;
     
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpCtx, ITenancyService tenancySrv)
-        : base(options)
-    {
-        _httpCtx = httpCtx;
-        _tenancySrv = tenancySrv;
-    }
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, IHttpContextAccessor httpCtx, ITenancyService tenancySrv)
+            : base(options)
+        {
+            _httpCtx = httpCtx;
+            _tenancySrv = tenancySrv;
+        }
 
-    // Define tables
-    public DbSet<Appointment> Appointments { get; set; } = default!;
-    public DbSet<Client> Clients { get; set; } = default!;
-    public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
-    public DbSet<ClientRecord> ClientRecords { get; set; } = default!;
-    public DbSet<Clinic> Clinics { get; set; } = default!;
-    public DbSet<ClinicHomepage> ClinicHomepages { get; set; } = default!;
-    public DbSet<Practitioner> Practitioners { get; set; } = default!;
-    public DbSet<Tenancy> Tenancies { get; set; } = default!;
-    public DbSet<Timeslot> Timeslots { get; set; } = default!;
-    public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
-    public DbSet<Treatment> Treatments { get; set; } = default!;
-    public DbSet<Setting> Settings { get; set; } = default!;
-    public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
+        // Define tables
+        public DbSet<Appointment> Appointments { get; set; } = default!;
+        public DbSet<Client> Clients { get; set; } = default!;
+        public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
+        public DbSet<ClientRecord> ClientRecords { get; set; } = default!;
+        public DbSet<Clinic> Clinics { get; set; } = default!;
+        public DbSet<ClinicHomepage> ClinicHomepages { get; set; } = default!;
+        public DbSet<Practitioner> Practitioners { get; set; } = default!;
+        public DbSet<Tenancy> Tenancies { get; set; } = default!;
+        public DbSet<Timeslot> Timeslots { get; set; } = default!;
+        public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
+        public DbSet<Treatment> Treatments { get; set; } = default!;
+        public DbSet<Setting> Settings { get; set; } = default!;
+        public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
     
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        base.OnModelCreating(modelBuilder);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         
-        // Set query filter for tenancy
-        modelBuilder.Entity<HbkBaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
-        modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
+            // Set query filter for tenancy
+            modelBuilder.Entity<HbkBaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
+            modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
         
-        // Manual relationships
-        // Configure one-to-many relationship between Clinic and Practitioner
-        modelBuilder.Entity<Practitioner>()
-            .HasOne(p => p.Clinic)
-            .WithMany(c => c.Practitioners)
-            .HasForeignKey(p => p.ClinicId);
+            // Manual relationships
+            // Configure one-to-many relationship between Clinic and Practitioner
+            modelBuilder.Entity<Practitioner>()
+                .HasOne(p => p.Clinic)
+                .WithMany(c => c.Practitioners)
+                .HasForeignKey(p => p.ClinicId);
 
-        // Configure one-to-one relationship between Clinic and LeadPractitioner
-        modelBuilder.Entity<Clinic>()
-            .HasOne(c => c.LeadPractitioner)
-            .WithOne()
-            .HasForeignKey<Clinic>(c => c.LeadPractitionerId);
+            // Configure one-to-one relationship between Clinic and LeadPractitioner
+            modelBuilder.Entity<Clinic>()
+                .HasOne(c => c.LeadPractitioner)
+                .WithOne()
+                .HasForeignKey<Clinic>(c => c.LeadPractitionerId);
 
-        // Ensure inherited entities are flattened into one table.
-        modelBuilder.Entity<HbkBaseEntity>().UseTpcMappingStrategy();
+            // Ensure inherited entities are flattened into one table.
+            modelBuilder.Entity<HbkBaseEntity>().UseTpcMappingStrategy();
 
-        // All models will have the date created ts.
-        modelBuilder.Entity<HbkBaseEntity>()
-            .Property(b => b.DateCreated)
-            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            // All models will have the date created ts.
+            modelBuilder.Entity<HbkBaseEntity>()
+                .Property(b => b.DateCreated)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-        // Make Id columns auto increment.
-        modelBuilder.UseIdentityAlwaysColumns();
+            // Make Id columns auto increment.
+            modelBuilder.UseIdentityAlwaysColumns();
         
-        // Name tables in snake case.
-        modelBuilder.NameModelEntitiesInSnakeCase();
+            // Name tables in snake case.
+            modelBuilder.NameModelEntitiesInSnakeCase();
         
-        modelBuilder.Entity<User>().ToTable("users");
-        modelBuilder.Entity<IdentityUserToken<string>>().ToTable("user_tokens");
-        modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("user_logins");
-        modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("user_claims");
-        modelBuilder.Entity<IdentityRole>().ToTable("application_roles");
-        modelBuilder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
-        modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
-    }
+            modelBuilder.Entity<User>().ToTable("users");
+            modelBuilder.Entity<IdentityUserToken<string>>().ToTable("user_tokens");
+            modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("user_logins");
+            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("user_claims");
+            modelBuilder.Entity<IdentityRole>().ToTable("application_roles");
+            modelBuilder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
+            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
+        }
 
-    /// <summary>
-    /// Set snake case on other entities.
-    /// </summary>
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Configure logging for database commands
+        /// <summary>
+        /// Set snake case on other entities.
+        /// </summary>
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            // Configure logging for database commands
 //        optionsBuilder.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug)));
-        optionsBuilder.UseSnakeCaseNamingConvention();
-    }
-
-    /// <summary>
-    /// Automatically update DateModified for all entities that inherit from BaseEntity.
-    /// </summary>
-    void UpdateEntries()
-    {
-        ChangeTracker.DetectChanges();
-
-        var modifiedEntries = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Modified);
-        var createdEntries = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Added);
-
-        // is the HTTP context available
-        string? userId = null;
-        if (_httpCtx.HttpContext != null)
-        {
-            userId = _httpCtx.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            optionsBuilder.UseSnakeCaseNamingConvention();
         }
 
-        foreach (var entry in modifiedEntries)
+        /// <summary>
+        /// Automatically update DateModified for all entities that inherit from BaseEntity.
+        /// </summary>
+        void UpdateEntries()
         {
-            if (entry.Entity is HbkBaseEntity entity)
+            ChangeTracker.DetectChanges();
+
+            var modifiedEntries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Modified);
+            var createdEntries = ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added);
+
+            // is the HTTP context available
+            string? userId = null;
+            if (_httpCtx.HttpContext != null)
             {
-                entity.DateModified = DateTime.UtcNow;
-                entity.ModifyActioner =  userId;
+                userId = _httpCtx.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            }
+
+            foreach (var entry in modifiedEntries)
+            {
+                if (entry.Entity is HbkBaseEntity entity)
+                {
+                    entity.DateModified = DateTime.UtcNow;
+                    entity.ModifyActioner =  userId;
+                }
+            }
+            foreach (var entry in createdEntries)
+            {
+                if (entry.Entity is HbkBaseEntity entity)
+                {
+                    entity.CreateActioner =  userId;
+                    entity.TenancyId = _tenancySrv.TenancyId;
+                }
             }
         }
-        foreach (var entry in createdEntries)
-        {
-            if (entry.Entity is HbkBaseEntity entity)
-            {
-                entity.CreateActioner =  userId;
-                entity.TenancyId = _tenancySrv.TenancyId;
-            }
-        }
-    }
 
-    public override int SaveChanges()
-    {
-        UpdateEntries();
-        return base.SaveChanges();
-    }
+        public override int SaveChanges()
+        {
+            UpdateEntries();
+            return base.SaveChanges();
+        }
     
     
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        UpdateEntries();
-        return base.SaveChangesAsync(cancellationToken);
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            UpdateEntries();
+            return base.SaveChangesAsync(cancellationToken);
+        }
     }
 }

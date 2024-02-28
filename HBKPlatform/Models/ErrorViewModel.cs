@@ -1,10 +1,11 @@
-﻿namespace HBKPlatform.Models;
-
-public class ErrorViewModel
+﻿namespace HBKPlatform.Models
 {
-    public string? RequestId { get; set; }
+    public class ErrorViewModel
+    {
+        public string? RequestId { get; set; }
 
-    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
-    public string? ErrorCode { get; set; }
+        public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+        public string? ErrorCode { get; set; }
+    }
 }
 

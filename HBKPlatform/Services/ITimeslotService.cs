@@ -1,8 +1,9 @@
 using HBKPlatform.Database;
 
-namespace HBKPlatform.Services;
-
-public interface ITimeslotService
+namespace HBKPlatform.Services
 {
-    public Task CreateTimeslots(List<Timeslot> timeslots);
+    public interface ITimeslotService
+    {
+        public Task CreateTimeslots(List<Timeslot> timeslots);
+    }
 }

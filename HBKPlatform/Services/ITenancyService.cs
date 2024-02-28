@@ -1,7 +1,8 @@
-namespace HBKPlatform.Services;
-
-public interface ITenancyService
+namespace HBKPlatform.Services
 {
-    public int TenancyId { get; }
-    public void SetTenancyId(int tenancyId);
+    public interface ITenancyService
+    {
+        public int TenancyId { get; }
+        public void SetTenancyId(int tenancyId);
+    }
 }
