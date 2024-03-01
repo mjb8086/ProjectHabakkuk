@@ -1,0 +1,21 @@
+@model List<HBKPlatform.Models.DTO.UserDto>;
+@{
+    ViewData["Title"] = "Auditing";
+    ViewBag.CurrentNav = "Auditing";
+    Layout = "_McpShared";
+}
+
+<h1>Auditing</h1>
+
+<h2>Recent Logins</h2>
+<p>User activity since @DateTime.UtcNow.Subtract(TimeSpan.FromDays(7)).</p>
+
+<div class="table1OuterWrap">
+<table class="table1">
+    <thead class="table1Item"><tr class="table1Item"><td>Email</td> <td>TenancyId</td> <td>Role</td> <td>Login Count</td> <td>LastLogin</td> <td>HasLockout</td> <td>LockoutEnd</td></tr></thead>
+    @foreach (var user in Model)
+    {
+        <tr class="table1Item"><td>@user.UserEmail</td> <td>@user.TenancyId</td> <td>@user.UserRole</td> <td>@user.LoginCount</td> <td>@user.LastLogin</td> <td>@(user.LockoutEnd > DateTime.UtcNow ? "Yes" : "No")</td> <td>@user.LockoutEnd</td></tr>
+    }
+</table>
+</div>

@@ -50,5 +50,10 @@ namespace HBKPlatform.Services.Implementation
             };
         }
 
+        public async Task<List<UserDto>> GetRecentLogins()
+        {
+            return await _mcpRepo.GetRecentLogins();
+        }
+
     }
 }

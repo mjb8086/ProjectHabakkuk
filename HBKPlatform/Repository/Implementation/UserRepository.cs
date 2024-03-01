@@ -1,6 +1,7 @@
 using System.Data;
 using HBKPlatform.Database;
 using HBKPlatform.Globals;
+using HBKPlatform.Models.DTO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -51,7 +52,7 @@ namespace HBKPlatform.Repository.Implementation
 
             await _db.SaveChangesAsync();
         }
-    
+
         /// <summary>
         /// Check all tenancies for a duplicate email. This is required because we use the email to identify the user
         /// and set his tenancy at login.

@@ -148,6 +148,20 @@ namespace HBKPlatform.Repository.Implementation
             return await _db.Practitioners.IgnoreQueryFilters().Include("User").Where(x => x.UserId != null && x.User.LockoutEnabled)
                 .ToDictionaryAsync(x => x.Id, x => new PracDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}", HasLockout = x.User.LockoutEnd > DateTime.UtcNow, LockoutEnd = x.User.LockoutEnd });
         }
+        
+        /// <summary>
+        /// MCP ONLY.
+        /// Get a list of UserDtos with a LastLogin date greater than 1 week ago.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<UserDto>> GetRecentLogins()
+        {
+            var oneWeekAgo = DateTime.UtcNow.Subtract(TimeSpan.FromDays(7));
+            return await _db.Users.IgnoreQueryFilters().Where(x => x.LastLogin.HasValue && x.LastLogin > oneWeekAgo)
+                .OrderBy(x => x.LastLogin)
+                .Select(x => new UserDto(){TenancyId = x.TenancyId, UserEmail = x.Email ?? "", LastLogin = x.LastLogin, UserRole = "TODO", LoginCount = x.LoginCount, LockoutEnd = x.LockoutEnd}).ToListAsync();
+        }
+    
     
     }
 }
