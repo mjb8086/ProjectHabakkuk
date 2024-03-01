@@ -27,6 +27,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.Requi
 // To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
 builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
+// Scoped - created once per HTTP request. Use for database because there may be multiple calls in a web service.
 builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
 builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -42,19 +43,25 @@ builder.Services.AddScoped<TenancyMiddleware>();
 builder.Services.AddScoped<ITenancyService, TenancyService>();
 builder.Services.AddScoped<IMcpRepository, McpRepository>();
 
+// Also use scoped for the cache and user service - both are utilised regularly
+builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISecurityService, SecurityService>();
+
+// Transient - created each time it is required. Use on web services, because they will typically serve one action
+// to the controller.
 builder.Services.AddTransient<IClinicService, ClinicService>();
-builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
-builder.Services.AddTransient<ICacheService, CacheService>();
 builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
 builder.Services.AddTransient<ITreatmentService, TreatmentService>();
 builder.Services.AddTransient<IBookingService, BookingService>();
 builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
-builder.Services.AddTransient<IDateTimeWrapper, DateTimeWrapper>();
 builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
 builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
 builder.Services.AddTransient<IMcpService, McpService>();
-builder.Services.AddTransient<ISecurityService, SecurityService>();
+
+// Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
+builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
 
 /*
 var loggerFactory = LoggerFactory.Create(builder =>
