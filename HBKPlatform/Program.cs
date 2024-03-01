@@ -18,7 +18,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 Console.WriteLine($"NowDoctor Ltd. Presents:\n{Consts.HBK_NAME}\nVersion {Consts.VERSION}. Starting up...");
 
-builder.Services.AddIdentity<User, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddIdentity<User, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Lockout.MaxFailedAccessAttempts = DefaultSettings.LOCKOUT_MAX_ATTEMPTS;
+    })
     .AddRoleManager<RoleManager<IdentityRole>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultUI()

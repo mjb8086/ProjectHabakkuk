@@ -88,7 +88,7 @@ namespace HBKPlatform.Database.Helpers
                         UserName = "outoftime@hillvalley.com",
                         NormalizedUserName = "outoftime@hillvalley.com".ToUpper(),
                         EmailConfirmed = true,
-                        LockoutEnabled = false,
+                        LockoutEnabled = true,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
                         Tenancy = t
@@ -125,7 +125,7 @@ namespace HBKPlatform.Database.Helpers
                             UserName = "another@hillvalley.com",
                             NormalizedUserName = "another@hillvalley.com".ToUpper(),
                             EmailConfirmed = true,
-                            LockoutEnabled = false,
+                            LockoutEnabled = true,
                             PhoneNumber = "0898 333 201",
                             PhoneNumberConfirmed = true,
                             Tenancy = t
@@ -141,7 +141,7 @@ namespace HBKPlatform.Database.Helpers
                         UserName = client1Email,
                         NormalizedUserName = client1Email.ToUpper(),
                         EmailConfirmed = true,
-                        LockoutEnabled = false,
+                        LockoutEnabled = true,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
                         Tenancy = t
@@ -169,7 +169,7 @@ namespace HBKPlatform.Database.Helpers
                         UserName = client2Email,
                         NormalizedUserName = client2Email.ToUpper(),
                         EmailConfirmed = true,
-                        LockoutEnabled = false,
+                        LockoutEnabled = true,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
                         Tenancy = t
@@ -197,7 +197,7 @@ namespace HBKPlatform.Database.Helpers
                         UserName = client3Email,
                         NormalizedUserName = client3Email.ToUpper(),
                         EmailConfirmed = true,
-                        LockoutEnabled = false,
+                        LockoutEnabled = true,
                         PhoneNumber = "98989",
                         PhoneNumberConfirmed = true,
                         Tenancy = t

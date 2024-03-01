@@ -29,7 +29,7 @@ namespace HBKPlatform.Repository.Implementation
         }
 
         /// <summary>
-        /// Lockout for the tenancy User Id. Or, any user if actioned by a Super Admin.
+        /// Permanently Lockout the tenancy User Id. Or, any user if actioned by a Super Admin.
         /// </summary>
         public async Task ToggleLockout(string userId)
         {
@@ -39,6 +39,7 @@ namespace HBKPlatform.Repository.Implementation
             var user = await userQuery.FirstOrDefaultAsync(x => x.Id == userId) 
                        ?? throw new MissingPrimaryKeyException($"Could not find user ID {userId}");
 
+            // Lockout enabled means the user has the *ability* to be locked out. It is not a lockout *toggle*. Ffs.
             if (user.LockoutEnabled)
             {
                 user.LockoutEnabled = false;

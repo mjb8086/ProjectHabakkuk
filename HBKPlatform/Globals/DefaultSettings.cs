@@ -5,6 +5,8 @@ namespace HBKPlatform.Globals
     public struct DefaultSettings
     {
         public const int DEFAULT_PASSWORD_LENGTH = 14;
+        public const bool LOCKOUT_ON_FAILURE = true;
+        public const int LOCKOUT_MAX_ATTEMPTS = 5;
         public const int AVAILABILITY_ADVANCE_WEEKS = 52;
         
         public static readonly Dictionary<string, SettingDto> DefaultSetting = new()

@@ -2,7 +2,6 @@ using HBKPlatform.Database;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Repository;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Services.Implementation
@@ -18,14 +17,16 @@ namespace HBKPlatform.Services.Implementation
     /// </summary>
     public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpContext, IUserRepository _userRepo) : IUserService
     {
+        // TODO: Refactor these into repositories.
+        
         /// <summary>
-        /// use this to set the user's associated prac Id or client Id
+        /// use this to set the user's associated prac Id or client Id, also update last sign in time
         /// used when signing in and set in user claims (cookie)
         /// </summary>
         public async Task<UserDto> GetLoginUserDto(string userId)
         {
             var user = new UserDto();
-            var client = await _db.Clients.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId);    // TODO: Put these in repositories
+            var client = await _db.Clients.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId);    // TODO: Put these in repositories
             Practitioner? prac;
             User? dbUser;
 
@@ -34,25 +35,32 @@ namespace HBKPlatform.Services.Implementation
                 user.ClientId = client.Id;
                 user.ClinicId = client.ClinicId;
                 user.TenancyId = client.TenancyId;
+                client.User.LastLogin = DateTime.UtcNow;
+                client.User.LoginCount++;
             }
-            else if ((prac = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId)) != null)
+            else if ((prac = await _db.Practitioners.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId)) != null)
             {
                 user.PractitionerId = prac.Id;
                 user.ClinicId = prac.ClinicId;
                 user.TenancyId = prac.TenancyId;
+                prac.User.LastLogin = DateTime.UtcNow;
+                prac.User.LoginCount++;
             }
             else if((dbUser = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == userId)) != null) // user has neither client or prac entity, get tenancyId from user entity
             {
                 user.TenancyId = dbUser.TenancyId;
+                dbUser.LastLogin = DateTime.UtcNow;
+                dbUser.LoginCount++;
             }
 
+            await _db.SaveChangesAsync();
             return user;
         }
     
         private async Task<string> GetPracUserId(int pracId)
         {
             var client = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == pracId);
-            if (string.IsNullOrWhiteSpace(client.UserId))
+            if (client == null || string.IsNullOrWhiteSpace(client.UserId))
             {
                 throw new NullReferenceException("UserID is null");
             }

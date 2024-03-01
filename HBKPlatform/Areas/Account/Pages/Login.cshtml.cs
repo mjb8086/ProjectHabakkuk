@@ -5,6 +5,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using HBKPlatform.Database;
+using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -78,8 +79,7 @@ namespace HBKPlatform.Areas.Account.Pages
                     ModelState.AddModelError(string.Empty, "User doesn't exist.");
                     return Page();
                 }
-                // TODO: enable lockout?
-                var result = await signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: false);
+                var result = await signInManager.CheckPasswordSignInAsync(user, Input.Password, lockoutOnFailure: DefaultSettings.LOCKOUT_ON_FAILURE);
                 if (result.Succeeded)
                 {
                     var userDto = await userService.GetLoginUserDto(user.Id);
