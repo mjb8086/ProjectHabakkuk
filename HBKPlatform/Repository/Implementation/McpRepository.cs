@@ -92,7 +92,7 @@ namespace HBKPlatform.Repository.Implementation
                 UserName = clinic.LeadPracEmail,
                 NormalizedUserName = clinic.LeadPracEmail.ToUpper(),
                 EmailConfirmed = true,
-                LockoutEnabled = false,
+                LockoutEnabled = true,
                 PhoneNumber = "",
                 PhoneNumberConfirmed = true,
                 Tenancy = tenancy
@@ -143,10 +143,10 @@ namespace HBKPlatform.Repository.Implementation
                 .Select(x => new PracDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}"}).ToListAsync();
         }
 
-        public async Task<Dictionary<int, bool>> GetPracLockoutStatusDict(int clinicId)
+        public async Task<Dictionary<int, PracDetailsUac>> GetPracLockoutStatusDict(int clinicId)
         {
-            return await _db.Practitioners.IgnoreQueryFilters().Include("User").Where(x => x.UserId != null)
-                .ToDictionaryAsync(x => x.Id, x => x.User.LockoutEnabled);
+            return await _db.Practitioners.IgnoreQueryFilters().Include("User").Where(x => x.UserId != null && x.User.LockoutEnabled)
+                .ToDictionaryAsync(x => x.Id, x => new PracDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}", HasLockout = x.User.LockoutEnd > DateTime.UtcNow, LockoutEnd = x.User.LockoutEnd });
         }
     
     }

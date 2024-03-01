@@ -19,6 +19,7 @@ namespace HBKPlatform.Models.DTO
     public class PracDetailsUac : PracDetailsLite
     {
         public bool HasLockout { get; set; } 
+        public DateTimeOffset? LockoutEnd { get; set; }
     }
 
     public struct ClientRecordLite

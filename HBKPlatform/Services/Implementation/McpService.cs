@@ -42,14 +42,7 @@ namespace HBKPlatform.Services.Implementation
 
         public async Task<ClinicPracs> GetClinicPracs(int clinicId)
         {
-            var lockoutDict = await _mcpRepo.GetPracLockoutStatusDict(clinicId);
-            var pracDetailsUac = new Dictionary<int, PracDetailsUac>();
-        
-            foreach (var prac in (await _mcpRepo.GetClinicPracs(clinicId)))
-            {
-                prac.HasLockout = lockoutDict[prac.Id];
-                pracDetailsUac.Add(prac.Id, prac);
-            }
+            var pracDetailsUac = await _mcpRepo.GetPracLockoutStatusDict(clinicId);
         
             return new ClinicPracs()
             {

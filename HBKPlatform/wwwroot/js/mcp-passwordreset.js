@@ -9,6 +9,7 @@ $(document).ready(function () {
     const csel = $("#clinicSelect");
     const psel = $("#pracSelect");
     const ls = $("#lockoutStatus");
+    const le = $("#lockoutEnd");
     
     // Functions
     function updatePracList(myPracData) {
@@ -34,10 +35,12 @@ $(document).ready(function () {
         console.log(`FOUND: ${JSON.stringify(pracData[pracId])}`);
        if(pracData[pracId].hasLockout) {
             ls.text("Lockout");
+            le.text(pracData[pracId].lockoutEnd);
             ls.removeClass('active');
             ls.addClass('inactive');
        } else {
             ls.text("Unlocked (Active)");
+            le.text("")
             ls.removeClass('inactive');
             ls.addClass('active');
         }

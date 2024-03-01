@@ -26,7 +26,7 @@ namespace HBKPlatform.Services.Implementation
         {
             var client = await _db.Clients.FirstAsync(x => x.Id == clientId);
             var prac = await _db.Practitioners.FirstAsync(x => x.Id == pracId);
-            return client.ClinicId == prac.ClinicId;
+            return client.ClinicId == prac.ClinicId && client.TenancyId == prac.TenancyId;
         }
 
         public async Task<InboxModel> GetInboxModel()

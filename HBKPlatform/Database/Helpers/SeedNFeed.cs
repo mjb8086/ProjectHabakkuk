@@ -245,6 +245,7 @@ namespace HBKPlatform.Database.Helpers
                     var roles = new List<IdentityUserRole<string>>
                     {
                         new () { UserId = user1.Id, RoleId = pracRole.Id },
+                        new () { UserId = prac2.User.Id, RoleId = pracRole.Id },
                         new () { UserId = client1User.Id, RoleId = clientRole.Id },
                         new () { UserId = client2User.Id, RoleId = clientRole.Id },
                         new () { UserId = superUser.Id, RoleId = superAdminRole.Id }

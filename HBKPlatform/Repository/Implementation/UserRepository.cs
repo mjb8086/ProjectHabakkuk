@@ -40,15 +40,13 @@ namespace HBKPlatform.Repository.Implementation
                        ?? throw new MissingPrimaryKeyException($"Could not find user ID {userId}");
 
             // Lockout enabled means the user has the *ability* to be locked out. It is not a lockout *toggle*. Ffs.
-            if (user.LockoutEnabled)
+            if (user.LockoutEnabled && (!user.LockoutEnd.HasValue || user.LockoutEnd < DateTime.UtcNow))
             {
-                user.LockoutEnabled = false;
-                user.LockoutEnd = new DateTimeOffset(DateTime.UtcNow.Subtract(new TimeSpan(365, 0, 0, 0)));
-            }
-            else
-            {
-                user.LockoutEnabled = true;
                 user.LockoutEnd = new DateTimeOffset(DateTime.UtcNow.AddYears(100));
+            }
+            else if(user.LockoutEnabled)
+            {
+                user.LockoutEnd = new DateTimeOffset(DateTime.UtcNow.Subtract(new TimeSpan(365, 0, 0, 0)));
             }
 
             await _db.SaveChangesAsync();

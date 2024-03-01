@@ -73,7 +73,7 @@ namespace HBKPlatform.Repository.Implementation
                     UserName = client.Email,
                     NormalizedUserName = client.Email.ToUpper(),
                     EmailConfirmed = true,
-                    LockoutEnabled = false,
+                    LockoutEnabled = true,
                     PhoneNumber = client.Telephone,
                     PhoneNumberConfirmed = true,
                     TenancyId = _tenancySrv.TenancyId

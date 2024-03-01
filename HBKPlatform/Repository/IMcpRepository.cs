@@ -11,6 +11,6 @@ namespace HBKPlatform.Repository
         public Task UpdateClinicDetails(ClinicDto clinic);
         public Task<Tenancy> RegisterClinic(ClinicRegistrationDto clinic);
         public Task<List<PracDetailsUac>> GetClinicPracs(int clinicId);
-        public Task<Dictionary<int, bool>> GetPracLockoutStatusDict(int clinicId);
+        public Task<Dictionary<int, PracDetailsUac>> GetPracLockoutStatusDict(int clinicId);
     }
 }
