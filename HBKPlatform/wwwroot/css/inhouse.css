@@ -154,8 +154,8 @@ div#hbkFlasherMessage {
 
 /* generic table styles */
 
-div#table1Wrap {
-    max-width: 650px;
+div#table1Wrap, div.table1Wrap {
+    max-width: 850px;
     background-color: #fdf9f9;
     padding: 10px;
     border-radius: 5px;
@@ -170,6 +170,28 @@ div.table1Item {
     border-bottom: 1px solid #d7d7d7;
 }
 
+div.table1OuterWrap { /* fix padding on table1 table */
+    background-color: #fdf9f9;
+    padding: 10px;
+    border-radius: 5px;
+    display: inline-block;
+}
+
+table.table1 {
+    max-width: 900px;
+    background-color: #fdf9f9;
+    border-collapse: collapse;
+}
+
+tr.table1Item, thead.table1Item {
+    border-bottom: 1px solid #d7d7d7;
+}
+thead.table1Item {
+    font-weight: bold;
+}
+ tr.table1Item td {
+     padding: 5px;
+ }
 
 /* Home  - TODO breakout! */
 div#homeContainer {

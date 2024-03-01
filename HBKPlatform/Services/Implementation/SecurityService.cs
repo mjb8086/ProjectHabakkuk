@@ -12,7 +12,7 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class SecurityService(ApplicationDbContext _db, ITenancyService _tenancy,IMemoryCache _memoryCache) : ISecurityService
+    public class SecurityService(ApplicationDbContext _db, ITenancyService _tenancy, IMemoryCache _memoryCache) : ISecurityService
     {
         // Security service - all entries expire after 1 hour
         private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromHours(1));
@@ -39,5 +39,6 @@ namespace HBKPlatform.Services.Implementation
         {
             _memoryCache.Remove($"ClientPracMap-t{TenancyId}");
         }
+        
     }
 }

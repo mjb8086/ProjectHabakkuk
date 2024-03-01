@@ -39,9 +39,11 @@ builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<ISettingRepository, SettingRepository>();
 builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<TenancyMiddleware>();
 builder.Services.AddScoped<ITenancyService, TenancyService>();
 builder.Services.AddScoped<IMcpRepository, McpRepository>();
+
+builder.Services.AddScoped<TenancyMiddleware>();
+builder.Services.AddScoped<CentralScrutinizerMiddleware>();
 
 // Also use scoped for the cache and user service - both are utilised regularly
 builder.Services.AddScoped<ICacheService, CacheService>();
@@ -62,6 +64,7 @@ builder.Services.AddTransient<IMcpService, McpService>();
 
 // Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
 builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
+builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
 /*
 var loggerFactory = LoggerFactory.Create(builder =>
@@ -110,7 +113,10 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// Register middleware
 app.UseMiddleware<TenancyMiddleware>();
+app.UseMiddleware<CentralScrutinizerMiddleware>();
 
 app.UseAuthorization();
 

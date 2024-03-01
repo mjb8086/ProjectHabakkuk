@@ -1,4 +1,4 @@
-
+@model Dictionary<string, HBKPlatform.Models.ActiveUser>;
 @{
     ViewData["Title"] = "Auditing";
     ViewBag.CurrentNav = "Auditing";
@@ -8,8 +8,16 @@
 <h1>Auditing</h1>
 
 <h2>Who Is Online?</h2>
-<div id="table1Wrap">
-    <div class="table1Item">Not yet implemented</div>
+<p>All users active in the last hour.</p>
+
+<div class="table1OuterWrap">
+<table class="table1">
+    <thead class="table1Item"><tr class="table1Item"><td>Email</td> <td>TenancyId</td> <td>Role</td> <td>Path</td> <td>LastActive</td> </tr></thead>
+    @foreach (var id in Model.Keys)
+    {
+        <tr class="table1Item"><td>@Model[id].UserEmail</td> <td>@Model[id].TenancyId</td> <td>@Model[id].UserRole</td> <td>@Model[id].Path</td> <td>@Model[id].LastActionTime</td></tr>
+    }
+</table>
 </div>
 
-<p>Total users online:</p>
+<p>Total users online: @Model.Count</p>

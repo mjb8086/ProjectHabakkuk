@@ -13,7 +13,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
     /// © 2024 NowDoctor Ltd.
     /// </summary>
     [Area("MCP"), Authorize(Roles="SuperAdmin")]
-    public class AuditingController(ICacheService _cacheService) : Controller
+    public class AuditingController(ICacheService _cacheService, ICentralScrutinizerService _centralScrutinizerService) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -22,7 +22,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
     
         public async Task<IActionResult> WhoIsOnline()
         {
-            return View();
+            return View(_centralScrutinizerService.GetActive());
         }
 
         public IActionResult ClearCache()
