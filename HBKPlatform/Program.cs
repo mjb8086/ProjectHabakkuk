@@ -77,14 +77,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         )
     );
 
-var loggerFactory = LoggerFactory.Create(lbuilder =>
+builder.Services.AddLogging(lb =>
 {
-    lbuilder.AddConsole();
-    lbuilder.AddConfiguration(builder.Configuration.GetRequiredSection("Logging"));
+    lb.AddConfiguration(builder.Configuration.GetSection("Logging"));
+    lb.AddFile(o => o.RootPath = builder.Environment.ContentRootPath);
+//    lb.AddFile<InfoFileLoggerProvider>(configure: o => o.RootPath = AppContext.BaseDirectory);
 });
-
-// Enable Npgsql native logging to console so we can actually see parameters.
-NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory, parameterLoggingEnabled: true);
 
 // Routing config - enable lowercase URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -97,6 +95,14 @@ var mvcBuilder = builder.Services.AddRazorPages();
 if (builder.Environment.IsDevelopment())
 {
     mvcBuilder.AddRazorRuntimeCompilation();
+    
+    // Enable Npgsql native logging to console so we can actually see parameters.
+    var loggerFactory = LoggerFactory.Create(lbuilder =>
+    {
+        lbuilder.AddConsole();
+        lbuilder.AddConfiguration(builder.Configuration.GetRequiredSection("Logging"));
+    });
+    NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory, parameterLoggingEnabled: true);
 }
 
 // END builder, create the webapp instance...
@@ -127,7 +133,14 @@ app.MapControllerRoute( name: "default", pattern: "{controller=Home}/{action=Ind
 app.MapRazorPages();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment()) // configure production
+if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
+{
+    app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
+    app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
+        string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
+    
+}
+else // configure production
 {
     app.UseStatusCodePagesWithReExecute("/Home/Error", "?statusCode={0}");
     app.UseExceptionHandler("/Home/Error");
@@ -135,12 +148,17 @@ if (!app.Environment.IsDevelopment()) // configure production
     app.UseHsts();
     builder.WebHost.UseUrls("http://*:80", "https://*.443");
 }
-else // configure for dev environment, enable all routes listing
+
+await using (ServiceProvider sp = builder.Services.BuildServiceProvider())
 {
-    app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
-    app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
-        string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
+    // create logger
+    ILogger<Program> logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger<Program>();
+
+    logger.LogTrace("This is a trace message. Should be discarded.");
+    logger.LogDebug("This is a debug message. Should be discarded.");
+    logger.LogInformation("This is an info message. Should go into 'info.log' only.");
+    logger.LogWarning("This is a warning message. Should go into 'warn+err.log' only.");
+    logger.LogError("This is an error message. Should go into 'warn+err.log' only.");
+    logger.LogCritical("This is a critical message. Should go into 'warn+err.log' only.");
 }
-
-
 app.Run();
