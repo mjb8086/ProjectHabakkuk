@@ -1,6 +1,7 @@
 using HBKPlatform.Areas.Account;
 using HBKPlatform.Database;
 using HBKPlatform.Database.Helpers;
+using HBKPlatform.Extensions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Middleware;
@@ -77,11 +78,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         )
     );
 
+// Logging - mostly configured in appsettings.json
 builder.Services.AddLogging(lb =>
 {
     lb.AddConfiguration(builder.Configuration.GetSection("Logging"));
     lb.AddFile(o => o.RootPath = builder.Environment.ContentRootPath);
-//    lb.AddFile<InfoFileLoggerProvider>(configure: o => o.RootPath = AppContext.BaseDirectory);
+    lb.AddFile<InfoFileLoggerProvider>(configure: o => o.RootPath = builder.Environment.ContentRootPath);
 });
 
 // Routing config - enable lowercase URLs
@@ -153,12 +155,6 @@ await using (ServiceProvider sp = builder.Services.BuildServiceProvider())
 {
     // create logger
     ILogger<Program> logger = sp.GetRequiredService<ILoggerFactory>().CreateLogger<Program>();
-
-    logger.LogTrace("This is a trace message. Should be discarded.");
-    logger.LogDebug("This is a debug message. Should be discarded.");
-    logger.LogInformation("This is an info message. Should go into 'info.log' only.");
-    logger.LogWarning("This is a warning message. Should go into 'warn+err.log' only.");
-    logger.LogError("This is an error message. Should go into 'warn+err.log' only.");
-    logger.LogCritical("This is a critical message. Should go into 'warn+err.log' only.");
+    logger.LogInformation("HBKPlatform startup complete.");
 }
 app.Run();
