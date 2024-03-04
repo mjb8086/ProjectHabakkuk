@@ -8,6 +8,9 @@ namespace HBKPlatform.Globals
         public const bool LOCKOUT_ON_FAILURE = true;
         public const int LOCKOUT_MAX_ATTEMPTS = 5;
         public const int AVAILABILITY_ADVANCE_WEEKS = 52;
+
+        public const string LOG_ROOT_PROD = "/var/log/";
+        public const string LOG_ROOT_LOCAL = "./log/";
         
         public static readonly Dictionary<string, SettingDto> DefaultSetting = new()
         {

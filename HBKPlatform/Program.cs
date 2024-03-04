@@ -8,7 +8,7 @@ using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
-
+using Karambolo.Extensions.Logging.File;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -70,25 +70,20 @@ builder.Services.AddTransient<IMcpService, McpService>();
 builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
 builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
-/*
-var loggerFactory = LoggerFactory.Create(builder =>
-{
-    builder
-        .AddFilter((category, level) =>
-            category == DbLoggerCategory.Database.Command.Name
-            && level == LogLevel.Information)
-        .AddConsole();
-});
-*/
-
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(
-                builder.Configuration.GetConnectionString("HbkContext") ??
-                throw new InvalidOperationException("Connection string is invalid.")
-            )//.UseLoggerFactory(loggerFactory)
+            builder.Configuration.GetConnectionString("HbkContext") ??
+            throw new InvalidOperationException("Connection string is invalid.")
+        )
     );
 
-var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+var loggerFactory = LoggerFactory.Create(lbuilder =>
+{
+    lbuilder.AddConsole();
+    lbuilder.AddConfiguration(builder.Configuration.GetRequiredSection("Logging"));
+});
+
+// Enable Npgsql native logging to console so we can actually see parameters.
 NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory, parameterLoggingEnabled: true);
 
 // Routing config - enable lowercase URLs
