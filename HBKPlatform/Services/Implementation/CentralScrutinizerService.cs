@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Security.Claims;
 using HBKPlatform.Models;
 
@@ -26,19 +27,25 @@ namespace HBKPlatform.Services.Implementation;
 /// </summary>
 public class CentralScrutinizerService : ICentralScrutinizerService
 {
-    private Dictionary<string, ActiveUser> _activeUsers = new();
+    private ConcurrentDictionary<string, ActiveUser> _activeUsers = new();
     private TimeSpan LAST_ACTION_SPAN = TimeSpan.FromHours(1);
 
     public void PruneActiveUsers()
     {
-        foreach ( var s in _activeUsers.Where(kv => kv.Value.LastActionTime < DateTime.UtcNow.Subtract(LAST_ACTION_SPAN)).ToList() ) {
-            _activeUsers.Remove(s.Key);
+        foreach (var s in _activeUsers.Where(kv => kv.Value.LastActionTime < DateTime.UtcNow.Subtract(LAST_ACTION_SPAN)).ToList() )
+        {
+            _activeUsers.TryRemove(s);
         }
     }
 
-    public Dictionary<string, ActiveUser> GetActive()
+    public ConcurrentDictionary<string, ActiveUser> GetActive()
     {
         return _activeUsers;
+    }
+
+    public int GetActiveCount()
+    {
+        return _activeUsers.Count;
     }
 
     public void RecordAction(HttpContext context)

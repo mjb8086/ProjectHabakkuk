@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using HBKPlatform.Models;
 
 namespace HBKPlatform.Services;
@@ -5,6 +6,7 @@ namespace HBKPlatform.Services;
 public interface ICentralScrutinizerService
 {
     public void PruneActiveUsers();
-    public Dictionary<string, ActiveUser> GetActive();
+    public ConcurrentDictionary<string, ActiveUser> GetActive();
+    public int GetActiveCount();
     public void RecordAction(HttpContext context);
 }
