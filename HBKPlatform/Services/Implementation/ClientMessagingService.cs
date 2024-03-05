@@ -1,6 +1,8 @@
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Models;
 using HBKPlatform.Repository;
+using MissingFieldException = System.MissingFieldException;
 
 namespace HBKPlatform.Services.Implementation
 {
@@ -37,13 +39,13 @@ namespace HBKPlatform.Services.Implementation
                }
                else
                {
-                    throw new InvalidOperationException("Message data is incomplete.");
+                    throw new MissingFieldException("Message data is incomplete.");
                }
 
                // Check that the users are part of the same clinic
                if (!(await _clinicService.VerifyClientAndPracClinicMembership(clientId, pracId)))
                {
-                    throw new InvalidOperationException("Client and practitioner are not members of the same clinic.");
+                    throw new InvalidUserOperationException("Client and practitioner are not members of the same clinic.");
                }
 
                // if that's okay, clean it and then save it.

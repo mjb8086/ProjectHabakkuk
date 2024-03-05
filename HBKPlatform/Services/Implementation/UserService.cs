@@ -62,7 +62,7 @@ namespace HBKPlatform.Services.Implementation
             var client = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == pracId);
             if (client == null || string.IsNullOrWhiteSpace(client.UserId))
             {
-                throw new NullReferenceException("UserID is null");
+                throw new MissingMemberException("UserID is null");
             }
             return client.UserId;
         }

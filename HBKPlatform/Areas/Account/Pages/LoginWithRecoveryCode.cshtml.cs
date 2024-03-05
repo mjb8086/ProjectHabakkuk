@@ -4,6 +4,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -46,7 +47,7 @@ namespace HBKPlatform.Areas.Account.Pages
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new IdxNotFoundException($"Unable to load two-factor authentication user.");
             }
 
             ReturnUrl = returnUrl;
@@ -64,7 +65,7 @@ namespace HBKPlatform.Areas.Account.Pages
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
             {
-                throw new InvalidOperationException($"Unable to load two-factor authentication user.");
+                throw new IdxNotFoundException($"Unable to load two-factor authentication user.");
             }
 
             var recoveryCode = Input.RecoveryCode.Replace(" ", string.Empty);

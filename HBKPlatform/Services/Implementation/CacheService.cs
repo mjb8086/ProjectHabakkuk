@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
@@ -40,7 +41,7 @@ namespace HBKPlatform.Services.Implementation
         
             var clinic = _db.Clinics.FirstOrDefault(x => x.Id == clinicId);
             if (clinic == null || !clinic.LeadPractitionerId.HasValue) 
-                throw new KeyNotFoundException($"No practitioner for clinicId {clinicId} exists");
+                throw new IdxNotFoundException($"No practitioner for clinicId {clinicId} exists");
             _memoryCache.Set(key, clinic.LeadPractitionerId.Value, CacheEntryOptions);
             return clinic.LeadPractitionerId.Value;
         }
@@ -51,7 +52,7 @@ namespace HBKPlatform.Services.Implementation
             if (_memoryCache.TryGetValue(key, out PracDetailsLite pracDetails)) return pracDetails;
 
             var prac = _db.Practitioners.FirstOrDefault(x => x.Id == pracId);
-            if (prac == null) throw new KeyNotFoundException($"No practitioner of id {pracId} exists");
+            if (prac == null) throw new IdxNotFoundException($"No practitioner of id {pracId} exists");
         
             pracDetails = new PracDetailsLite()
                 { Id = prac.Id, Name = $"{prac.Forename} {prac.Surname}", ClinicId = prac.ClinicId };
@@ -70,7 +71,7 @@ namespace HBKPlatform.Services.Implementation
             if (_memoryCache.TryGetValue(key, out ClientDetailsLite clientDetails)) return clientDetails;
 
             var client = _db.Clients.FirstOrDefault(x => x.Id == clientId);
-            if (client == null) throw new KeyNotFoundException($"No client of id {clientId} exists");
+            if (client == null) throw new IdxNotFoundException($"No client of id {clientId} exists");
         
             clientDetails = new ClientDetailsLite()
                 { Id = client.Id, Name = $"{client.Forename} {client.Surname}", ClinicId = client.ClinicId };

@@ -29,6 +29,15 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
     .AddDefaultUI()
     .AddDefaultTokenProviders();
 
+
+// Logging - mostly configured in appsettings.json
+builder.Services.AddLogging(lb =>
+{
+    lb.AddConfiguration(builder.Configuration.GetSection("Logging"));
+    lb.AddFile(o => o.RootPath = builder.Environment.ContentRootPath);
+    lb.AddFile<InfoFileLoggerProvider>(configure: o => o.RootPath = builder.Environment.ContentRootPath);
+});
+
 // To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
 builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
@@ -78,14 +87,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
         )
     );
 
-// Logging - mostly configured in appsettings.json
-builder.Services.AddLogging(lb =>
-{
-    lb.AddConfiguration(builder.Configuration.GetSection("Logging"));
-    lb.AddFile(o => o.RootPath = builder.Environment.ContentRootPath);
-    lb.AddFile<InfoFileLoggerProvider>(configure: o => o.RootPath = builder.Environment.ContentRootPath);
-});
-
 // Routing config - enable lowercase URLs
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -113,7 +114,6 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-
     await SeedNFeed.Initialise(services, new PasswordHasher<User>());
 }
 

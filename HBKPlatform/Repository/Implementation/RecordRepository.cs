@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<FullClientRecordDto> GetRecord(int recordId)
         {
             return await _db.ClientRecords.Where(x => x.Id == recordId).Select(x =>  SelectDto(x))
-                .AsNoTracking().FirstOrDefaultAsync() ?? throw new InvalidOperationException($"Record Id {recordId} not found.");
+                .AsNoTracking().FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Record Id {recordId} not found.");
         }
 
         public async Task<List<ClientRecordLite>> GetClientRecordsLite(int clientId)
@@ -32,7 +33,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<FullClientRecordDto> UpdateRecord(FullClientRecordDto recordDto)
         {
             var dbRecord = await _db.ClientRecords.FirstOrDefaultAsync(x => x.Id == recordDto.Id) ?? 
-                           throw new InvalidOperationException($"Record Id {recordDto.Id} not found.");
+                           throw new IdxNotFoundException($"Record Id {recordDto.Id} not found.");
             dbRecord.Title = recordDto.Title;
             dbRecord.NoteBody = recordDto.NoteBody;
             dbRecord.RecordVisibility = recordDto.Visibility;
@@ -44,7 +45,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<FullClientRecordDto> UpdateRecordLite(UpdateRecordLite recordDto)
         {
             var dbRecord = await _db.ClientRecords.FirstOrDefaultAsync(x => x.Id == recordDto.Id) ?? 
-                           throw new InvalidOperationException($"Record Id {recordDto.Id} not found.");
+                           throw new IdxNotFoundException($"Record Id {recordDto.Id} not found.");
             dbRecord.Title = recordDto.NoteTitle;
             dbRecord.NoteBody = recordDto.NoteBody;
             await _db.SaveChangesAsync();

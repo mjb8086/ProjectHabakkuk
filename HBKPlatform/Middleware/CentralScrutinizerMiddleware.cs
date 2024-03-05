@@ -1,3 +1,4 @@
+using HBKPlatform.Exceptions;
 using HBKPlatform.Services;
 
 namespace HBKPlatform.Middleware;
@@ -15,8 +16,24 @@ public class CentralScrutinizerMiddleware (ICentralScrutinizerService _centralSc
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        // Update service with the user's action
         _centralScrutinizer.RecordAction(context);
+        
         await next(context);
+        // If any exceptions are thrown while processing the request, log them.
+            /*
+        catch (HbkException ex)
+        {
+            _logger.LogError(ex, ex.Message);
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, ex.Message);
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            throw;
+        }
+        */
     }
     
 }

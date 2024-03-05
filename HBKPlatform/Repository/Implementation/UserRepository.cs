@@ -1,5 +1,6 @@
 using System.Data;
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using Microsoft.AspNetCore.Identity;
@@ -18,7 +19,7 @@ namespace HBKPlatform.Repository.Implementation
                 _db.Users.IgnoreQueryFilters() : _db.Users;
             
             var user = await userQuery.FirstOrDefaultAsync(x => x.Id == userId) 
-                       ?? throw new MissingPrimaryKeyException($"Could not find user ID {userId}");
+                       ?? throw new IdxNotFoundException($"Could not find user ID {userId}");
         
             var pwdGen = new PasswordGenerator.Password(DefaultSettings.DEFAULT_PASSWORD_LENGTH);
             var pwd = pwdGen.Next();
@@ -38,7 +39,7 @@ namespace HBKPlatform.Repository.Implementation
                 _db.Users.IgnoreQueryFilters() : _db.Users;
         
             var user = await userQuery.FirstOrDefaultAsync(x => x.Id == userId) 
-                       ?? throw new MissingPrimaryKeyException($"Could not find user ID {userId}");
+                       ?? throw new IdxNotFoundException($"Could not find user ID {userId}");
 
             // Lockout enabled means the user has the *ability* to be locked out. It is not a lockout *toggle*. Ffs.
             if (user.LockoutEnabled && (!user.LockoutEnd.HasValue || user.LockoutEnd < DateTime.UtcNow))

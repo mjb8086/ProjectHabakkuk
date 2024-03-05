@@ -50,7 +50,7 @@ namespace HBKPlatform.Services.Implementation
                 };
             }
 
-            throw new InvalidOperationException("Missing data");
+            throw new MissingFieldException("Record Id or client ID missing.");
         }
 
         public async Task<FullClientRecordDto> CreateRecord(ClientRecordDto recordDto)

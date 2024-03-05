@@ -1,4 +1,5 @@
 using System.Data;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
@@ -82,7 +83,7 @@ namespace HBKPlatform.Services.Implementation
                 };
             }
 
-            throw new MissingPrimaryKeyException($"Treatment ID {treatmentId} does not exist or cannot be booked.");
+            throw new IdxNotFoundException($"Treatment ID {treatmentId} does not exist or cannot be booked.");
         }
 
         private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
@@ -223,7 +224,7 @@ namespace HBKPlatform.Services.Implementation
         
             if (!treatments.TryGetValue(treatmentId, out var treatment) || (!clientId.HasValue && treatment.Requestability == Enums.TreatmentRequestability.PracOnly))
             {
-                throw new Exception($"TreatmentId {treatmentId} does not exist or cannot be booked.");
+                throw new IdxNotFoundException($"TreatmentId {treatmentId} does not exist or cannot be booked.");
             }
         
             var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
@@ -263,13 +264,13 @@ namespace HBKPlatform.Services.Implementation
             // first check for no clashes
             if (await ClashCheckSingle(timeslotId, pracId, weekNum))
             {
-                throw new InvalidOperationException("Another appointment has already been booked into the timeslot.");
+                throw new InvalidUserOperationException("Another appointment has already been booked into the timeslot.");
             }
 
             var treatments = await _cacheService.GetTreatments();
             if (!treatments.TryGetValue(treatmentId, out var treatment) || (isClientAction && treatment.Requestability == Enums.TreatmentRequestability.PracOnly))
             {
-                throw new Exception($"TreatmentId {treatmentId} does not exist or cannot be booked.");
+                throw new IdxNotFoundException($"TreatmentId {treatmentId} does not exist or cannot be booked.");
             }
         
             // all clear? then create the booking
@@ -284,7 +285,7 @@ namespace HBKPlatform.Services.Implementation
             catch (Exception e)
             {
                 // todo: log exact exception
-                throw new InvalidOperationException("Problem when creating booking. Please try again.");
+                throw new InvalidUserOperationException("Problem when creating booking. Please try again.");
             }
 
             // todo: notify, email

@@ -31,7 +31,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
         public async Task<IActionResult> DoUpdateClinic(int clinicId, [FromForm] ClinicDto model)
         {
             model.Id = clinicId;
-            if (!ModelState.IsValid) throw new Exception("Model Bad");
+            if (!ModelState.IsValid) throw new MissingFieldException("Model Bad");
             await _mcpService.UpdateClinic(model);
             return RedirectToRoute(new { controller = "ClinicManagement", action = "ViewClinic", clinicId=clinicId });
         }
@@ -54,7 +54,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
         [HttpPost]
         public async Task<IActionResult> DoRegisterClinic([FromForm] ClinicRegistrationDto model)
         {
-            if (!ModelState.IsValid) throw new Exception("Model Bad");
+            if (!ModelState.IsValid) throw new MissingFieldException("Model Bad");
             await _mcpService.RegisterClinic(model);
             TempData["Message"] = "Successfully registered new clinic and created lead practitioner user.";
             return RedirectToRoute(new { controller = "ClinicManagement", action = "ListClinics" });
@@ -63,7 +63,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
         [HttpPost]
         public async Task<IActionResult> DoUacAction([FromForm] UacRequest model)
         {
-            if (!ModelState.IsValid) throw new Exception("Someone set us up the model");
+            if (!ModelState.IsValid) throw new MissingFieldException("Someone set us up the model");
             await _userService.DoUacAction(model);
             TempData["Message"] = $"Successfully completed action {model.Action}.";
             return RedirectToRoute(new { controller = "ClinicManagement", action = "PasswordReset" });
