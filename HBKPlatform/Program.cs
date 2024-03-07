@@ -1,3 +1,9 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
+using Npgsql;
+using Serilog;
+
 using HBKPlatform.Areas.Account;
 using HBKPlatform.Database;
 using HBKPlatform.Database.Helpers;
@@ -8,23 +14,24 @@ using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-
-using Npgsql;
-using Serilog;
+using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .WriteTo.Console()
-    .CreateLogger();
+    .CreateBootstrapLogger();
 
-// BEGIN Builder.
 try
 {
+    // BEGIN Builder.
     var builder = WebApplication.CreateBuilder(args);
+    builder.Host.UseSerilog((context, services, configuration) => configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
 
     Console.WriteLine($"NowDoctor Ltd. Presents:\n{Consts.HBK_NAME}\nVersion {Consts.VERSION}. Starting up...");
-
+    
     builder.Services.AddIdentity<User, IdentityRole>(options =>
         {
             options.SignIn.RequireConfirmedAccount = false;
@@ -35,12 +42,10 @@ try
         .AddDefaultUI()
         .AddDefaultTokenProviders();
 
-    builder.Host.UseSerilog();
-
-// To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
+    // To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
     builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
-// Scoped - created once per HTTP request. Use for database because there may be multiple calls in a web service.
+    // Scoped - created once per HTTP request. Use for database because there may be multiple calls in a web service.
     builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
     builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
     builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -58,13 +63,13 @@ try
     builder.Services.AddScoped<TenancyMiddleware>();
     builder.Services.AddScoped<CentralScrutinizerMiddleware>();
 
-// Also use scoped for the cache and user service - both are utilised regularly
+    // Also use scoped for the cache and user service - both are utilised regularly
     builder.Services.AddScoped<ICacheService, CacheService>();
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<ISecurityService, SecurityService>();
 
-// Transient - created each time it is required. Use on web services, because they will typically serve one action
-// to the controller.
+    // Transient - created each time it is required. Use on web services, because they will typically serve one action
+    // to the controller.
     builder.Services.AddTransient<IClinicService, ClinicService>();
     builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
     builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
@@ -75,7 +80,7 @@ try
     builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
     builder.Services.AddTransient<IMcpService, McpService>();
 
-// Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
+    // Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
     builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
     builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
@@ -86,10 +91,10 @@ try
         )
     );
 
-// Routing config - enable lowercase URLs
+    // Routing config - enable lowercase URLs
     builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
-// Add services to the container.
+    // Add services to the container.
     builder.Services.AddControllersWithViews();
 
     var mvcBuilder = builder.Services.AddRazorPages();
@@ -103,8 +108,9 @@ try
         NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory, parameterLoggingEnabled: true);
     }
 
-// END builder, create the webapp instance...
+    // END builder, create the webapp instance...
     var app = builder.Build();
+    
 
     using (var scope = app.Services.CreateScope())
     {
@@ -114,9 +120,10 @@ try
 
     app.UseHttpsRedirection();
     app.UseStaticFiles();
+    app.UseSerilogRequestLogging();
     app.UseRouting();
 
-// Register middleware
+    // Register middleware
     app.UseMiddleware<TenancyMiddleware>();
     app.UseMiddleware<CentralScrutinizerMiddleware>();
 
@@ -129,7 +136,7 @@ try
 
     app.MapRazorPages();
 
-// Configure the HTTP request pipeline.
+    // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
     {
         app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
