@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
@@ -42,7 +43,7 @@ namespace HBKPlatform.Repository.Implementation
                 StreetAddress = x.StreetAddress,
                 LeadPracFullName  = $"{x.LeadPractitioner.Title} {x.LeadPractitioner.Forename} {x.LeadPractitioner.Surname}",
                 LeadPractitionerId = x.LeadPractitionerId.HasValue ? x.LeadPractitionerId.Value : -1  // Enforce integrity elsewhere
-            }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException($"Could not find clinic ID {clinicIdx}");
+            }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Could not find clinic ID {clinicIdx}");
         }
 
         public async Task<List<ClinicDetailsLite>> GetClinicDetailsLite()
@@ -53,7 +54,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task UpdateClinicDetails(ClinicDto clinic)
         {
             var dbClinic = await _db.Clinics.IgnoreQueryFilters().Include("Tenancy").FirstOrDefaultAsync(x => x.Id == clinic.Id) ??
-                           throw new KeyNotFoundException($"Could not find clinic ID {clinic.Id}");
+                           throw new IdxNotFoundException($"Could not find clinic ID {clinic.Id}");
             dbClinic.Tenancy.OrgName = clinic.OrgName;
             dbClinic.Tenancy.OrgTagline = clinic.OrgTagline;
             dbClinic.Telephone = clinic.Telephone;
@@ -66,7 +67,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<Tenancy> RegisterClinic(ClinicRegistrationDto clinic)
         {
             if (await _userRepo.IsEmailInUse(clinic.LeadPracEmail)) 
-                throw new InvalidOperationException("Email address already in use");
+                throw new InvalidUserOperationException("Email address already in use");
 
             var saTenancyId = _tenancySrv.TenancyId;
         

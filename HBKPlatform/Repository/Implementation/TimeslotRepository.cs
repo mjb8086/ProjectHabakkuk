@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,7 +24,7 @@ namespace HBKPlatform.Repository.Implementation
                 Duration = x.Duration,
                 Day = x.Day,
                 Time = x.Time
-            }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Could not find timeslot Id");
+            }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException("Could not find timeslot Id");
         }
 
         public async Task<List<TimeslotDto>> GetClinicTimeslots()

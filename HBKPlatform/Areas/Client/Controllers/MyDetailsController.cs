@@ -25,7 +25,7 @@ namespace HBKPlatform.Areas.Client.Controllers
         [HttpPost]
         public async Task<IActionResult> DoEditDetails([FromForm] ClientDto client)
         {
-            if (!ModelState.IsValid) throw new Exception("Model bad");
+            if (!ModelState.IsValid) throw new MissingFieldException();
             await _cdSrv.UpdateClientDetailsAsClient(client);
             TempData["Message"] = "Successfully updated your details";
             return RedirectToRoute(new { controller = "MyDetails", action = "Index" });

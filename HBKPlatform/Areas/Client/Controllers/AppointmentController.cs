@@ -56,7 +56,7 @@ namespace HBKPlatform.Areas.Client.Controllers
         [Route("booking/docancel")]
         public async Task<IActionResult> DoCancelBooking([FromQuery] int appointmentId, [FromForm] CancelAppointmentFormModel model)
         {
-            if (!ModelState.IsValid) throw new Exception("Model bad");
+            if (!ModelState.IsValid) throw new MissingFieldException("Model bad");
             await _bookingService.DoCancelBooking(appointmentId, model.Reason, Enums.AppointmentStatus.CancelledByClient);
             TempData["Message"] = "Successfully cancelled booking";
             return RedirectToRoute(new { controller = "Appointment", action = "Index" });

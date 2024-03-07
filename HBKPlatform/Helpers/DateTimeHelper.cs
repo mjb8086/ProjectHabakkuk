@@ -1,6 +1,6 @@
-using System.Runtime.InteropServices.JavaScript;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Exceptions;
 
 namespace HBKPlatform.Helpers
 {
@@ -20,12 +20,12 @@ namespace HBKPlatform.Helpers
         /// Uses either the timeslotDto's weekNum or the explicit weekNum, with the explicit weekNum
         /// taking priority in the calculation.
         /// </summary>
-        /// <exception cref="InvalidOperationException"></exception>
+        /// <exception cref="InvalidUserOperationException"></exception>
         public static DateTime FromTimeslot(string dbStartDate, TimeslotDto timeslot, int? weekNum = null)
         {
             if (string.IsNullOrEmpty(dbStartDate) || timeslot == null || (weekNum == null && timeslot.WeekNum < 1) || weekNum.HasValue && weekNum.Value < 1)
             {
-                throw new InvalidOperationException("Inadequate parameters to produce DateTime.");
+                throw new InvalidUserOperationException("Inadequate parameters to produce DateTime.");
             }
 
             // subtract 1 from weekNum to account for the first week being week 1 (origin)
@@ -44,7 +44,7 @@ namespace HBKPlatform.Helpers
         {
             if (string.IsNullOrEmpty(dbStartDate) || dateTime == DateTime.MinValue)
             {
-                throw new InvalidOperationException("Invalid parameters to produce WeekNum");
+                throw new InvalidUserOperationException("Invalid parameters to produce WeekNum");
             }
             // add 1 to account for week 1
             return ((int)Math.Floor((dateTime - DateTime.Parse(dbStartDate)).TotalDays) / 7) + 1;
@@ -57,7 +57,7 @@ namespace HBKPlatform.Helpers
         {
             if (DateTime.Parse(dbStartDate).DayOfWeek != DayOfWeek.Monday)
             {
-                throw new Exception("Database start date is not a Monday");
+                throw new InvalidConfigException("Database start date is not a Monday");
             }
         }
 

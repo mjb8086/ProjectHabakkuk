@@ -1,7 +1,9 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using MissingFieldException = System.MissingFieldException;
 
 namespace HBKPlatform.Repository.Implementation
 {
@@ -26,7 +28,7 @@ namespace HBKPlatform.Repository.Implementation
                 Cost = x.Cost,
                 Requestability = x.TreatmentRequestability,
                 Img = x.Img
-            }).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Could not find treatment Id");
+            }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException("Could not find treatment Id");
         }
     
         public async Task<List<TreatmentLite>> GetClinicTreatments(bool clientOnly)
@@ -55,9 +57,9 @@ namespace HBKPlatform.Repository.Implementation
     
         public async Task UpdateTreatment(TreatmentDto treatmentDto)
         {
-            if (treatmentDto == null) throw new InvalidOperationException("Treatment missing, cannot proceed.");
+            if (treatmentDto == null) throw new MissingFieldException("Treatment missing, cannot proceed.");
             var treatment = await _db.Treatments.FirstOrDefaultAsync(x => x.Id == treatmentDto.Id) ??
-                            throw new InvalidOperationException($"Treatment {treatmentDto.Id} does not exist.");
+                            throw new IdxNotFoundException($"Treatment {treatmentDto.Id} does not exist.");
             treatment.Title = treatmentDto.Title;
             treatment.Description = treatmentDto.Description;
             treatment.Cost = treatmentDto.Cost;

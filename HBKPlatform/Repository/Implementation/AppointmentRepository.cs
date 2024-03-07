@@ -1,5 +1,6 @@
 using System.Data;
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
@@ -37,7 +38,7 @@ namespace HBKPlatform.Repository.Implementation
             return await _db.Appointments.Where(x => x.Id == appointmentId).Select(x => new AppointmentDto()
             {
                 Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId
-            }).AsNoTracking().FirstOrDefaultAsync() ?? throw new InvalidOperationException($"Appointment Id {appointmentId} not found.");
+            }).AsNoTracking().FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Appointment Id {appointmentId} not found.");
         }
 
         public async Task<List<AppointmentDto>> GetAppointmentsForClient(int clientId)
@@ -94,14 +95,14 @@ namespace HBKPlatform.Repository.Implementation
         {
             // is appointment already cancelled?
             var appointment = await _db.Appointments.Include("Timeslot").FirstOrDefaultAsync(x => x.Id == appointmentId) ??
-                              throw new MissingPrimaryKeyException($"Appointment ID {appointmentId} does not exist.");
+                              throw new IdxNotFoundException($"Appointment ID {appointmentId} does not exist.");
 
             if (appointment.Status != Enums.AppointmentStatus.Live)
-                throw new InvalidOperationException("Appointment is already cancelled.");
+                throw new InvalidUserOperationException("Appointment is already cancelled.");
         
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             if (DateTimeHelper.FromTimeslot(dbStartDate, TimeslotDto.FromDbTimeslot(appointment.Timeslot), appointment.WeekNum) < DateTime.UtcNow)
-                throw new InvalidOperationException("Cannot cancel appointments in the past.");
+                throw new InvalidUserOperationException("Cannot cancel appointments in the past.");
 
             // if not, update appointment to be cancelled and append reason
             appointment.Status = cancelActioner;

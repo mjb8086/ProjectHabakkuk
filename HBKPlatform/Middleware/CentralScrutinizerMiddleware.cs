@@ -1,3 +1,5 @@
+using HBKPlatform.Exceptions;
+using HBKPlatform.Extensions;
 using HBKPlatform.Services;
 
 namespace HBKPlatform.Middleware;
@@ -15,8 +17,18 @@ public class CentralScrutinizerMiddleware (ICentralScrutinizerService _centralSc
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        // Update service with the user's action
         _centralScrutinizer.RecordAction(context);
-        await next(context);
+
+        // Format exceptions - use when logging to file
+        try
+        {
+            await next(context);
+        }
+        catch (Exception ex)
+        {
+            throw new HbkException(LogFormatterExtensions.FormatException(ex));
+        }
     }
     
 }

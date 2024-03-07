@@ -1,9 +1,11 @@
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MyND;
 using HBKPlatform.Repository;
+using MissingMemberException = System.MissingMemberException;
 
 namespace HBKPlatform.Services.Implementation
 {
@@ -37,7 +39,7 @@ namespace HBKPlatform.Services.Implementation
             
             if (weekNum < currentWeek || weekNum > currentWeek + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
             {
-                throw new InvalidOperationException("Week number out of permitted range.");
+                throw new InvalidUserOperationException("Week number out of permitted range.");
             }
             
             var dateRangeStr = currentWeek == weekNum
@@ -81,8 +83,8 @@ namespace HBKPlatform.Services.Implementation
         /// </summary>
         public Dictionary<Enums.Day, List<AvailabilityLite>> BuildAvaLiteDict(List<TimeslotDto> allTimeslots)
         {
-            if (_currentAvailability == null) throw new NullReferenceException("Current availability is not populated.");
-            if (_indefiniteAvailability == null) throw new NullReferenceException("Indefinite availability is not populated.");
+            if (_currentAvailability == null) throw new MissingMemberException("Current availability is not populated.");
+            if (_indefiniteAvailability == null) throw new MissingMemberException("Indefinite availability is not populated.");
             var dailyTimeslotLookup = new Dictionary<Enums.Day, List<AvailabilityLite>>();
             foreach (var day in new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday})
             {
@@ -140,7 +142,7 @@ namespace HBKPlatform.Services.Implementation
             // Check week number is in range
             if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
             {
-                throw new InvalidOperationException("Week number out of permitted range.");
+                throw new InvalidUserOperationException("Week number out of permitted range.");
             }
             await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, model.Updated);
         }
@@ -154,7 +156,7 @@ namespace HBKPlatform.Services.Implementation
             // Check week number is in range
             if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
             {
-                throw new InvalidOperationException("Week number out of permitted range.");
+                throw new InvalidUserOperationException("Week number out of permitted range.");
             }
             await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId);
         }

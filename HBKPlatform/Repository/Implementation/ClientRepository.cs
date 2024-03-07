@@ -1,5 +1,6 @@
 using System.Data;
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
@@ -37,7 +38,7 @@ namespace HBKPlatform.Repository.Implementation
                     Telephone = x.Telephone,
                     HasUserAccount = !string.IsNullOrWhiteSpace(x.UserId)
                 }
-            ).FirstOrDefault() ?? throw new MissingPrimaryKeyException($"Could not find client ID {clientId}");
+            ).FirstOrDefault() ?? throw new IdxNotFoundException($"Could not find client ID {clientId}");
         }
 
         public async Task<List<ClientDetailsLite>> GetLiteDetails()
@@ -65,7 +66,7 @@ namespace HBKPlatform.Repository.Implementation
         
             if (willHaveUser)
             {
-                if (await _userRepo.IsEmailInUse(client.Email)) throw new InvalidOperationException("Email address already in use");
+                if (await _userRepo.IsEmailInUse(client.Email)) throw new InvalidUserOperationException("Email address already in use");
                 var user = new User()
                 {
                     Email = client.Email,
@@ -97,7 +98,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task Update(ClientDto client)
         {
             var dbClient = await _db.Clients.Include("User").FirstOrDefaultAsync(x => client.Id == x.Id) 
-                           ?? throw new KeyNotFoundException($"ClientID {client.Id} not found.");
+                           ?? throw new IdxNotFoundException($"ClientID {client.Id} not found.");
             dbClient.Title = client.Title;
             dbClient.Forename = client.Forename;
             dbClient.Surname = client.Surname;
@@ -109,7 +110,7 @@ namespace HBKPlatform.Repository.Implementation
 
             if (!(string.IsNullOrEmpty(dbClient.UserId) || string.IsNullOrEmpty(client.Email)))
             {
-                if (await _userRepo.IsEmailInUse(client.Email, dbClient.User.Email)) throw new InvalidOperationException("Email address already in use");
+                if (await _userRepo.IsEmailInUse(client.Email, dbClient.User.Email)) throw new InvalidUserOperationException("Email address already in use");
                 dbClient.User.Email = client.Email;
             }
         
