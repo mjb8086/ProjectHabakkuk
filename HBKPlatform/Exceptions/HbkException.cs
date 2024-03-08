@@ -18,6 +18,7 @@ public class HbkException: Exception
 
 /// <summary>
 /// Throw when a user performs an invalid operation, e.g. an out of range value is supplied.
+/// NOTE: currently shadowed and overriden by the native exception... unnecessary?
 /// </summary>
 public class InvalidUserOperationException : HbkException
 {
@@ -58,6 +59,7 @@ public class InvalidConfigException : HbkException
 
 /// <summary>
 /// Throw when an essential member of a class is null.
+/// NOTE: currently shadowed and overriden by the native exception... unnecessary?
 /// </summary>
 public class MissingMemberException : HbkException
 {

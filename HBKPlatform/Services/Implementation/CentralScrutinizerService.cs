@@ -48,6 +48,12 @@ public class CentralScrutinizerService : ICentralScrutinizerService
         return _activeUsers.Count;
     }
 
+    public void RemoveUser(HttpContext context)
+    {
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null) _activeUsers.TryRemove(userId, out _);
+    }
+
     public void RecordAction(HttpContext context)
     {
         var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
