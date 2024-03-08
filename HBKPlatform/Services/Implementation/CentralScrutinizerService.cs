@@ -25,16 +25,17 @@ namespace HBKPlatform.Services.Implementation;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class CentralScrutinizerService : ICentralScrutinizerService
+public class CentralScrutinizerService(ILogger<CentralScrutinizerService> _logger) : ICentralScrutinizerService
 {
     private ConcurrentDictionary<string, ActiveUser> _activeUsers = new();
-    private TimeSpan LAST_ACTION_SPAN = TimeSpan.FromHours(1);
+    private TimeSpan LAST_ACTION_SPAN = TimeSpan.FromMinutes(1);
 
     public void PruneActiveUsers()
     {
+        _logger.LogInformation("Pruning active users dictionary.");
         foreach (var s in _activeUsers.Where(kv => kv.Value.LastActionTime < DateTime.UtcNow.Subtract(LAST_ACTION_SPAN)).ToList() )
         {
-            _activeUsers.TryRemove(s);
+            _activeUsers.TryRemove(s.Key, out _);
         }
     }
 

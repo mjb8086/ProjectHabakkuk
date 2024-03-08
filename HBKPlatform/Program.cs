@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using Npgsql;
 using Serilog;
+using Serilog.Events;
+using Hangfire;
+using Hangfire.PostgreSql;
 
 using HBKPlatform.Areas.Account;
 using HBKPlatform.Database;
@@ -14,7 +16,6 @@ using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
-using Serilog.Events;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -84,34 +85,57 @@ try
     builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
     builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseNpgsql(
-            builder.Configuration.GetConnectionString("HbkContext") ??
-            throw new InvalidOperationException("Connection string is invalid.")
-        )
-    );
+    if (builder.Environment.IsDevelopment()) {
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("HbkContext") ??
+                    throw new InvalidOperationException("Connection string is invalid.") );
+                options.EnableSensitiveDataLogging();
+            }
+        );
+    }
+    else
+    {
+        builder.Services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("HbkContext") ??
+                    throw new InvalidOperationException("Connection string is invalid.") );
+            }
+        );
+    }
 
     // Routing config - enable lowercase URLs
     builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
+    
+    // Add Hangfire services.
+    builder.Services.AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UsePostgreSqlStorage(x =>
+        {
+            x.UseNpgsqlConnection(builder.Configuration.GetConnectionString("HangfireConnection"));
+        }));
 
+    // Add the processing server as IHostedService
+    builder.Services.AddHangfireServer();
+    
     var mvcBuilder = builder.Services.AddRazorPages();
 
     if (builder.Environment.IsDevelopment())
     {
         mvcBuilder.AddRazorRuntimeCompilation();
-
-        // Enable Npgsql native logging to console so we can actually see parameters.
-        var loggerFactory = new LoggerFactory().AddSerilog(Log.Logger);
-        NpgsqlLoggingConfiguration.InitializeLogging(loggerFactory, parameterLoggingEnabled: true);
     }
 
     // END builder, create the webapp instance...
     var app = builder.Build();
     
-
+    // Seed DB with sample data and admin user if necessary.
     using (var scope = app.Services.CreateScope())
     {
         var services = scope.ServiceProvider;
@@ -142,7 +166,6 @@ try
         app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
         app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
             string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
-
     }
     else // configure production
     {
@@ -152,10 +175,14 @@ try
         app.UseHsts();
         builder.WebHost.UseUrls("http://*:80", "https://*.443");
     }
-
+    
     Log.Information("HBKPlatform startup complete.");
 
     app.Run();
+    
+    // Register background tasks.
+    RecurringJob.AddOrUpdate<ICentralScrutinizerService>("pruneactive", css => css.PruneActiveUsers(), "*/2 * * * *");
+
 }
 catch (Exception ex)
 {

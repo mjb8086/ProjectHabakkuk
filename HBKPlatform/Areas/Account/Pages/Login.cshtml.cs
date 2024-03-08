@@ -39,7 +39,7 @@ namespace HBKPlatform.Areas.Account.Pages
             [DataType(DataType.Password)]
             public string Password { get; set; }
 
-            [Display(Name = "Remember me?")] // I'm the one who stole your baby - Tame Impala
+            [Display(Name = "Remember me?")] // Tame Impala
             public bool RememberMe { get; set; }
         }
 
