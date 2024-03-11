@@ -32,7 +32,7 @@ public class CentralScrutinizerService(ILogger<CentralScrutinizerService> _logge
 
     public void PruneActiveUsers()
     {
-        _logger.LogInformation("Pruning active users dictionary.");
+        _logger.LogInformation($"Pruning active users dictionary. Current size: {_activeUsers.Count}");
         foreach (var s in _activeUsers.Where(kv => kv.Value.LastActionTime < DateTime.UtcNow.Subtract(LAST_ACTION_SPAN)).ToList() )
         {
             _activeUsers.TryRemove(s.Key, out _);

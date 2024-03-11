@@ -24,7 +24,12 @@ namespace HBKPlatform.Services.Implementation
         private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
         private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
     
-        private async Task<List<TimeslotDto>> GetTimeslotsForBooking()
+        /// <summary>
+        /// Get a list of timeslots in the future, from this week day until the upper bound of the BookingAdvanceWeeks
+        /// value. Each Ts DTO will have its weekNum field populated.
+        /// Timeslots returned from this method do not exclude unavailable - we don't know the conditions just yet!
+        /// </summary>
+        private async Task<List<TimeslotDto>> GetPopulatedFutureTimeslots()
         {
             var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
@@ -70,8 +75,8 @@ namespace HBKPlatform.Services.Implementation
             var treatments = await _cacheService.GetTreatments();
             var pracId = _cacheService.GetLeadPracId(clinicId);
         
-            var availableTs =  await GetTimeslotsForBooking();
-            availableTs = (await ClashCheck(availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            var availableTs =  await GetPopulatedFutureTimeslots();
+            availableTs = (await FilterOutUnsuitableTimeslots(availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
             if (treatments.TryGetValue(treatmentId, out var treatment) && treatment.Requestability == Enums.TreatmentRequestability.ClientAndPrac) // security filter
             {
@@ -86,9 +91,13 @@ namespace HBKPlatform.Services.Implementation
             throw new IdxNotFoundException($"Treatment ID {treatmentId} does not exist or cannot be booked.");
         }
 
-        private async Task<List<TimeslotDto>> ClashCheck(List<TimeslotDto> timeslots, int pracId)
+        /// <summary>
+        /// Takes a list of timeslots and returns only those available to book with the specified practitioner
+        /// </summary>
+        private async Task<List<TimeslotDto>> FilterOutUnsuitableTimeslots(List<TimeslotDto> timeslots, int pracId)
         {
-            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
+            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now);
+            // populate lookups for IsAvailable check
             _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
             _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(pracId);
         
@@ -103,7 +112,7 @@ namespace HBKPlatform.Services.Implementation
         /// Check whether the timeslot is free for the practitioner.
         /// </summary>
         /// <returns>TRUE - timeslot clashes with another appointment, or is set to unavailable.</returns>
-        private async Task<bool> ClashCheckSingle(int timeslotId, int pracId, int weekNum)
+        private async Task<bool> ClashCheck(int timeslotId, int pracId, int weekNum)
         {
             var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
             _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
@@ -132,7 +141,7 @@ namespace HBKPlatform.Services.Implementation
         private bool IsAvailable(int weekNum, int tsId)
         {
             // first check definite (weekly) timeslots
-            TimeslotAvailabilityDto weekAva;
+            TimeslotAvailabilityDto? weekAva;
             if ((weekAva = _weeklyAvaLookup.FirstOrDefault(y => y.WeekNum == weekNum && y.TimeslotId == tsId)) != null)
             {
                 return weekAva.Availability == Enums.TimeslotAvailability.Available;
@@ -262,7 +271,7 @@ namespace HBKPlatform.Services.Implementation
         private async Task<BookingConfirm> DoBooking(int timeslotId, int pracId, int weekNum, int clientId, int treatmentId, bool isClientAction)
         {
             // first check for no clashes
-            if (await ClashCheckSingle(timeslotId, pracId, weekNum))
+            if (await ClashCheck(timeslotId, pracId, weekNum))
             {
                 throw new InvalidUserOperationException("Another appointment has already been booked into the timeslot.");
             }
@@ -311,8 +320,8 @@ namespace HBKPlatform.Services.Implementation
         
             var treatments = await _cacheService.GetTreatments();
             var clients = await _cacheService.GetClinicClientDetailsLite();
-            var timeslots = await GetTimeslotsForBooking();
-            timeslots = (await ClashCheck(timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            var timeslots = await GetPopulatedFutureTimeslots();
+            timeslots = (await FilterOutUnsuitableTimeslots(timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
             var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
             var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);

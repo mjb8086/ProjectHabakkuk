@@ -106,12 +106,14 @@ namespace HBKPlatform.Helpers
     public interface IDateTimeWrapper
     {
         /// <summary>
-        /// Silly wrapper but saves massive headaches whilst unit testing...
+        /// Silly wrapper but saves massive headaches whilst unit testing. Returns the same value as DateTime.Now
         /// </summary>
-        public DateTime Now
-        {
-            get { return DateTime.Now; }
-        }
+        public DateTime Now => DateTime.Now;
+
+        /// <summary>
+        /// Returns the same value as DateTime.UtcNow
+        /// </summary>
+        public DateTime UtcNow => DateTime.UtcNow;
     }
 
     public class DateTimeWrapper : IDateTimeWrapper {}

@@ -37,8 +37,6 @@ namespace HBKPlatform.Models.DTO
 
         public bool IsClash(TimeslotDto other)
         {
-//        if (other.WeekNum == this.WeekNum && other.Day == this.Day && other.Time == this.Time) return true;
-//        if (other.WeekNum == 0 || this.WeekNum == 0) return true; // not strictly a clash but still bad
             return (other.WeekNum == this.WeekNum && other.Day == this.Day &&
                     (this.Time < other.Time.AddMinutes(other.Duration) &&
                      this.Time.AddMinutes(this.Duration) > other.Time));
@@ -47,6 +45,19 @@ namespace HBKPlatform.Models.DTO
         public bool IsNotClashAny(List<TimeslotDto> others)
         {
             return !others.Any(x => x.IsClash(this));
+        }
+        
+        /// <summary>
+        /// this better bloody work, wtf is a sealed class?
+        /// </summary>
+        public bool Equals(TimeslotDto y)
+        {
+            var x = this;
+            if (ReferenceEquals(x, y)) return true;
+            if (ReferenceEquals(x, null)) return false;
+            if (ReferenceEquals(y, null)) return false;
+            if (x.GetType() != y.GetType()) return false;
+            return x.Id == y.Id && x.Description == y.Description && x.ClinicId == y.ClinicId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
         }
 
         private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>

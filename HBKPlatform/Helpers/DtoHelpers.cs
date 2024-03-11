@@ -2,7 +2,7 @@ using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Helpers
 {
-    public class DtoHelpers
+    public static class DtoHelpers
     {
         public static List<TimeslotLite> ConvertTimeslotsToLite(string dbStartDate, List<TimeslotDto> timeslots)
         {
@@ -36,5 +36,24 @@ namespace HBKPlatform.Helpers
 
             return lites;
         }
+
+        /// <summary>
+        /// Expensive operation - duplicates a source and target, iterates all members and ensures they are identical.
+        /// Intended for unit tests, does not compare all members - only the essentials.
+        /// </summary>
+        public static bool CompareTsList(this List<TimeslotDto> source, List<TimeslotDto> target)
+        {
+            if (source.Count != target.Count) return false;
+            
+            var orderedSource = source.OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            var orderedTarget = target.OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            
+            for (int i=0; i< orderedSource.Count; i++)
+            {
+                if(!orderedTarget[i].Equals(orderedSource[i])) return false;
+            }
+            return true;
+        }
+        
     }
 }
