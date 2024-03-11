@@ -181,7 +181,7 @@ try
     app.Run();
     
     // Register background tasks.
-    RecurringJob.AddOrUpdate<ICentralScrutinizerService>("pruneactive", css => css.PruneActiveUsers(), "*/2 * * * *");
+    RecurringJob.AddOrUpdate<ICentralScrutinizerService>("pruneactive", css => css.PruneActiveUsers(), "1 * * * *");
 
 }
 catch (Exception ex)

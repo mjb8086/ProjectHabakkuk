@@ -28,7 +28,7 @@ namespace HBKPlatform.Services.Implementation;
 public class CentralScrutinizerService(ILogger<CentralScrutinizerService> _logger) : ICentralScrutinizerService
 {
     private ConcurrentDictionary<string, ActiveUser> _activeUsers = new();
-    private TimeSpan LAST_ACTION_SPAN = TimeSpan.FromMinutes(1);
+    private TimeSpan LAST_ACTION_SPAN = TimeSpan.FromMinutes(60);
 
     public void PruneActiveUsers()
     {
