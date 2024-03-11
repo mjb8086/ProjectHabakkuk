@@ -58,13 +58,20 @@ namespace HBK.Test
             }
             return timeslots;
         }
+        
 
         /// <summary>
-        /// check that the timeslots returned are expected - first, all in the next two weeks
+        /// check that the timeslots returned are expected - first, all in the next two weeks when there are no
+        /// appointments, then some other cases.
+        /// Nice and even because it assumes today is the first hour of the first day in the set of timeslots
         /// </summary>
-        [Fact]
-        public async Task GetTimeslotsForBookingTest_1()
+        [Theory]
+        [InlineData(new [] {3,4}, "2", "2024-01-15 12:00")]
+        [InlineData(new [] {3,4,5,6}, "4", "2024-01-15 12:00")]
+        [InlineData(new [] {1}, "1", "2024-01-01 12:00")]
+        public async Task GetTimeslotsClientView_ReturnsExpectedTimeslots(int[] weekNums, string advanceWeeks, string dtString)
         {
+            var now = DateTime.Parse(dtString);
             // Arrange
             var timeslotList = GenerateTimeslots(12, 15, DEFAULT_DURATION);
             
@@ -78,12 +85,12 @@ namespace HBK.Test
             
             mockTimeslotRepo.Setup(x => x.GetClinicTimeslots()).ReturnsAsync(timeslotList);
             mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate")).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
-            mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = "2"});
-            mockDateTimeHelper.Setup(x => x.Now).Returns(new DateTime(2024, 01, 15, 12, 00, 00));
+            mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = advanceWeeks});
+            mockDateTimeHelper.Setup(x => x.Now).Returns(now);
             mockUserService.Setup(x => x.GetClaimFromCookie("ClinicId")).Returns(FAKE_CLINIC_ID);
             mockCacheService.Setup(x => x.GetLeadPracId(FAKE_CLINIC_ID)).Returns(FAKE_PRAC_ID);
             mockCacheService.Setup(x => x.GetTreatments()).ReturnsAsync(FAKE_TREATMENTS);
-            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, new[] { 3, 4 }))
+            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, weekNums))
                 .ReturnsAsync(new List<TimeslotAvailabilityDto>()); 
             // Return empty availability for this test - a missing availability value for any week is reckoned as available
             mockAvaRepo.Setup(x => x.GetAvailabilityLookupForIndef(FAKE_PRAC_ID))
@@ -98,10 +105,57 @@ namespace HBK.Test
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
             
             // Assert
-            var expected = GenerateTimeslots(12, 15, DEFAULT_DURATION, 3);
-            expected.AddRange(GenerateTimeslots(12, 15, DEFAULT_DURATION, 4));
+            var expected = new List<TimeslotDto>();
+            foreach (var weekNum in weekNums)
+            {
+                expected.AddRange(GenerateTimeslots(12, 15, DEFAULT_DURATION, weekNum));
+            }
             
             Assert.True(timeslots.CompareTsList(expected));
+        }
+        
+        [Theory]
+        [InlineData(new [] {3,4}, "2", "2024-01-15 12:00", "2024-01-15 12:00", "2024-01-15 12:00", 322)]
+        public async Task GetTimeslotsClientView_BoundsCheck(int[] weekNums, string advanceWeeks, string dtString, string firstTs, string lastTs, int expectedTsCount)
+        {
+            var now = DateTime.Parse(dtString);
+            // Arrange
+            var timeslotList = GenerateTimeslots(09, 18, 30);
+            
+            var mockTimeslotRepo = new Mock<ITimeslotRepository>();
+            var mockConfigService = new Mock<IConfigurationService>();
+            var mockDateTimeHelper = new Mock<IDateTimeWrapper>();
+            var mockUserService = new Mock<IUserService>();
+            var mockCacheService = new Mock<ICacheService>();
+            var mockAvaRepo = new Mock<IAvailabilityRepository>();
+            var mockApptRepo = new Mock<IAppointmentRepository>();
+            
+            mockTimeslotRepo.Setup(x => x.GetClinicTimeslots()).ReturnsAsync(timeslotList);
+            mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate")).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
+            mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = advanceWeeks});
+            mockDateTimeHelper.Setup(x => x.Now).Returns(now);
+            mockUserService.Setup(x => x.GetClaimFromCookie("ClinicId")).Returns(FAKE_CLINIC_ID);
+            mockCacheService.Setup(x => x.GetLeadPracId(FAKE_CLINIC_ID)).Returns(FAKE_PRAC_ID);
+            mockCacheService.Setup(x => x.GetTreatments()).ReturnsAsync(FAKE_TREATMENTS);
+            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, weekNums))
+                .ReturnsAsync(new List<TimeslotAvailabilityDto>()); 
+            // Return empty availability for this test - a missing availability value for any week is reckoned as available
+            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForIndef(FAKE_PRAC_ID))
+                .ReturnsAsync(new Dictionary<int, TimeslotAvailabilityDto>());
+            mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRAC_ID, mockDateTimeHelper.Object.Now))
+                .ReturnsAsync(new List<AppointmentDto>());
+
+            // Instantiate booking service
+            var bookingService = new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object);
+            
+            // Act
+            var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
+            
+            // Assert
+            var actualTsCount = timeslots.Count; 
+            Assert.Equal(expectedTsCount, actualTsCount);
+            
+            // Create timeslots from InlineData.
         }
         
         // then with some appointments already booked - ensure those slots are not available
