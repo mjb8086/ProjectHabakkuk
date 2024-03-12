@@ -1,3 +1,4 @@
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
@@ -136,7 +137,7 @@ namespace HBK.Test
                 Time = new TimeOnly(14, 00)
             };
         
-            Assert.Throws<InvalidOperationException>(() => DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot));
+            Assert.Throws<InvalidUserOperationException>(() => DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot));
         }
     
         /*

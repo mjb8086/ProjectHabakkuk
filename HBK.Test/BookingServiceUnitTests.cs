@@ -52,20 +52,19 @@ namespace HBK.Test
                 {
                     var newTs = new TimeslotDto()
                     {
-                        Id = id, Day = day, Time = time, Duration = duration, WeekNum = weekNum, 
+                        Id = id++, Day = day, Time = time, Duration = duration, WeekNum = weekNum, 
                     };
                     if(weekNum > 0) newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(DB_START_DATE, newTs));
                     timeslots.Add(newTs);
-                    
                     time = time.AddMinutes(duration);
-                    id++;
                 }
             }
             return timeslots;
         }
 
         // Save the repetition...
-        public BookingService GetMockedBookingService(List<TimeslotDto> timeslotList, string advanceWeeks, DateTime now, int[]? weekNums = null)
+        public BookingService GetMockedBookingService(List<TimeslotDto> timeslotList, string advanceWeeks, DateTime now, 
+            List<AppointmentDto> appointments, Dictionary<int, TimeslotAvailabilityDto> indefAvailability, int[]? weekNums = null)
         {
             var mockTimeslotRepo = new Mock<ITimeslotRepository>();
             var mockConfigService = new Mock<IConfigurationService>();
@@ -92,11 +91,11 @@ namespace HBK.Test
                 mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, It.IsAny<int[]>()))
                     .ReturnsAsync(new List<TimeslotAvailabilityDto>());
             }
-            // Return empty availability for this test - a missing availability value for any week is reckoned as available
+            // Return empty availability when not specified - a missing availability value for any week is reckoned as available
             mockAvaRepo.Setup(x => x.GetAvailabilityLookupForIndef(FAKE_PRAC_ID))
-                .ReturnsAsync(new Dictionary<int, TimeslotAvailabilityDto>());
+                .ReturnsAsync(indefAvailability);
             mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRAC_ID, mockDateTimeHelper.Object.Now))
-                .ReturnsAsync(new List<AppointmentDto>());
+                .ReturnsAsync(appointments);
 
             return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object);
         }
@@ -122,7 +121,7 @@ namespace HBK.Test
             var timeslotList = GenerateTimeslots(12, 15, DEFAULT_DURATION);
             
             // Instantiate booking service
-            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, weekNums);
+            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, new List<AppointmentDto>(), new Dictionary<int, TimeslotAvailabilityDto>(), weekNums);
             
             // Act
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
@@ -158,7 +157,7 @@ namespace HBK.Test
             var timeslotList = GenerateTimeslots(09, 18, 30);
             
             // Instantiate booking service
-            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, null);
+            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, new List<AppointmentDto>(), new Dictionary<int, TimeslotAvailabilityDto>(), null);
             
             // Act
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
@@ -177,9 +176,93 @@ namespace HBK.Test
             Assert.Equal(DateTime.Parse(expectedLastTs), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslots[^1]));
         }
         
-        // then with some appointments already booked - ensure those slots are not available
+        /// <summary>
+        /// test with some appointments already booked - ensure those slots are not available
+        ///</summary>
+        [Fact]
+        public async Task TestBookingView_ExcludesBookedTimeslots()
+        {
+            var WEEK_NUM = 5;
+            var TS_ID = 20;
+            
+            // Arrange
+            var timeslotList = GenerateTimeslots(09, 18, 30, WEEK_NUM);
+            // NB: AppointmentRepo includes Timeslot data in select, thus the appointment's timeslot must be instantiated
+            var appointments = new List<AppointmentDto>()
+            {
+                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == TS_ID), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
+            };
+            
+            // Instantiate booking service
+            // weekNum is 5 on the 2nd of Feb 
+            var bookingService = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , appointments, new Dictionary<int, TimeslotAvailabilityDto>());
+            var bookingServiceNoAppts = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , new List<AppointmentDto>(), new Dictionary<int, TimeslotAvailabilityDto>());
+            
+            // Act
+            var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
+            var timeslotsNoAppts = (await bookingServiceNoAppts.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
+            
+            // Assert
+            // number of available Timeslots as expected?
+            Assert.Equal(265, timeslots.Count);
+            Assert.Equal(266, timeslotsNoAppts.Count);
+            
+            // Is the booked timeslot excluded? 
+            Assert.False(timeslots.Any(x => x.Id == TS_ID && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            // And the control group...
+            Assert.True(timeslotsNoAppts.Any(x => x.Id == TS_ID && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+        }
+        
+        [Fact]
+        public async Task TestBookingView_ExcludesBookedTimeslots_2()
+        {
+            var WEEK_NUM = 5;
+            
+            // Arrange
+            var timeslotList = GenerateTimeslots(09, 18, 30, WEEK_NUM);
+            // NB: AppointmentRepo includes Timeslot data in select, thus the appointment's timeslot must be instantiated
+            var appointments = new List<AppointmentDto>()
+            {
+                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 21), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
+                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 41), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
+                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 30), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
+            };
+            
+            // Instantiate booking service
+            // weekNum is 5 on the 2nd of Feb 
+            var bookingService = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , appointments, new Dictionary<int, TimeslotAvailabilityDto>());
+            
+            // Act
+            var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
+            
+            // Assert
+            // number of available Timeslots as expected?
+            Assert.Equal(263, timeslots.Count);
+            
+            // Is the booked timeslot excluded? 
+            Assert.False(timeslots.Any(x => x.Id == 21 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            Assert.False(timeslots.Any(x => x.Id == 30 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            Assert.False(timeslots.Any(x => x.Id == 41 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            
+            Assert.True(timeslots.Any(x => x.Id == 22 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.Id == 23 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.Id == 29 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.Id == 31 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+        }
+        
+        // TODO: More of the appointment booking tests.
+        
+        // ensure that cancelled appointments release their timeslot
         
         // try to double book an appointment, ensure the exception prevents this
+        
+        // Ensure client cannot book prac only appointments
+        
+        // Ensure prac can book all appt types
+        
+        // Ensure that global availability is applied
+        
+        // Ensure that per-week availability applies and only to the specified week
 
     }
 }
