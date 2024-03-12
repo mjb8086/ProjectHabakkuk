@@ -63,15 +63,16 @@ namespace HBK.Test
         /// <summary>
         /// check that the timeslots returned are expected - first, all in the next two weeks when there are no
         /// appointments, then some other cases.
+        /// This simulates the choose a timeslot booking screen - the timeslots have the weeknum populated
         /// Nice and even because it assumes today is the first hour of the first day in the set of timeslots
         /// </summary>
         [Theory]
         [InlineData(new [] {3,4}, "2", "2024-01-15 12:00")]
         [InlineData(new [] {3,4,5,6}, "4", "2024-01-15 12:00")]
         [InlineData(new [] {1}, "1", "2024-01-01 12:00")]
-        public async Task GetTimeslotsClientView_ReturnsExpectedTimeslots(int[] weekNums, string advanceWeeks, string dtString)
+        public async Task GetTimeslotsClientView_ReturnsExpectedTimeslots(int[] weekNums, string advanceWeeks, string currentDt)
         {
-            var now = DateTime.Parse(dtString);
+            var now = DateTime.Parse(currentDt);
             // Arrange
             var timeslotList = GenerateTimeslots(12, 15, DEFAULT_DURATION);
             
@@ -114,11 +115,23 @@ namespace HBK.Test
             Assert.True(timeslots.CompareTsList(expected));
         }
         
+        /// <summary>
+        /// Verify availability timeslots fall within expected weekNums - based on the current dt
+        /// All timeslots generated start ar 09:00 and end at 18:00 for these tests
+        /// This simulates the choose a timeslot booking screen - the timeslots have their weeknum populated
+        /// </summary>
         [Theory]
-        [InlineData(new [] {3,4}, "2", "2024-01-15 12:00", "2024-01-15 12:00", "2024-01-15 12:00", 322)]
-        public async Task GetTimeslotsClientView_BoundsCheck(int[] weekNums, string advanceWeeks, string dtString, string firstTs, string lastTs, int expectedTsCount)
+        [InlineData(new [] {3,4}, "2", "2024-01-15 09:00", "2024-01-15 09:00", "2024-01-28 18:00", 266)]
+        [InlineData(new [] {3,4,5}, "2", "2024-01-17 11:20", "2024-01-17 11:30", "2024-01-31 11:00", 266)]
+        [InlineData(new [] {3,4,5}, "2", "2024-01-17 07:20", "2024-01-17 09:00", "2024-01-30 18:00", 266)] // what happens outside of hours?
+        [InlineData(new [] {3,4,5}, "2", "2024-01-17 21:12", "2024-01-18 09:00", "2024-01-31 18:00", 266)] // what happens outside of hours?
+        [InlineData(new [] {3,4,5}, "2", "2024-01-17 08:59:59", "2024-01-17 09:00", "2024-01-30 18:00", 266)] // on the dot just before it
+        [InlineData(new [] {3,4,5}, "2", "2024-01-17 17:59:59", "2024-01-17 18:00", "2024-01-31 17:30:00", 266)] // and just at the end
+        [InlineData(new [] {6}, "1", "2024-02-05 09:00", "2024-02-05 09:00", "2024-02-11 18:00", 133)] // one advance week
+        [InlineData(new [] {6, 7}, "1", "2024-02-07 11:42", "2024-02-07 12:00", "2024-02-14 11:30", 133)] // one advance week
+        public async Task GetTimeslotsClientView_BoundsCheck(int[] weekNums, string advanceWeeks, string currentDt, string expectedFirstTs, string expectedLastTs, int expectedTsCount)
         {
-            var now = DateTime.Parse(dtString);
+            var now = DateTime.Parse(currentDt);
             // Arrange
             var timeslotList = GenerateTimeslots(09, 18, 30);
             
@@ -137,7 +150,7 @@ namespace HBK.Test
             mockUserService.Setup(x => x.GetClaimFromCookie("ClinicId")).Returns(FAKE_CLINIC_ID);
             mockCacheService.Setup(x => x.GetLeadPracId(FAKE_CLINIC_ID)).Returns(FAKE_PRAC_ID);
             mockCacheService.Setup(x => x.GetTreatments()).ReturnsAsync(FAKE_TREATMENTS);
-            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, weekNums))
+            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, It.IsAny<int[]>())) // ignore exact weekNums value, we don't care to test availability lookup 
                 .ReturnsAsync(new List<TimeslotAvailabilityDto>()); 
             // Return empty availability for this test - a missing availability value for any week is reckoned as available
             mockAvaRepo.Setup(x => x.GetAvailabilityLookupForIndef(FAKE_PRAC_ID))
@@ -152,10 +165,17 @@ namespace HBK.Test
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
             
             // Assert
+            // number of Timeslots as expected?
             var actualTsCount = timeslots.Count; 
             Assert.Equal(expectedTsCount, actualTsCount);
+
+            // Weeknums as expected?
+            var actualWeekNums = timeslots.Select(x => x.WeekNum).Distinct().ToArray();
+            Assert.Equal(weekNums, actualWeekNums);
             
-            // Create timeslots from InlineData.
+            // First and last timeslots as expected?
+            Assert.Equal(DateTime.Parse(expectedFirstTs), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslots.First()));
+            Assert.Equal(DateTime.Parse(expectedLastTs), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslots[^1]));
         }
         
         // then with some appointments already booked - ensure those slots are not available
