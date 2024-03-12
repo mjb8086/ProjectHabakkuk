@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace HBKPlatform.Database
 {
     public class ClinicHomepage : HbkBaseEntity

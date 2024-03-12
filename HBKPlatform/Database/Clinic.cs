@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database
 {
@@ -24,5 +22,6 @@ namespace HBKPlatform.Database
         public Practitioner LeadPractitioner { get; set; }
         public virtual ICollection<Practitioner> Practitioners { get; set; }
         public virtual ICollection<Client> Clients { get; set; }
+        public virtual ICollection<Room> Rooms { get; set; }
     }
 }

@@ -15,6 +15,9 @@ delete from users;
 delete from user_claims;
 delete from appointments;
 delete from tenancies;
+delete from attributes;
+delete from room_attributes;
+delete from rooms;
 
 EOF
 

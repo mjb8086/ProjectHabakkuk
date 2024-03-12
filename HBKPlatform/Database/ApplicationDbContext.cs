@@ -42,7 +42,9 @@ namespace HBKPlatform.Database
         public DbSet<Treatment> Treatments { get; set; } = default!;
         public DbSet<Setting> Settings { get; set; } = default!;
         public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
-    
+        public DbSet<Room> Rooms { get; set; } = default!;
+        public DbSet<Attribute> Attributes { get; set; } = default!;
+        public DbSet<RoomAttribute> RoomAttributes { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

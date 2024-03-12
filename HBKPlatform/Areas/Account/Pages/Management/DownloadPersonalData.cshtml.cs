@@ -41,7 +41,7 @@ namespace HBKPlatform.Areas.Account.Pages.Management
             // Only include personal data for download
             var personalData = new Dictionary<string, string>();
             var personalDataProps = typeof(User).GetProperties().Where(
-                            prop => Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
+                            prop => System.Attribute.IsDefined(prop, typeof(PersonalDataAttribute)));
             foreach (var p in personalDataProps)
             {
                 personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
