@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using HBKPlatform.Database;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
@@ -15,7 +16,7 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2023 NowDoctor Ltd.
     /// </summary>
-    public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpContext, IUserRepository _userRepo) : IUserService
+    public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpContext, IUserRepository _userRepo, ILogger<UserService> _logger) : IUserService
     {
         // TODO: Refactor these into repositories.
         
@@ -74,9 +75,11 @@ namespace HBKPlatform.Services.Implementation
             {
                 case UacAction.PasswordReset:
                     await _userRepo.ResetPasswordForUser(userId);
+                    _logger.LogInformation($"UAC: Password reset performed for {userId}");
                     break;
                 case UacAction.ToggleLockout:
                     await _userRepo.ToggleLockout(userId);
+                    _logger.LogInformation($"UAC: Lockout toggled for {userId}");
                     break;
             }
         }
@@ -92,6 +95,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 return val;
             }
+            _logger.LogWarning($"User {_httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)} attempted to retrieve missing claim: {claim}");
             return -1;
         }
     

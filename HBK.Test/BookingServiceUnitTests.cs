@@ -179,7 +179,7 @@ namespace HBK.Test
         
         // then with some appointments already booked - ensure those slots are not available
         
-        // try to book an appointment, ensure the exception prevents this
+        // try to double book an appointment, ensure the exception prevents this
 
     }
 }
