@@ -43,7 +43,7 @@ try
         .AddDefaultUI()
         .AddDefaultTokenProviders();
 
-    // To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
+    // To ensure custom claims (PracticeId, PracId, etc) are added to new identity when principal is refreshed.
     builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
     // Scoped - created once per HTTP request. Use for database because there may be multiple calls in a web service.
@@ -71,7 +71,7 @@ try
 
     // Transient - created each time it is required. Use on web services, because they will typically serve one action
     // to the controller.
-    builder.Services.AddTransient<IClinicService, ClinicService>();
+    builder.Services.AddTransient<IPracticeService, PracticeService>();
     builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
     builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
     builder.Services.AddTransient<ITreatmentService, TreatmentService>();

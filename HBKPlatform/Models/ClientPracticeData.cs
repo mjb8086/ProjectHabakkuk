@@ -1,6 +1,6 @@
 namespace HBKPlatform.Models
 {
-    public class ClientClinicData
+    public class ClientPracticeData
     {
         public int PracId { get; set; }
         public string MyPracName { get; set; }

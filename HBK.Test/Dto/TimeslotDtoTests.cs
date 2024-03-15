@@ -26,7 +26,7 @@ namespace HBK.Test.Dto
         
             var timeslot1 = new TimeslotDto()
             {
-                ClinicId = originalClinicId,
+                PracticeId = originalClinicId,
                 Day = originalDay,
                 Description = originalDescription,
                 Duration = originalDuration,
@@ -36,7 +36,7 @@ namespace HBK.Test.Dto
             };
 
             var timeslot2 = timeslot1.Clone();
-            timeslot2.ClinicId = 2;
+            timeslot2.PracticeId = 2;
             timeslot2.Day = Enums.Day.Wednesday;
             timeslot2.Description = "Bar";
             timeslot2.Duration = 40;
@@ -46,7 +46,7 @@ namespace HBK.Test.Dto
         
             Assert.NotEqual(timeslot1, timeslot2);
         
-            Assert.NotEqual(timeslot1.ClinicId, timeslot2.ClinicId);
+            Assert.NotEqual(timeslot1.PracticeId, timeslot2.PracticeId);
             Assert.NotEqual(timeslot1.Day, timeslot2.Day);
             Assert.NotEqual(timeslot1.Description, timeslot2.Description);
             Assert.NotEqual(timeslot1.Duration, timeslot2.Duration);
@@ -55,7 +55,7 @@ namespace HBK.Test.Dto
             Assert.NotEqual(timeslot1.WeekNum, timeslot2.WeekNum);
         
             Assert.Equal(originalDescription, timeslot1.Description);
-            Assert.Equal(originalClinicId, timeslot1.ClinicId);
+            Assert.Equal(originalClinicId, timeslot1.PracticeId);
             Assert.Equal(originalDay, timeslot1.Day);
             Assert.Equal(originalDuration, timeslot1.Duration);
             Assert.Equal(originalTime, timeslot1.Time);

@@ -27,7 +27,7 @@ namespace HBKPlatform.Services.Implementation
         {
             await _clientRepo.Update(client);
             _cacheService.ClearClientDetails(client.Id);
-            _cacheService.ClearClinicClientDetails();
+            _cacheService.ClearPracticeClientDetails();
         }
 
         public async Task UpdateClientDetailsAsClient(ClientDto client)
@@ -37,17 +37,17 @@ namespace HBKPlatform.Services.Implementation
             await _clientRepo.Update(client);
             // Housekeeping for the cache
             _cacheService.ClearClientDetails(client.Id);
-            _cacheService.ClearClinicClientDetails();
+            _cacheService.ClearPracticeClientDetails();
         }
 
         public async Task CreateClient(ClientDto client)
         {
-            client.ClinicId = _userService.GetClaimFromCookie("ClinicId");
+            client.PracticeId = _userService.GetClaimFromCookie("PracticeId");
             client.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
         
             await _clientRepo.Create(client);
             // Housekeeping for the cache
-            _cacheService.ClearClinicClientDetails();
+            _cacheService.ClearPracticeClientDetails();
             _securityService.ClearClientPracOwnership();
         }
 

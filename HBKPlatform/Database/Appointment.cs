@@ -14,7 +14,7 @@ namespace HBKPlatform.Database
     /// </summary>
     public class Appointment: HbkBaseEntity
     {
-//    public int ClinicId { get; set; }
+//    public int PracticeId { get; set; }
         public int ClientId { get; set; }
         public int PractitionerId { get; set; }
         public int TreatmentId { get; set; }
@@ -25,7 +25,7 @@ namespace HBKPlatform.Database
         public string? CancellationReason { get; set; }
     
         // EF Navigations
-//    public virtual Clinic Clinic { get; set; }
+//    public virtual Practice Practice { get; set; }
         public virtual Client Client { get; set; }
         public virtual Practitioner Practitioner { get; set; }
         public virtual Treatment Treatment { get; set; }

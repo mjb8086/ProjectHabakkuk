@@ -31,7 +31,7 @@ namespace HBKPlatform.Services.Implementation
         /// </summary>
         private async Task<List<TimeslotDto>> GetPopulatedFutureTimeslots()
         {
-            var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
+            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks")).Value);
             var now = _dateTime.Now;
@@ -71,12 +71,12 @@ namespace HBKPlatform.Services.Implementation
         {
             // Do clash checking - only show free and available timeslots in the future
             // Get treatment Id
-            var clinicId = _userService.GetClaimFromCookie("ClinicId");
+            var practiceId = _userService.GetClaimFromCookie("PracticeId");
             var treatments = await _cacheService.GetTreatments();
-            var pracId = _cacheService.GetLeadPracId(clinicId);
+            var practitionerId = _cacheService.GetLeadPractitionerId(practiceId);
         
             var availableTs =  await GetPopulatedFutureTimeslots();
-            availableTs = (await FilterOutUnsuitableTimeslots(availableTs, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            availableTs = (await FilterOutUnsuitableTimeslots(availableTs, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
             if (treatments.TryGetValue(treatmentId, out var treatment) && treatment.Requestability == Enums.TreatmentRequestability.ClientAndPrac) // security filter
             {
@@ -165,7 +165,7 @@ namespace HBKPlatform.Services.Implementation
             foreach (var appointment in appointments)
             {
                 var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
-                appointment.PractitionerName = _cacheService.GetPracName(appointment.PractitionerId);
+                appointment.PractitionerName = _cacheService.GetPractitionerName(appointment.PractitionerId);
                 appointment.DateString = dateTime.ToShortDateString();
                 appointment.TimeString = dateTime.ToShortTimeString();
                 appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
@@ -215,7 +215,7 @@ namespace HBKPlatform.Services.Implementation
             };
         }
 
-        public async Task<BookingConfirm> GetBookingConfirmModel(PracBookingFormModel model)
+        public async Task<BookingConfirm> GetBookingConfirmModel(PractitionerBookingFormModel model)
         {
             var tsWeekNum = model.ParseTsWeekNum();
             return await GetBookingConfirmModel(model.TreatmentId, tsWeekNum[0], tsWeekNum[1], model.ClientId);
@@ -226,9 +226,9 @@ namespace HBKPlatform.Services.Implementation
         /// </summary>
         public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? clientId)
         {
-            var clinicId = _userService.GetClaimFromCookie("ClinicId");
+            var practiceId = _userService.GetClaimFromCookie("PracticeId");
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
-            pracId = pracId < 1 ? _cacheService.GetLeadPracId(clinicId) : pracId;
+            pracId = pracId < 1 ? _cacheService.GetLeadPractitionerId(practiceId) : pracId;
             var treatments = await _cacheService.GetTreatments();
         
             if (!treatments.TryGetValue(treatmentId, out var treatment) || (!clientId.HasValue && treatment.Requestability == Enums.TreatmentRequestability.PracOnly))
@@ -244,7 +244,7 @@ namespace HBKPlatform.Services.Implementation
                 TreatmentId = treatmentId,
                 WeekNum = weekNum,
                 TimeslotId = timeslotId,
-                PracctitionerName = _cacheService.GetPracName(pracId),
+                PracctitionerName = _cacheService.GetPractitionerName(pracId),
                 ClientId = clientId,
                 ClientName = clientId.HasValue ? _cacheService.GetClientName(clientId.Value) : "",
                 TreatmentTitle = treatment.Title,
@@ -254,9 +254,9 @@ namespace HBKPlatform.Services.Implementation
 
         public async Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum)
         {
-            var clinicId = _userService.GetClaimFromCookie("ClinicId");
+            var practiceId = _userService.GetClaimFromCookie("PracticeId");
             var clientId = _userService.GetClaimFromCookie("ClientId");
-            var pracId = _cacheService.GetLeadPracId(clinicId);
+            var pracId = _cacheService.GetLeadPractitionerId(practiceId);
 
             return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, true);
         }
@@ -306,7 +306,7 @@ namespace HBKPlatform.Services.Implementation
                 TreatmentId = treatmentId,
                 WeekNum = weekNum,
                 TimeslotId = timeslotId,
-                PracctitionerName = _cacheService.GetPracName(pracId),
+                PracctitionerName = _cacheService.GetPractitionerName(pracId),
                 ClientName = _cacheService.GetClientName(clientId),
                 TreatmentTitle = treatment.Title,
                 BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
@@ -315,13 +315,13 @@ namespace HBKPlatform.Services.Implementation
 
         public async Task<BookClientTreatment> GetBookClientTreatmentView()
         {
-            var pracId = _userService.GetClaimFromCookie("PractitionerId");
+            var practitionerId = _userService.GetClaimFromCookie("PractitionerId");
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         
             var treatments = await _cacheService.GetTreatments();
-            var clients = await _cacheService.GetClinicClientDetailsLite();
+            var clients = await _cacheService.GetPracticeClientDetailsLite();
             var timeslots = await GetPopulatedFutureTimeslots();
-            timeslots = (await FilterOutUnsuitableTimeslots(timeslots, pracId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            timeslots = (await FilterOutUnsuitableTimeslots(timeslots, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
             var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
             var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);
@@ -344,7 +344,7 @@ namespace HBKPlatform.Services.Implementation
             return new BookingCancel()
             {
                 AppointmentId = appointment.Id,
-                PractitionerName = _cacheService.GetPracName(appointment.PractitionerId),
+                PractitionerName = _cacheService.GetPractitionerName(appointment.PractitionerId),
                 ClientName = _cacheService.GetClientName(appointment.ClientId),
                 DateString = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslot, appointment.WeekNum)),
                 TreatmentTitle = treatments[appointment.TreatmentId].Title

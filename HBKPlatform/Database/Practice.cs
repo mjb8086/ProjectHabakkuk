@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations;
 namespace HBKPlatform.Database
 {
     /// <summary>
-    /// Clinic entity. Store details for each customer clinic to be displayed on its homepage
-    /// as well as some of our business data like the licence status. Analogous to a tenant.
+    /// Store practice data - the umbrella legal entity under which a practitioner practices
+    /// Includes clients, practitioners, and prac address/ contact details
     /// </summary>
-    public class Clinic : HbkBaseEntity
+    public class Practice : HbkBaseEntity
     {
         // Columns
         public string Description { get; set; }
@@ -20,8 +20,7 @@ namespace HBKPlatform.Database
     
         // EF Navigations
         public Practitioner LeadPractitioner { get; set; }
-        public virtual ICollection<Practitioner> Practitioners { get; set; }
-        public virtual ICollection<Client> Clients { get; set; }
-        public virtual ICollection<Room> Rooms { get; set; }
+        public ICollection<Practitioner> Practitioners { get; set; }
+        public ICollection<Client> Clients { get; set; }
     }
 }

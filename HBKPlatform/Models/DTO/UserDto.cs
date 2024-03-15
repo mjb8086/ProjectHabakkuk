@@ -5,7 +5,7 @@ namespace HBKPlatform.Models.DTO
         public int? PractitionerId { get; set; }
         public int? ClientId { get; set; }
 
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
         public int TenancyId { get; set; }
         public string UserEmail { get; set; }
         public string UserRole { get; set; }

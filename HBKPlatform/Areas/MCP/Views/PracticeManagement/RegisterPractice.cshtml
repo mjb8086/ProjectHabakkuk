@@ -1,14 +1,14 @@
 @using HBKPlatform.Globals
-@model HBKPlatform.Models.DTO.ClinicRegistrationDto;
+@model HBKPlatform.Models.DTO.PracticeRegistrationDto;
 @{
-    ViewData["Title"] = "MCP Clinic Management - Register a new clinic";
-    ViewBag.CurrentNav = "ClinicManagement";
-    ViewBag.Css = "admin-clinicmgmt.css";
+    ViewData["Title"] = "MCP Practice Management - Register a new practice";
+    ViewBag.CurrentNav = "PracticeManagement";
+    ViewBag.Css = "mcp-practicemgmt.css";
     Layout = "_McpShared";
 }
-<h1>New clinic</h1>
+<h1>New practice</h1>
 <div id="uacWrapper">
-<form id="treatmentDetails" asp-area="MCP" asp-controller="ClinicManagement" asp-action="DoRegisterClinic" method="post"> 
+<form id="treatmentDetails" asp-area="MCP" asp-controller="PracticeManagement" asp-action="DoRegisterPractice" method="post"> 
     <fieldset>
         <legend for="orgName" class="form-textfield">Organisation Name</legend>
         <input type="text" id="orgName" asp-for="OrgName" value="" placeholder="Pearce & Pearce" >
@@ -71,7 +71,7 @@
     </fieldset>
     
     <fieldset>
-        <input type="submit" id="btnSave" value="Register clinic" />
+        <input type="submit" id="btnSave" value="Register practice" />
     </fieldset>
 </form>
 </div>

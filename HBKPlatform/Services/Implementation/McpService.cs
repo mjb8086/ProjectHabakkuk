@@ -10,41 +10,41 @@ namespace HBKPlatform.Services.Implementation
     {
     
         /* MCP Methods */
-        public async Task<ClinicDetailsDto> GetClinicModel(int clinicId)
+        public async Task<PracticeDetailsDto> GetPracticeModel(int practiceId)
         {
-            return await _mcpRepo.GetClinicAlone(clinicId);
+            return await _mcpRepo.GetPracticeAlone(practiceId);
         }
 
-        public async Task<ListClinics> GetListClinicsView()
+        public async Task<ListPractices> GetListPracticesView()
         {
-            return new ListClinics() { Clinics = await _mcpRepo.GetClinicDetailsLite() };
+            return new ListPractices() { Practices = await _mcpRepo.GetPracticeDetailsLite() };
         }
 
-        public async Task UpdateClinic(ClinicDto model)
+        public async Task UpdatePractice(PracticeDto model)
         {
-            await _mcpRepo.UpdateClinicDetails(model);
+            await _mcpRepo.UpdatePracticeDetails(model);
         }
 
-        public async Task RegisterClinic(ClinicRegistrationDto model)
+        public async Task RegisterPractice(PracticeRegistrationDto model)
         {
-            var tenancy = await _mcpRepo.RegisterClinic(model);
+            var tenancy = await _mcpRepo.RegisterPractice(model);
             await _timeslotRepo.Create(TimeslotHelper.GenerateDefaultTimeslots(tenancy));
         }
 
         public async Task<UserAccountFunctions> GetUacView()
         {
-            var clinics = await _mcpRepo.GetClinicDetailsLite();
+            var practices = await _mcpRepo.GetPracticeDetailsLite();
             return new UserAccountFunctions()
             {
-                Clinics = clinics.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToList(),
+                Practices = practices.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToList(),
             };
         }
 
-        public async Task<ClinicPracs> GetClinicPracs(int clinicId)
+        public async Task<PracticePractitioners> GetPracPracs(int practiceId)
         {
-            var pracDetailsUac = await _mcpRepo.GetPracLockoutStatusDict(clinicId);
+            var pracDetailsUac = await _mcpRepo.GetPractitionerLockoutStatusDict(practiceId);
         
-            return new ClinicPracs()
+            return new PracticePractitioners()
             {
                 Pracs = pracDetailsUac
             };

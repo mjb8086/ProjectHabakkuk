@@ -14,11 +14,11 @@ namespace HBKPlatform.Areas.Client.Controllers
     /// © 2023 NowDoctor Ltd.
     /// </summary>
     [Area("Client"), Authorize(Roles="Client")]
-    public class ReceptionController(IClinicService _clinicService): Controller
+    public class ReceptionController(IPracticeService practiceService): Controller
     {
         public async Task <IActionResult> Index()
         {
-            var data = await _clinicService.GetClientClinicData();
+            var data = await practiceService.GetClientPracticeData();
             return View(data);
         }
     }

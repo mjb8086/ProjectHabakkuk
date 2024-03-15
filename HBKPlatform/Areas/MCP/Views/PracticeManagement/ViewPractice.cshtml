@@ -1,17 +1,17 @@
 @using HBKPlatform.Globals
-@model HBKPlatform.Models.DTO.ClinicDetailsDto;
+@model HBKPlatform.Models.DTO.PracticeDetailsDto;
 @{
-    ViewData["Title"] = "MCP Clinic Details";
-    ViewBag.CurrentNav = "ClinicManagement";
-    ViewBag.Css = "admin-clinicmgmt.css";
+    ViewData["Title"] = "MCP Practice Details";
+    ViewBag.CurrentNav = "PracticeManagement";
+    ViewBag.Css = "admin-practicemgmt.css";
     Layout = "_McpShared";
 }
-<h1>View or modify clinic</h1>
+<h1>View or modify practice</h1>
 <div id="uacWrapper">
-<form id="treatmentDetails" asp-area="MCP" asp-controller="ClinicManagement" asp-action="DoUpdateClinic" asp-route-clinicId="@Model.Id" method="post"> 
+<form id="treatmentDetails" asp-area="MCP" asp-controller="PracticeManagement" asp-action="DoUpdatePractice" asp-route-practiceId="@Model.Id" method="post"> 
     <fieldset>
         <legend for="orgName" class="form-textfield">Organisation Name</legend>
-        <input type="text" id="orgName" asp-for="OrgName" value="@Model.OrgName" placeholder="Sample Clinic" >
+        <input type="text" id="orgName" asp-for="OrgName" value="@Model.OrgName" placeholder="Sample Practice" >
     </fieldset>
 
     <fieldset>
@@ -50,7 +50,7 @@
   
     <fieldset>
         <legend class="form-textfield">Lead Practitioner</legend>
-        <p>@Model.LeadPracFullName</p>
+        <p>@Model.LeadPractitionerFullName</p>
     </fieldset>
     
     <fieldset>
@@ -61,7 +61,7 @@
 
 <h2>Options</h2>
 <ol>
-    <li><a>Send password reset to lead practitioner @Model.LeadPracFullName</a></li>
-    <li><a>Delete clinic</a></li>
-    <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="ListClinics">Return to clinic list.</a></li>
+    <li><a>Send password reset to lead practitioner @Model.LeadPractitionerFullName</a></li>
+    <li><a>Delete practice</a></li>
+    <li><a asp-area="MCP" asp-controller="PracticeManagement" asp-action="ListPractices">Return to practice list.</a></li>
 </ol>

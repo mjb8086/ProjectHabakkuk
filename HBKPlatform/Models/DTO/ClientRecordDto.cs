@@ -6,7 +6,6 @@ namespace HBKPlatform.Models.DTO
     public class ClientRecordDto
     {
         public int ClientId { get; set; }
-        public int ClinicId { get; set; }
         public int PractitionerId { get; set; }
         public string? AppointmentDetails { get; set; }
         public DateTime? AppointmentDate { get; set; }

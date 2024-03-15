@@ -6,14 +6,14 @@ namespace HBKPlatform.Services
     public interface IMcpService
     {
     
-        public Task<ClinicDetailsDto> GetClinicModel(int clinicId);
-        public Task<ListClinics> GetListClinicsView();
-        public Task UpdateClinic(ClinicDto model);
-        public Task RegisterClinic(ClinicRegistrationDto model);
+        public Task<PracticeDetailsDto> GetPracticeModel(int practiceId);
+        public Task<ListPractices> GetListPracticesView();
+        public Task UpdatePractice(PracticeDto model);
+        public Task RegisterPractice(PracticeRegistrationDto model);
         public Task<UserAccountFunctions> GetUacView();
         public Task<List<UserDto>> GetRecentLogins();
     
         // API Methods
-        public Task<ClinicPracs> GetClinicPracs(int clinicId);
+        public Task<PracticePractitioners> GetPracPracs(int practiceId);
     }
 }

@@ -6,17 +6,17 @@ namespace HBKPlatform.Models.DTO
     {
         public string Name { get; set; }
         public int Id { get; set; }
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
     }
 
-    public class PracDetailsLite
+    public class PractitionerDetailsLite
     {
         public string Name { get; set; }
         public int Id { get; set; }
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
     }
 
-    public class PracDetailsUac : PracDetailsLite
+    public class PractitionerDetailsUac : PractitionerDetailsLite
     {
         public bool HasLockout { get; set; } 
         public DateTimeOffset? LockoutEnd { get; set; }
@@ -46,7 +46,7 @@ namespace HBKPlatform.Models.DTO
         public string Description { get; set; }
     }
 
-    public class PracBookingFormModel
+    public class PractitionerBookingFormModel
     {
         public string TimeslotWeekNum { get; set; }
         public int TreatmentId { get; set; }

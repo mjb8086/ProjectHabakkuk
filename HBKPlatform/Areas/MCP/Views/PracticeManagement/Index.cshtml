@@ -1,0 +1,12 @@
+
+@{
+    ViewData["Title"] = "MCP Practice Management";
+    ViewBag.CurrentNav = "PracticeManagement";
+    Layout = "_McpShared";
+}
+<h1>Practice Management</h1>
+<ol>
+    <li><a asp-area="MCP" asp-controller="PracticeManagement" asp-action="RegisterPractice">Register a new practice.</a></li>
+    <li><a asp-area="MCP" asp-controller="PracticeManagement" asp-action="ListPractices">View, delete or modify existing practices.</a></li>
+    <li><a asp-area="MCP" asp-controller="PracticeManagement" asp-action="PasswordReset">User Lockout & Password reset.</a></li>
+</ol>

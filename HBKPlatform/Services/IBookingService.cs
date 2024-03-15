@@ -12,7 +12,7 @@ namespace HBKPlatform.Services
         public Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId);
         public Task<UpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView();
         public Task<ClientUpcomingAppointmentsView> GetClientUpcomingAppointmentsView();
-        public Task<BookingConfirm> GetBookingConfirmModel(PracBookingFormModel model);
+        public Task<BookingConfirm> GetBookingConfirmModel(PractitionerBookingFormModel model);
         public Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? clientId = null);
         public Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum);
         public Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId);

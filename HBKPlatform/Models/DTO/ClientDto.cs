@@ -23,7 +23,7 @@ namespace HBKPlatform.Models.DTO
         public string? Email { get; set; } // Sourced from User object
         public bool HasUserAccount { get; set; }
 
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
         public int PractitionerId { get; set; }
     }
 }

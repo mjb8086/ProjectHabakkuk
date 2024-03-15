@@ -112,7 +112,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BookingConfirm([FromForm] PracBookingFormModel appointment)
+        public async Task<IActionResult> BookingConfirm([FromForm] PractitionerBookingFormModel appointment)
         {
             if (!ModelState.IsValid) throw new Exception("Model bad");
             return View(await _bookingService.GetBookingConfirmModel(appointment));

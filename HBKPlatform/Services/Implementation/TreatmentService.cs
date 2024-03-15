@@ -20,19 +20,19 @@ namespace HBKPlatform.Services.Implementation
         {
             return new TreatmentManagementView()
             {
-                Treatments = await _treatmentRepo.GetClinicTreatments()
+                Treatments = await _treatmentRepo.GetPracticeTreatments()
             };
         }
 
         public async Task CreateTreatment(TreatmentDto treatment)
         {
-            treatment.ClinicId = _userService.GetClaimFromCookie("ClinicId");
+            treatment.PracticeId = _userService.GetClaimFromCookie("PracticeId");
             await _treatmentRepo.CreateTreatment(treatment);
         }
 
         public async Task DeleteTreatment(int treatmentId)
         {
-            // todo: confirm user is member of clinic
+            // todo: confirm user is member of practice
             await _treatmentRepo.Delete(treatmentId);
             _cacheService.ClearTreatments();
         }
@@ -52,7 +52,7 @@ namespace HBKPlatform.Services.Implementation
         {
             return new ClientTreatmentSelectView()
             {
-                Treatments = await _treatmentRepo.GetClinicTreatments(true)
+                Treatments = await _treatmentRepo.GetPracticeTreatments(true)
             };
         }
     

@@ -5,12 +5,11 @@ namespace HBKPlatform.Models.View.MCP
 {
     public class UserAccountFunctions
     {
-        public List<SelectListItem> Clinics { get; set; }
+        public List<SelectListItem> Practices { get; set; }
     }
 
     public class UacRequest
     {
-        public int ClinicId { get; set; }
         public int PractitionerId { get; set; }
         public UacAction Action { get; set; }
     }
@@ -22,8 +21,8 @@ namespace HBKPlatform.Models.View.MCP
         ToggleLockout = 2
     }
 
-    public struct ClinicPracs
+    public struct PracticePractitioners
     {
-        public Dictionary<int, PracDetailsUac> Pracs { get; set; }
+        public Dictionary<int, PractitionerDetailsUac> Pracs { get; set; }
     }
 }

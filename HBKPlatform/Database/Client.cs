@@ -16,10 +16,10 @@ namespace HBKPlatform.Database
         public string Telephone { get; set; }
         [DataType(DataType.MultilineText)]
         public string? Address { get; set; }
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
     
         // EF Navigations
-        public virtual Clinic Clinic { get; set; }
+        public virtual Practice Practice { get; set; }
         public virtual User User { get; set; }
         public virtual ICollection<ClientMessage> ClientMessages { get; set; }
         public virtual ICollection<ClientPractitioner> ClientPractitioners { get; set; }

@@ -2,7 +2,7 @@ using HBKPlatform.Globals;
 
 namespace HBKPlatform.Models.DTO
 {
-    public class ClinicDto
+    public class PracticeDto
     {
         public int Id { get; set; }
         public string OrgName { get; set; }
@@ -15,14 +15,14 @@ namespace HBKPlatform.Models.DTO
         public DateTime RegistrationDate { get; set; }
     }
 
-// Additional fields used to view clinic details in MCP
-    public class ClinicDetailsDto : ClinicDto
+// Additional fields used to view practice details in MCP
+    public class PracticeDetailsDto : PracticeDto
     {
-        public string LeadPracFullName { get; set; }
+        public string LeadPractitionerFullName { get; set; }
     }
 
 // For use on initial registration only.
-    public class ClinicRegistrationDto : ClinicDto 
+    public class PracticeRegistrationDto : PracticeDto 
     {
         public Enums.Title LeadPracTitle { get; set; }
         public string LeadPracForename { get; set; }

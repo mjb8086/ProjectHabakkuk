@@ -5,7 +5,7 @@ namespace HBKPlatform.Models.DTO
     public class TreatmentDto
     {
         public int Id { get; set; }
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
         public Enums.TreatmentRequestability Requestability { get; set; }
         public double Cost { get; set; }
         public string Title { get; set; }

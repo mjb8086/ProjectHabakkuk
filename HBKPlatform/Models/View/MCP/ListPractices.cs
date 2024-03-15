@@ -1,11 +1,11 @@
 namespace HBKPlatform.Models.View.MCP
 {
-    public struct ListClinics
+    public struct ListPractices
     {
-        public List<ClinicDetailsLite> Clinics { get; set; }
+        public List<PracticeDetailsLite> Practices { get; set; }
     }
 
-    public struct ClinicDetailsLite
+    public struct PracticeDetailsLite
     {
         public int Id { get; set; }
         public string Name { get; set; }

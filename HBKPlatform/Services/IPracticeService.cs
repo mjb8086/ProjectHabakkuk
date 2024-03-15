@@ -6,11 +6,11 @@ using HBKPlatform.Models.View.MyND;
 
 namespace HBKPlatform.Services
 {
-    public interface IClinicService
+    public interface IPracticeService
     {
-        public Task<bool> VerifyClientAndPracClinicMembership(int clientId, int pracId);
+        public Task<bool> VerifyClientPractitionerMembership(int clientId, int practitionerId);
         public Task<InboxModel> GetInboxModel();
-        public Task<ClientClinicData> GetClientClinicData();
+        public Task<ClientPracticeData> GetClientPracticeData();
         public Task<ReceptionModel> GetReceptionModel();
     }
 }

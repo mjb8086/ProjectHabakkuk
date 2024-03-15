@@ -19,7 +19,7 @@ namespace HBKPlatform.Services.Implementation
         private int TenancyId = _tenancy.TenancyId;
     
         /// <summary>
-        /// Refresh this when a new client is registered to the clinic
+        /// Refresh this when a new client is registered to the practice
         /// Security method, verify that the client Id specified is registered under the practitioner.
         /// Returns TRUE if yes, or false if client is not registered under the prac/prac is not found
         /// </summary>

@@ -20,7 +20,7 @@ namespace HBKPlatform.Services.Implementation
         {
             return new ClientRecordsIndex
             {
-                ClientDetails = await _cache.GetClinicClientDetailsLite()
+                ClientDetails = await _cache.GetPracticeClientDetailsLite()
             };
         }
         public async Task<ClientRecords> GetClientRecords(int clientId)
@@ -55,7 +55,6 @@ namespace HBKPlatform.Services.Implementation
 
         public async Task<FullClientRecordDto> CreateRecord(ClientRecordDto recordDto)
         {
-            recordDto.ClinicId = _userService.GetClaimFromCookie("ClinicId");
             recordDto.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
             return await _recordRepo.CreateRecord(recordDto);
         }

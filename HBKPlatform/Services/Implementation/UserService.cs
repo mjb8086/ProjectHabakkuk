@@ -34,7 +34,7 @@ namespace HBKPlatform.Services.Implementation
             if (client != null)
             {
                 user.ClientId = client.Id;
-                user.ClinicId = client.ClinicId;
+                user.PracticeId = client.PracticeId;
                 user.TenancyId = client.TenancyId;
                 client.User.LastLogin = DateTime.UtcNow;
                 client.User.LoginCount++;
@@ -42,7 +42,7 @@ namespace HBKPlatform.Services.Implementation
             else if ((prac = await _db.Practitioners.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId)) != null)
             {
                 user.PractitionerId = prac.Id;
-                user.ClinicId = prac.ClinicId;
+                user.PracticeId = prac.PracticeId;
                 user.TenancyId = prac.TenancyId;
                 prac.User.LastLogin = DateTime.UtcNow;
                 prac.User.LoginCount++;

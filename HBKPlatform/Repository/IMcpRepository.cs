@@ -6,12 +6,12 @@ namespace HBKPlatform.Repository
 {
     public interface IMcpRepository
     {
-        public Task<ClinicDetailsDto> GetClinicAlone(int clinicId);
-        public Task<List<ClinicDetailsLite>> GetClinicDetailsLite();
-        public Task UpdateClinicDetails(ClinicDto clinic);
-        public Task<Tenancy> RegisterClinic(ClinicRegistrationDto clinic);
-        public Task<List<PracDetailsUac>> GetClinicPracs(int clinicId);
-        public Task<Dictionary<int, PracDetailsUac>> GetPracLockoutStatusDict(int clinicId);
+        public Task<PracticeDetailsDto> GetPracticeAlone(int practiceId);
+        public Task<List<PracticeDetailsLite>> GetPracticeDetailsLite();
+        public Task UpdatePracticeDetails(PracticeDto practice);
+        public Task<Tenancy> RegisterPractice(PracticeRegistrationDto practice);
+        public Task<List<PractitionerDetailsUac>> GetPracticePracs(int practiceId);
+        public Task<Dictionary<int, PractitionerDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId);
         public Task<List<UserDto>> GetRecentLogins();
     }
 }

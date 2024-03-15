@@ -15,7 +15,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
     /// </summary>
     [Area("MyND"), Authorize(Roles="Practitioner")]
     public class MessagingController
-        (IClientMessagingService _clientMessagingService, IClinicService _clinicService) : Controller
+        (IClientMessagingService _clientMessagingService, IPracticeService practiceService) : Controller
     {
 
         [HttpGet]
@@ -28,7 +28,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var inboxView = await _clinicService.GetInboxModel();
+            var inboxView = await practiceService.GetInboxModel();
             return View(inboxView);
         }
 

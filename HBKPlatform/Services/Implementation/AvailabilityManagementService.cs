@@ -46,7 +46,7 @@ namespace HBKPlatform.Services.Implementation
                 ? DateTimeHelper.GetDateRangeStringForThisWeek(dbStartDate)
                 : DateTimeHelper.GetDateRangeStringFromWeekNum(dbStartDate, weekNum);
         
-            var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
+            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
             _currentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
             _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef( pracId);
@@ -66,7 +66,7 @@ namespace HBKPlatform.Services.Implementation
         {
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
         
-            var allTimeslots = await _timeslotRepo.GetClinicTimeslots();
+            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
             // identical for indef model construction
             _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(pracId);

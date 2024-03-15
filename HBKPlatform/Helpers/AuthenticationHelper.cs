@@ -12,7 +12,7 @@ namespace HBKPlatform.Helpers
         {
             return new[]
             {
-                new Claim("ClinicId", userDto.ClinicId.ToString()), 
+                new Claim("PracticeId", userDto.PracticeId.ToString()), 
                 new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
                 new Claim("ClientId", userDto.ClientId?.ToString() ?? ""),
                 new Claim("TenancyId", userDto.TenancyId.ToString())

@@ -1,0 +1,15 @@
+@model HBKPlatform.Models.View.MCP.ListPractices;
+@{
+    ViewData["Title"] = "MCP Practice Management";
+    ViewBag.CurrentNav = "PracticeManagement";
+    Layout = "_McpShared";
+}
+
+<h1>Current registrants</h1>
+<p>Open a practice to: modify details, send a password reset to the lead practitioner, modify activation or delete it from the system.</p>
+<div id="table1Wrap">
+@foreach (var practice in Model.Practices)
+{
+    <div class="table1Item"><span>@practice.Name</span> <a asp-area="MCP" asp-controller="PracticeManagement" asp-action="ViewPractice" asp-route-practiceId="@practice.Id">View Practice</a></div>
+}
+</div>

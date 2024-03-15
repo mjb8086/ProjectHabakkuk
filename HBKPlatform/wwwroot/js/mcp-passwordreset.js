@@ -2,40 +2,40 @@ import Globals from './globals.js';
 
 $(document).ready(function () {
     // Model
-    var pracData = {};
+    var practitionerData = {};
     var isDisabled = true;
     
     // Elements
-    const csel = $("#clinicSelect");
-    const psel = $("#pracSelect");
+    const practiceSelect = $("#practiceSelect");
+    const practitionerSelect = $("#practitionerSelect");
     const ls = $("#lockoutStatus");
     const le = $("#lockoutEnd");
     
     // Functions
-    function updatePracList(myPracData) {
-        psel.empty();
+    function updatePractitionerList(thisPracticePractitioners) {
+        practitionerSelect.empty();
         var isFirst = true;
-        const pracKeys = Object.keys(myPracData);
-        pracKeys.forEach(function(e) {
+        const practitionerKeys = Object.keys(thisPracticePractitioners);
+        practitionerKeys.forEach(function(e) {
            if (isFirst) {
-               psel.append($('<option>',{text: myPracData[e].name, value: e, selected: "selected"}));
+               practitionerSelect.append($('<option>',{text: thisPracticePractitioners[e].name, value: e, selected: "selected"}));
                isFirst = false;
            } else {
-               psel.append($('<option>',{text: myPracData[e].name, value: e}));
+               practitionerSelect.append($('<option>',{text: thisPracticePractitioners[e].name, value: e}));
            }
         });
-        displayLockout(myPracData[pracKeys[0]].id);
+        displayLockout(thisPracticePractitioners[practitionerKeys[0]].id);
     }
     
-    function displayLockout(pracId) {
-        if(!pracData[pracId]) { 
-            console.error(`pracID ${pracId} not in pracdata`);
+    function displayLockout(practitionerId) {
+        if(!practitionerData[practitionerId]) { 
+            console.error(`pracID ${practitionerId} not in pracdata`);
             return;
         }
-        console.log(`FOUND: ${JSON.stringify(pracData[pracId])}`);
-       if(pracData[pracId].hasLockout) {
+        console.log(`FOUND: ${JSON.stringify(practitionerData[practitionerId])}`);
+       if(practitionerData[practitionerId].hasLockout) {
             ls.text("Lockout");
-            le.text(pracData[pracId].lockoutEnd);
+            le.text(practitionerData[practitionerId].lockoutEnd);
             ls.removeClass('active');
             ls.addClass('inactive');
        } else {
@@ -46,32 +46,31 @@ $(document).ready(function () {
         }
     }
     
-    function fetchClinicPracs(id) {
+    function fetchPracticePracs(id) {
         $.ajax({
-            url: `${Globals.BaseUrl}/mcp/clinicmanagement/getclinicpracs?clinicId=${id}`,
+            url: `${Globals.BaseUrl}/mcp/practicemanagement/getpracticepracs?practiceId=${id}`,
             contentType: "application/json",
             method: "get",
             success: function (data) {
-                console.log(`Finished fetching prac data, result: ${JSON.stringify(data)} `);
-                pracData = data.pracs;
-                updatePracList(pracData);
+                practitionerData = data.pracs;
+                updatePractitionerList(practitionerData);
             }
         });
     }
     
     // Listeners
-    csel.on('change', function (e) {
-        fetchClinicPracs(e.target.value);
+    practiceSelect.on('change', function (e) {
+        fetchPracticePracs(e.target.value);
         if (isDisabled) {
             $('#doIt').removeAttr("disabled");
-            psel.removeAttr("disabled");
+            practitionerSelect.removeAttr("disabled");
             isDisabled = false;
         }
     });
     
-    psel.on('change', function (e) {
+    practitionerSelect.on('change', function (e) {
        displayLockout(e.target.value);
     });
     
-    csel.trigger("change");
+    practiceSelect.trigger("change");
 });

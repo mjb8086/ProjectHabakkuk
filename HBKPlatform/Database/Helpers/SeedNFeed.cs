@@ -38,7 +38,7 @@ namespace HBKPlatform.Database.Helpers
                     await roleStore.CreateAsync(clientRole);
                 }
                     
-                if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Clinics.Any()) {
+                if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Practices.Any()) {
 
                     var ndTenancy = new Tenancy()
                     {
@@ -100,11 +100,12 @@ namespace HBKPlatform.Database.Helpers
                         Forename = "Emmett",
                         Surname = "Brown",
                         Title = Enums.Title.Dr,
-                        Bio = "inventor of the flux capacitor",
+                        ClientBio = "inventor of the flux capacitor",
                         Location = "hill valley",
                         DateOfBirth = new DateOnly(1932, 07, 08),
                         Img = new string("samples/brown.jpg"),
                         User = user1,
+                        GmcNumber = "foo",
                         Tenancy = t
                     };
                     
@@ -113,11 +114,12 @@ namespace HBKPlatform.Database.Helpers
                         Forename = "Another",
                         Surname = "Prac",
                         Title = Enums.Title.Dr,
-                        Bio = "layabout",
+                        ClientBio = "layabout",
                         Location = "the pub",
                         DateOfBirth = new DateOnly(1992, 07, 08),
                         Img = new string("samples/second.jpg"),
                         Tenancy = t,
+                        GmcNumber = "foo",
                         User =  new ()
                         {
                             Email = "another@hillvalley.com",
@@ -217,20 +219,20 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t
                     };
                     
-                    var clinic = new Clinic()
+                    var practice = new Practice()
                     {
                         EmailAddress = "foo@bar.com",
-                        Description = "Hill Valley Clinic",
+                        Description = "Hill Valley Practice",
                         Telephone = "0898 333 201",
                         Clients = new List<Client>() {client1, client2, client3},
                         Practitioners = new List<Practitioner>() {prac1, prac2},
                         Tenancy = t
                     };
 
-                    ctx.Add(clinic);
+                    ctx.Add(practice);
                     ctx.SaveChanges();
 
-                    clinic.LeadPractitioner = prac1;
+                    practice.LeadPractitioner = prac1;
                     ctx.SaveChanges();
 
                     var clientPracs = new List<ClientPractitioner>()
@@ -256,31 +258,30 @@ namespace HBKPlatform.Database.Helpers
                     var conversation = new List<ClientMessage>();
                     conversation.Add(new ClientMessage()
                     {
-                        ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Client,
+                        ClientId = client1.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Client,
                         MessageBody = "lost the plutonium sorry", Tenancy = t
                     });
                     conversation.Add(new ClientMessage()
                     {
-                        ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
+                        ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "ah bollocks", Tenancy = t
                     });
                     conversation.Add(new ClientMessage()
                     {
-                        ClientId = client2.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
+                        ClientId = client2.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "don't steal that almanac you tool", Tenancy = t
                     });
                     ctx.AddRange(conversation);
 
                     var clientRecord1 = new ClientRecord()
                     {
-                        Clinic = clinic, Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
+                        Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
                         Title = "Bad news for the bowels", NoteBody = "bother shifting the goods", Practitioner = prac1, Tenancy = t
                     };
                     ctx.Add(clientRecord1);
 
                     var treatment1 = new Treatment()
                     {
-                        Clinic = clinic,
                         TreatmentRequestability = Enums.TreatmentRequestability.ClientAndPrac,
                         Title = "Checkup",
                         Description = "talk and pretend to do something",
@@ -290,7 +291,6 @@ namespace HBKPlatform.Database.Helpers
                     
                     var treatment2 = new Treatment()
                     {
-                        Clinic = clinic,
                         TreatmentRequestability = Enums.TreatmentRequestability.PracOnly,
                         Title = "Prac Only Test",
                         Description = "no book for client",
@@ -347,8 +347,7 @@ namespace HBKPlatform.Database.Helpers
                     {
                         Key = "DbStartDate",
                         Value = "2024-01-01",
-                        Tenancy = t,
-                        Clinic = clinic
+                        Tenancy = t
                     };
                     ctx.Add(startDate);
 
