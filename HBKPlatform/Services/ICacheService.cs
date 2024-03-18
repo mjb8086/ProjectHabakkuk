@@ -9,7 +9,7 @@ namespace HBKPlatform.Services
         public int GetLeadPractitionerId(int practiceId);
         public PractitionerDetailsLite GetPractitionerDetailsLite(int pracId);
         public ClientDetailsLite GetClientDetailsLite(int clientId);
-        public Task<List<PractitionerDetailsLite>> GetPracticePractitionerDetailsLite();
+        public Task<Dictionary<int, PractitionerDetailsLite>> GetPracticePractitionerDetailsLite();
         public Task<List<ClientDetailsLite>> GetPracticeClientDetailsLite();
         public Task<Dictionary<string, SettingDto>> GetAllTenancySettings();
         public Task<Dictionary<int, TreatmentDto>> GetTreatments();

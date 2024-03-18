@@ -256,17 +256,17 @@ namespace HBKPlatform.Database.Helpers
                     ctx.AddRange(roles);
 
                     var conversation = new List<ClientMessage>();
-                    conversation.Add(new ClientMessage()
+                    conversation.Add(new ()
                     {
-                        ClientId = client1.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Client,
+                        ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Client,
                         MessageBody = "lost the plutonium sorry", Tenancy = t
                     });
-                    conversation.Add(new ClientMessage()
+                    conversation.Add(new ()
                     {
                         ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "ah bollocks", Tenancy = t
                     });
-                    conversation.Add(new ClientMessage()
+                    conversation.Add(new ()
                     {
                         ClientId = client2.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "don't steal that almanac you tool", Tenancy = t

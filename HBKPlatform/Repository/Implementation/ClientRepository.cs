@@ -1,4 +1,3 @@
-using System.Data;
 using HBKPlatform.Database;
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
@@ -51,7 +50,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task Create(ClientDto client)
         {
             bool willHaveUser = client.HasUserAccount && !string.IsNullOrWhiteSpace(client.Email);
-            var dbClient = new Database.Client()
+            var dbClient = new Client()
             {
                 Title = client.Title,
                 Forename = client.Forename,
@@ -86,10 +85,12 @@ namespace HBKPlatform.Repository.Implementation
                 user.PasswordHash = passwordHasher.HashPassword(user, pwd);
                 dbClient.User = user;
             }
-        
             await _db.AddAsync(dbClient);
-            var clientPrac = new ClientPractitioner() { Client = dbClient, PractitionerId = client.PractitionerId };
-            await _db.AddAsync(clientPrac);
+            await _db.AddAsync(new ClientPractitioner() { 
+                Client = dbClient, 
+                PractitionerId = client.PractitionerId, 
+                TenancyId = _tenancySrv.TenancyId
+            });
         
             await _db.SaveChangesAsync();
             if (willHaveUser) await _userMgr.AddToRoleAsync(dbClient.User, "Client");

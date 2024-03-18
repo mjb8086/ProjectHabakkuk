@@ -85,14 +85,14 @@ namespace HBKPlatform.Services.Implementation
             _memoryCache.Remove($"Client-t{TenancyId}-{clientId}");
         }
 
-        public async Task<List<PractitionerDetailsLite>> GetPracticePractitionerDetailsLite()
+        public async Task<Dictionary<int, PractitionerDetailsLite>> GetPracticePractitionerDetailsLite()
         {
             string key = $"Practitioners-t{TenancyId}";
-            if (_memoryCache.TryGetValue(key, out List<PractitionerDetailsLite>? practitionerDetails)) 
+            if (_memoryCache.TryGetValue(key, out Dictionary<int, PractitionerDetailsLite>? practitionerDetails)) 
                 return practitionerDetails ?? throw new IdxNotFoundException();
         
             practitionerDetails = await _db.Practitioners.Select(x => new PractitionerDetailsLite()
-                { Id = x.Id, Name = $"{x.Title} {x.Forename} {x.Surname}", PracticeId = x.PracticeId }).ToListAsync();
+                { Id = x.Id, Name = $"{x.Title} {x.Forename} {x.Surname}", PracticeId = x.PracticeId }).ToDictionaryAsync(x => x.Id);
             _memoryCache.Set(key,  practitionerDetails, CacheEntryOptions);
             return practitionerDetails;
         }
