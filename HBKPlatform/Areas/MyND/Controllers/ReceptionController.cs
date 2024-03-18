@@ -18,7 +18,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
     {
         public async Task<IActionResult> Index()
         {
-            return View(await practiceService.GetReceptionModel());
+            return View(await practiceService.GetPractitionerReceptionModel());
         }
     }
 }

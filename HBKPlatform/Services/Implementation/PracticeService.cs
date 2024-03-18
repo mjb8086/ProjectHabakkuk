@@ -20,14 +20,12 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2023 NowDoctor Ltd.
     /// </summary>
-    public class PracticeService(ApplicationDbContext _db, ICacheService _cache, IUserService _userSrv) : IPracticeService
+    public class PracticeService(ICacheService _cache, IUserService _userSrv, IClientMessageRepository _messageRepo, IUserRepository _userRepo) : IPracticeService
     {
         public async Task<bool> VerifyClientPractitionerMembership(int clientId, int practitionerId)
         {
-            // TODO: Deprecate or move to repository.
-            var client = await _db.Clients.FirstAsync(x => x.Id == clientId);
-            var prac = await _db.Practitioners.FirstAsync(x => x.Id == practitionerId);
-            return client.PracticeId == prac.PracticeId && client.TenancyId == prac.TenancyId;
+            return await _userRepo.VerifyClientPractitionerMembership(clientId, practitionerId);
+
         }
 
         public async Task<InboxModel> GetInboxModel()
@@ -35,7 +33,7 @@ namespace HBKPlatform.Services.Implementation
             return new () { ClientDetails = await _cache.GetPracticeClientDetailsLite() };
         }
 
-        public async Task<ClientPracticeData> GetClientPracticeData()
+        public async Task<ClientPracticeData> GetClientReceptionData()
         {
             var clientId = _userSrv.GetClaimFromCookie("ClientId");
             var leadPracId = _cache.GetLeadPractitionerId(_userSrv.GetClaimFromCookie("PracticeId"));
@@ -45,19 +43,18 @@ namespace HBKPlatform.Services.Implementation
             {
                 data.PracId = practitionerDetailsLite[leadPracId].Id;
                 data.MyPracName = practitionerDetailsLite[leadPracId].Name;
-                // TODO: Move to repository.
-                data.NumUnreadMessages = await _db.ClientMessages.CountAsync(x => x.PractitionerId == data.PracId && x.ClientId == clientId && x.MessageOrigin == Enums.MessageOrigin.Practitioner && x.MessageStatusClient == Enums.MessageStatus.Unread);
+                data.NumUnreadMessages = await _messageRepo.GetUnreadMessagesAsClient(leadPracId, clientId);
             }
 
             return data;
         }
 
-        public async Task<ReceptionModel> GetReceptionModel()
+        public async Task<ReceptionModel> GetPractitionerReceptionModel()
         {
             var practitionerId = _userSrv.GetClaimFromCookie("PractitionerId");
             var data = new ReceptionModel();
             {
-                data.NumUnreadMessages = await _db.ClientMessages.CountAsync(x => x.PractitionerId == practitionerId && x.MessageOrigin == Enums.MessageOrigin.Client && x.MessageStatusPractitioner == Enums.MessageStatus.Unread);
+                data.NumUnreadMessages = await _messageRepo.GetUnreadMessagesAsPractitioner(practitionerId);
             }
 
             return data;

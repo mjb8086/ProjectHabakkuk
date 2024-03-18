@@ -10,7 +10,7 @@ namespace HBKPlatform.Services
     {
         public Task<bool> VerifyClientPractitionerMembership(int clientId, int practitionerId);
         public Task<InboxModel> GetInboxModel();
-        public Task<ClientPracticeData> GetClientPracticeData();
-        public Task<ReceptionModel> GetReceptionModel();
+        public Task<ClientPracticeData> GetClientReceptionData();
+        public Task<ReceptionModel> GetPractitionerReceptionModel();
     }
 }

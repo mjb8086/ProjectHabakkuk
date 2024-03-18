@@ -6,6 +6,7 @@ using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MissingMemberException = System.MissingMemberException;
 
 namespace HBKPlatform.Repository.Implementation
 {
@@ -161,6 +162,17 @@ namespace HBKPlatform.Repository.Implementation
             return await _db.Users.IgnoreQueryFilters().Where(x => x.LastLogin.HasValue && x.LastLogin > oneWeekAgo)
                 .OrderBy(x => x.LastLogin)
                 .Select(x => new UserDto(){TenancyId = x.TenancyId, UserEmail = x.Email ?? "", LastLogin = x.LastLogin, UserRole = "TODO", LoginCount = x.LoginCount, LockoutEnd = x.LockoutEnd}).ToListAsync();
+        }
+        
+        
+        public async Task<string> GetPracUserId(int pracId)
+        {
+            var practitioner = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == pracId);
+            if (practitioner == null || string.IsNullOrWhiteSpace(practitioner.UserId))
+            {
+                throw new MissingMemberException("UserID is null");
+            }
+            return practitioner.UserId;
         }
     
     

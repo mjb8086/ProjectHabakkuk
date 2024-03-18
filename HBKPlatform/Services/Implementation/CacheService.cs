@@ -15,7 +15,7 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, ITenancyService _tenancy): ICacheService
+    public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, ITenancyService _tenancy, ILogger<CacheService> _logger): ICacheService
     {
         // Default policy: All values will be evicted after 1 day
         private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(1));
@@ -173,6 +173,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 concreteMemoryCache.Clear();
             } 
+            _logger.LogWarning("Memory cache has been cleared.");
         }
     }
 }

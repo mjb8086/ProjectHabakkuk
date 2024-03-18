@@ -13,5 +13,7 @@ namespace HBKPlatform.Repository
         public Task<List<PractitionerDetailsUac>> GetPracticePracs(int practiceId);
         public Task<Dictionary<int, PractitionerDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId);
         public Task<List<UserDto>> GetRecentLogins();
+
+        public Task<string> GetPracUserId(int pracId);
     }
 }
