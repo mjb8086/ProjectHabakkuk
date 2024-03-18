@@ -9,7 +9,6 @@ namespace HBKPlatform.Database
         public Enums.Sex Sex { get; set; }
         public string Forename { get; set; }
         public string Surname { get; set; }
-
         public DateOnly DateOfBirth { get; set; }
         public string? Img { get; set; }
         public string? UserId { get; set; }

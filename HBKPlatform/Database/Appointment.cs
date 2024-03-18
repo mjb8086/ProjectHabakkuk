@@ -19,6 +19,7 @@ namespace HBKPlatform.Database
         public int PractitionerId { get; set; }
         public int TreatmentId { get; set; }
         public int TimeslotId { get; set; }
+        public int? RoomId { get; set; }
         public string? Note { get; set; }
         public int WeekNum { get; set; }
         public Enums.AppointmentStatus Status { get; set; }
@@ -30,6 +31,7 @@ namespace HBKPlatform.Database
         public virtual Practitioner Practitioner { get; set; }
         public virtual Treatment Treatment { get; set; }
         public virtual Timeslot Timeslot { get; set; }
+        public virtual Room? Room { get; set; }
 
     }
 }

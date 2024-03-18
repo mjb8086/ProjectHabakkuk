@@ -19,7 +19,7 @@ namespace HBKPlatform.Database.Helpers
                provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), new HttpContextAccessor(), tenancySrv))
             {
                 var roleStore = new RoleStore<IdentityRole>(ctx);
-                IdentityRole? superAdminRole, pracRole, clientRole;
+                IdentityRole? superAdminRole, pracRole, clientRole, clinicMgrRole;
 
                 if ((superAdminRole = ctx.Roles.FirstOrDefault(r => r.Name == "SuperAdmin")) == null)
                 {
@@ -36,6 +36,11 @@ namespace HBKPlatform.Database.Helpers
                 {
                     clientRole = new IdentityRole() { Name = "Client", NormalizedName = "Client".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
                     await roleStore.CreateAsync(clientRole);
+                }
+                if ((clinicMgrRole = ctx.Roles.FirstOrDefault(r => r.Name == "ClinicManager")) == null)
+                {
+                    clinicMgrRole = new IdentityRole() { Name = "ClinicManager", NormalizedName = "ClinicManager".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
+                    await roleStore.CreateAsync(clinicMgrRole);
                 }
                     
                 if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Practices.Any()) {
@@ -388,6 +393,50 @@ namespace HBKPlatform.Database.Helpers
                     };
                     ctx.AddRange(ta);
                     ctx.SaveChanges();
+                    
+                    // Now add Clinic and rooms for rental
+                    // TODO: Attributes
+
+                    var mgr1Email = "coach@btinternet.com";
+                    var managerUser = new User()
+                    {
+                        Email = mgr1Email,
+                        NormalizedEmail = mgr1Email.ToUpper(),
+                        UserName = mgr1Email,
+                        NormalizedUserName = mgr1Email.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = true,
+                        PhoneNumber = "98989",
+                        PhoneNumberConfirmed = true,
+                        Tenancy = t,
+                    };
+                    managerUser.PasswordHash = passwordHasher.HashPassword(client1User, "vip_pass_mode");
+                    await ctx.AddAsync(managerUser);
+                    await ctx.SaveChangesAsync();
+
+                    var mgrUser = new IdentityUserRole<string>()
+                    {
+                        UserId = managerUser.Id,
+                        RoleId = clinicMgrRole.Id
+                    };
+                    await ctx.AddAsync(mgrUser);
+                    
+                    var clinic1 = new Clinic()
+                    {
+                        OrgName = "The Coachman",
+                        StreetAddress = "Broad Street\nMagherafelt",
+                        Telephone = "1690",
+                        EmailAddress = "coachm@btinternet.com",
+                        ManagerUserId = managerUser.Id,
+                        Rooms = new List<Room>()
+                        {
+                            new () {Description = "Pool room", Title = "Pool Room"},
+                            new () {Description = "Drinks and a jukebox", Title = "Front Bar"},
+                            new () {Description = "bring coat", Title = "Beer garden"}
+                        }
+                    };
+                    await ctx.AddAsync(clinic1);
+                    await ctx.SaveChangesAsync();
                 }
             }
         }

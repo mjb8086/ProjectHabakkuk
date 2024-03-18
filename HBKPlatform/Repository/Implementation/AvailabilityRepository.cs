@@ -9,21 +9,21 @@ namespace HBKPlatform.Repository.Implementation
     {
         public async Task<List<TimeslotAvailabilityDto>> GetAvailabilityLookupForWeek(int pracId, int weekNum)
         {
-            return await _db.TimeslotAvailabilities.Include("Timeslot")
+            return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => x.WeekNum == weekNum && x.PractitionerId == pracId)
                 .Select(x => new TimeslotAvailabilityDto() {WeekNum = x.WeekNum, Availability = x.Availability, TimeslotId = x.TimeslotId}).ToListAsync();
         }
     
         public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetAvailabilityLookupForIndef(int pracId)
         {
-            return await _db.TimeslotAvailabilities.Include("Timeslot")
+            return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => x.IsIndefinite && x.PractitionerId == pracId)
                 .ToDictionaryAsync(x => x.TimeslotId, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotId});
         }
     
         public async Task<List<TimeslotAvailabilityDto>> GetAvailabilityLookupForWeeks(int pracId, int[] weekNums)
         {
-            return await _db.TimeslotAvailabilities.Include("Timeslot")
+            return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => weekNums.Contains(x.WeekNum) && x.PractitionerId == pracId)
                 .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.TimeslotId, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
         }
@@ -33,7 +33,7 @@ namespace HBKPlatform.Repository.Implementation
             // Ensure this week is current or in the future
             
             // 1. Find and update any existing availability records
-            var existingRecords = await _db.TimeslotAvailabilities.Include("Timeslot").Where(x =>
+            var existingRecords = await _db.TimeslotAvailability.Include("Timeslot").Where(x =>
                 x.WeekNum == weekNum && x.PractitionerId == pracId).ToDictionaryAsync(x => x.TimeslotId);
 
             UpdateExistingRecords(tsAvaDict, existingRecords);
@@ -48,7 +48,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task UpdateAvailabilityForIndef(int pracId, Dictionary<int, bool> tsAvaDict)
         {
             // 1. Find and update any existing availability records
-            var existingRecords = await _db.TimeslotAvailabilities.Include("Timeslot").Where(x =>
+            var existingRecords = await _db.TimeslotAvailability.Include("Timeslot").Where(x =>
                 x.IsIndefinite  && x.PractitionerId == pracId).ToDictionaryAsync(x => x.TimeslotId);
 
             UpdateExistingRecords(tsAvaDict, existingRecords);
@@ -95,12 +95,12 @@ namespace HBKPlatform.Repository.Implementation
 
         public async Task RevertAvailabilityForWeek(int weekNum, int pracId)
         {
-            await _db.TimeslotAvailabilities.Include("Timeslot").Where(x => x.WeekNum == weekNum && x.PractitionerId == pracId).ExecuteDeleteAsync();
+            await _db.TimeslotAvailability.Include("Timeslot").Where(x => x.WeekNum == weekNum && x.PractitionerId == pracId).ExecuteDeleteAsync();
         }
     
         public async Task RevertAvailabilityForIndef(int pracId)
         {
-            await _db.TimeslotAvailabilities.Include("Timeslot").Where(x => x.IsIndefinite && x.PractitionerId == pracId).ExecuteDeleteAsync();
+            await _db.TimeslotAvailability.Include("Timeslot").Where(x => x.IsIndefinite && x.PractitionerId == pracId).ExecuteDeleteAsync();
         }
 
     }

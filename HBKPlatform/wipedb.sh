@@ -7,6 +7,7 @@ delete from client_records;
 delete from timeslot_availabilities;
 delete from timeslots;
 delete from clients;
+delete from clinics;
 delete from practices;
 delete from practitioners;
 delete from user_roles;

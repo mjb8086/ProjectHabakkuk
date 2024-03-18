@@ -38,6 +38,11 @@ namespace HBKPlatform.Globals
                Unavailable, Available
           }
 
+          public enum AvailabilityEntity
+          {
+               Practitioner, Room
+          }
+
           public enum AppointmentStatus
           {
                Live, 

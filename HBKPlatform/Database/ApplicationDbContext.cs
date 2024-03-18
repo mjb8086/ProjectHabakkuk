@@ -37,13 +37,14 @@ namespace HBKPlatform.Database
         public DbSet<Practitioner> Practitioners { get; set; } = default!;
         public DbSet<Tenancy> Tenancies { get; set; } = default!;
         public DbSet<Timeslot> Timeslots { get; set; } = default!;
-        public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
+        public DbSet<TimeslotAvailability> TimeslotAvailability { get; set; } = default!;
         public DbSet<Treatment> Treatments { get; set; } = default!;
         public DbSet<Setting> Settings { get; set; } = default!;
         public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
         public DbSet<Room> Rooms { get; set; } = default!;
         public DbSet<Attribute> Attributes { get; set; } = default!;
         public DbSet<RoomAttribute> RoomAttributes { get; set; } = default!;
+        public DbSet<Clinic> Clinics { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
