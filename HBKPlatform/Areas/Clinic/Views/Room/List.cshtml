@@ -1,0 +1,21 @@
+@model List<HBKPlatform.Models.DTO.RoomDto>
+@{
+    ViewData["Title"] = "Room Management";
+    ViewBag.CurrentNav = "RoomManagement";
+    Layout = "_Clinic";
+}
+
+<h1>Room List</h1>
+<p>Shows all the current rooms in your clinic that are intended for practitioner booking. Here you may add a new room, modify an existing room or delete it from the system.</p>
+
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Name</td> <td>Actions</td></tr></thead>
+        @foreach (var room in Model)
+        {
+            <tr class="table1Item"><td>@room.Title</td> <td>Modify | Delete</td> </tr>
+        }
+    </table>
+</div>
+
+<a href="">Add New Room</a>

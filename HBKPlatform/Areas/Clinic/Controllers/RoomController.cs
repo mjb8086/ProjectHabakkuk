@@ -23,4 +23,14 @@ public class RoomController(): Controller
     {
         return View();
     }
+    
+    public async Task <IActionResult> List()
+    {
+        return View();
+    }
+    
+    public async Task <IActionResult> ViewRoom()
+    {
+        return View();
+    }
 }

@@ -1,0 +1,31 @@
+@model HBKPlatform.Models.DTO.RoomDto;
+@{
+    ViewData["Title"] = "Room Details";
+    ViewBag.CurrentNav = "RoomManagement";
+    ViewBag.Css = "clinic-roommgmt.css";
+    Layout = "_Clinic";
+}
+<h1>View or modify room</h1>
+<div id="uacWrapper">
+<form id="treatmentDetails" asp-area="Clinic" asp-controller="Room" asp-action="DoUpdateRoom" asp-route-roomId="@Model.Id" method="post"> 
+    <fieldset>
+        <legend for="title" class="form-textfield">Title</legend>
+        <input type="text" id="title" asp-for="Title" value="@Model.Title" placeholder="Operating Theatre" >
+    </fieldset>
+
+    <fieldset>
+        <legend for="description" class="form-textfield">Organisation Tagline</legend>
+        <input type="text" id="description" asp-for="Description" value="@Model.Description" placeholder="Big table in the middle." >
+    </fieldset>
+
+    <fieldset>
+      <label for="pricePerUse" class="form-textfield">Price Per Use</label>
+      <span>£</span> <input type="number" name="cost" id="pricePerUse" step=".01" value="@Model.PricePerUse"/>
+    </fieldset>
+    
+    <fieldset>
+        <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/>
+    </fieldset>
+</form>
+</div>
+
