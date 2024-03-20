@@ -51,7 +51,8 @@ namespace HBKPlatform.Database.Helpers
                         ContactEmail = ".",
                         LicenceStatus = Enums.LicenceStatus.Active,
                         RegistrationDate = DateTime.UtcNow,
-                        OrgTagline = ""
+                        OrgTagline = "",
+                        Type = TenancyType.NdAdmin
                     };
                     
                     var t = new Tenancy()
@@ -60,7 +61,8 @@ namespace HBKPlatform.Database.Helpers
                         ContactEmail = "foo@bar.net",
                         LicenceStatus = Enums.LicenceStatus.Active,
                         RegistrationDate = DateTime.UtcNow,
-                        OrgTagline = "Timely treatment or your time back."
+                        OrgTagline = "Timely treatment or your time back.",
+                        Type = TenancyType.Practice
                     };
                     
                     var suEmail = "mjb+sudo1@nowdoctor.co.uk";
@@ -395,8 +397,16 @@ namespace HBKPlatform.Database.Helpers
                     ctx.SaveChanges();
                     
                     // Now add Clinic and rooms for rental
-                    // TODO: Attributes
-
+                    
+                    var clinicTenancy = new Tenancy() {
+                        OrgName = "The Coachman",
+                        LicenceStatus = Enums.LicenceStatus.Active,
+                        Type = TenancyType.Clinic
+                    };
+                    await ctx.AddAsync(clinicTenancy);
+                    await ctx.SaveChangesAsync();
+                    tenancySrv.SetTenancyId(clinicTenancy.Id);
+                    
                     var mgr1Email = "coach@btinternet.com";
                     var managerUser = new User()
                     {
@@ -408,7 +418,7 @@ namespace HBKPlatform.Database.Helpers
                         LockoutEnabled = true,
                         PhoneNumber = "98989",
                         PhoneNumberConfirmed = true,
-                        Tenancy = t,
+                        Tenancy = clinicTenancy,
                     };
                     managerUser.PasswordHash = passwordHasher.HashPassword(client1User, "vip_pass_mode");
                     await ctx.AddAsync(managerUser);
@@ -420,7 +430,6 @@ namespace HBKPlatform.Database.Helpers
                         RoleId = clinicMgrRole.Id
                     };
                     await ctx.AddAsync(mgrUser);
-                    
                     var clinic1 = new Clinic()
                     {
                         OrgName = "The Coachman",
@@ -430,9 +439,9 @@ namespace HBKPlatform.Database.Helpers
                         ManagerUserId = managerUser.Id,
                         Rooms = new List<Room>()
                         {
-                            new () {Description = "Pool room", Title = "Pool Room"},
-                            new () {Description = "Drinks and a jukebox", Title = "Front Bar"},
-                            new () {Description = "bring coat", Title = "Beer garden"}
+                            new() { Description = "Pool room", Title = "Pool Room" },
+                            new() { Description = "Drinks and a jukebox", Title = "Front Bar" },
+                            new() { Description = "bring coat", Title = "Beer garden" }
                         }
                     };
                     await ctx.AddAsync(clinic1);

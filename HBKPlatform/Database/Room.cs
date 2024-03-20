@@ -15,6 +15,7 @@ public class Room : HbkBaseEntity
     public string Description { get; set; }
     public string? Img { get; set; }
     public int ClinicId { get; set; }
+    public double PricePerUse { get; set; }
     
     // EV Navigations
     public virtual ICollection<RoomAttribute> RoomAttributes { get; set; }
