@@ -66,7 +66,13 @@
                         @if (User.IsInRole("Client"))
                         {
                             <li class="nav-item">
-                                <a class="navbar-light" asp-area="Client" asp-controller="Reception" asp-action="Index">Practice Reception</a>
+                                <a class="navbar-light" asp-area="Client" asp-controller="Reception" asp-action="Index">Reception</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("ClinicManager"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Clinic" asp-controller="Reception" asp-action="Index">Clinic Management</a>
                             </li>
                         }
                 </ul>

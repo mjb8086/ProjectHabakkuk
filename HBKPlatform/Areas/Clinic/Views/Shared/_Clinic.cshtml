@@ -1,0 +1,18 @@
+@{
+    Layout = "_Layout";
+}
+
+@functions
+{
+    public string GetActiveClass(string navPath){
+        if (ViewBag.CurrentNav == null) return "";
+        return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
+    }
+}
+
+<div class="subNav">
+    <a asp-area="Clinic" asp-controller="Reception" asp-action="Index" class="@GetActiveClass("Reception")">Reception</a>
+    <a asp-area="Clinic" asp-controller="Room" asp-action="Index" class="@GetActiveClass("RoomManagement")">Room Management</a>
+    <a asp-area="Clinic" asp-controller="Reservation" asp-action="Index" class="@GetActiveClass("Reservations")">Reservations</a>
+</div>
+@RenderBody()

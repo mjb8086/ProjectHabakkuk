@@ -156,6 +156,13 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t
                     };
                     client1User.PasswordHash = passwordHasher.HashPassword(client1User, "toodamnloud");
+
+                    var setting = new Setting()
+                    {
+                        Key = "SelfBookingEnabled",
+                        Value = "True"
+                    };
+                    ctx.Add(setting);
                     
                     var client1 = new Client()
                     {
