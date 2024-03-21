@@ -62,4 +62,11 @@ namespace HBKPlatform.Models.DTO
     {
         public string Reason { get; set; }
     }
+
+    public class RoomLite
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+    }
+    
 }

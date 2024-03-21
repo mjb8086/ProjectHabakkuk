@@ -1,11 +1,11 @@
 using HBKPlatform.Models.DTO;
 
-namespace HBKPlatform.Repository;
+namespace HBKPlatform.Services;
 
-public interface IRoomRepository
+public interface IRoomService
 {
     public Task Create(RoomDto room);
     public Task Update(RoomDto room);
     public Task<RoomDto> GetRoom(int roomId);
-    public Task<List<RoomLite>> GetClinicRoomsLite(int clinicId);
+    public Task<List<RoomLite>> GetClinicRooms();
 }

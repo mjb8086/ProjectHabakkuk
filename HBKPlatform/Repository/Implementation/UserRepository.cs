@@ -79,11 +79,11 @@ namespace HBKPlatform.Repository.Implementation
         ////////////////////////////////////////////////////////////////////////////////
         public async Task<UserDto> GetAndUpdateLoginUser(string userId)
         {
-            
             var user = new UserDto();
             var client = await _db.Clients.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId);    // TODO: Put these in repositories
             Practitioner? prac;
             User? dbUser;
+            Clinic? clinic;
 
             if (client != null)
             {
@@ -101,12 +101,19 @@ namespace HBKPlatform.Repository.Implementation
                 prac.User.LastLogin = DateTime.UtcNow;
                 prac.User.LoginCount++;
             }
+            else if ((clinic = await _db.Clinics.Include("ManagerUser").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.ManagerUserId == userId)) != null)
+            {
+                user.TenancyId = clinic.TenancyId;
+                user.ClinicId = clinic.Id;
+                clinic.ManagerUser.LastLogin = DateTime.UtcNow;
+                clinic.ManagerUser.LoginCount++;
+            }
             else if((dbUser = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == userId)) != null) // user has neither client or prac entity, get tenancyId from user entity
             {
                 user.TenancyId = dbUser.TenancyId;
                 dbUser.LastLogin = DateTime.UtcNow;
                 dbUser.LoginCount++;
-                _logger.LogWarning($"Plain user login: {userId}");
+                _logger.LogWarning($"Plain user with no associated Client, Practitioner or Clinic login: {userId}");
             }
 
             await _db.SaveChangesAsync();

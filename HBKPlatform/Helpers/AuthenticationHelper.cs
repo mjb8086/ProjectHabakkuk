@@ -12,7 +12,9 @@ namespace HBKPlatform.Helpers
         {
             return new[]
             {
-                new Claim("PracticeId", userDto.PracticeId.ToString()), 
+                // TODO: Reconsider this, just create non null claims instead
+                new Claim("PracticeId", userDto.PracticeId?.ToString() ?? ""), 
+                new Claim("ClinicId", userDto.ClinicId?.ToString() ?? ""), 
                 new Claim("PractitionerId", userDto.PractitionerId?.ToString() ?? ""),
                 new Claim("ClientId", userDto.ClientId?.ToString() ?? ""),
                 new Claim("TenancyId", userDto.TenancyId.ToString())

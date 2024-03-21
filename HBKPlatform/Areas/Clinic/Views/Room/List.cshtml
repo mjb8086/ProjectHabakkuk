@@ -1,7 +1,8 @@
-@model List<HBKPlatform.Models.DTO.RoomDto>
+@model List<HBKPlatform.Models.DTO.RoomLite>
 @{
     ViewData["Title"] = "Room Management";
     ViewBag.CurrentNav = "RoomManagement";
+    ViewBag.Css = "clinic-roommgmt.css";
     Layout = "_Clinic";
 }
 
@@ -13,9 +14,11 @@
         <thead class="table1Item"><tr class="table1Item"><td>Name</td> <td>Actions</td></tr></thead>
         @foreach (var room in Model)
         {
-            <tr class="table1Item"><td>@room.Title</td> <td>Modify | Delete</td> </tr>
+            <tr class="table1Item"><td class="roomTitle">@room.Title</td> <td><a asp-area="Clinic" asp-controller="Room" asp-action="AddEdit" asp-route-roomId="@room.Id">Modify</a> | Delete</td> </tr>
         }
     </table>
 </div>
 
-<a href="">Add New Room</a>
+<div>
+    <a asp-area="Clinic" asp-controller="Room" asp-action="AddEdit">Add New Room</a>
+</div>

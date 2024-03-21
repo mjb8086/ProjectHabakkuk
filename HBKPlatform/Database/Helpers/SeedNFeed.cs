@@ -446,9 +446,9 @@ namespace HBKPlatform.Database.Helpers
                         ManagerUserId = managerUser.Id,
                         Rooms = new List<Room>()
                         {
-                            new() { Description = "Pool room", Title = "Pool Room" },
-                            new() { Description = "Drinks and a jukebox", Title = "Front Bar" },
-                            new() { Description = "bring coat", Title = "Beer garden" }
+                            new() { Description = "Pool room", Title = "Pool Room", PricePerUse = 8.8},
+                            new() { Description = "Drinks and a jukebox", Title = "Front Bar", PricePerUse = 100.0},
+                            new() { Description = "bring coat", Title = "Beer garden", PricePerUse = 3.0}
                         }
                     };
                     await ctx.AddAsync(clinic1);

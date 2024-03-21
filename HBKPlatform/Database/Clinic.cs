@@ -20,5 +20,6 @@ public class Clinic : HbkBaseEntity
     [DataType(DataType.EmailAddress)] 
     public string EmailAddress { get; set; }
     public string ManagerUserId { get; set; }
+    public virtual User ManagerUser { get; set; }
     public ICollection<Room> Rooms { get; set; }
 }
