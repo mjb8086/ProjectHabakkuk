@@ -7,6 +7,10 @@ namespace HBKPlatform.Repository.Implementation;
 
 public class RoomRepository (ApplicationDbContext _db): IRoomRepository
 {
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // NB: Query filters are in effect. These methods are suitable only for Clinics.
+    ////////////////////////////////////////////////////////////////////////////////
     public async Task Create(RoomDto room)
     {
         await _db.AddAsync(new Room()
@@ -31,9 +35,6 @@ public class RoomRepository (ApplicationDbContext _db): IRoomRepository
         await _db.SaveChangesAsync();
     }
     
-    ////////////////////////////////////////////////////////////////////////////////
-    // NB: Query filters are in effect. These methods are suitable only for Clinics.
-    ////////////////////////////////////////////////////////////////////////////////
     public async Task<List<RoomLite>> GetClinicRoomsLite(int clinicId)
     {
         return await _db.Rooms.Where(x => x.ClinicId == clinicId).Select(x => new RoomLite()
@@ -45,19 +46,33 @@ public class RoomRepository (ApplicationDbContext _db): IRoomRepository
     
     public async Task<RoomDto> GetRoom(int roomId)
     {
-        return await _db.Rooms.Select(x => new RoomDto()
+        return await _db.Rooms.Select(x => SelectDto(x)).FirstOrDefaultAsync(x => x.Id == roomId) ?? 
+               throw new IdxNotFoundException($"RoomId {roomId} does not exist.");
+    }
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // The following have no query filters. I.e. Access is not restricted by tenancy.
+    // These may be used by Pracs to find rooms.
+    ////////////////////////////////////////////////////////////////////////////////
+
+    public async Task<List<RoomDto>> GetRoomsAvailableForBooking()
+    {
+        return await _db.Rooms.IgnoreQueryFilters().Select(x => SelectDto(x)).ToListAsync();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // Helpers
+    ////////////////////////////////////////////////////////////////////////////////
+    private static RoomDto SelectDto(Room x)
+    {
+        return new RoomDto()
         {
             Id = x.Id,
             Title = x.Title,
             PricePerUse = x.PricePerUse,
             Description = x.Description,
             Img = x.Img
-        }).FirstOrDefaultAsync(x => x.Id == roomId) ?? 
-               throw new IdxNotFoundException($"RoomId {roomId} does not exist.");
+        };
     }
-    
-    ////////////////////////////////////////////////////////////////////////////////
-    // End query filters. The following may be used by Pracs to find rooms.
-    ////////////////////////////////////////////////////////////////////////////////
     
 }

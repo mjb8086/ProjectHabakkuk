@@ -17,9 +17,10 @@ namespace HBKPlatform.Database
         public DateTime RegistrationDate { get; set; }
     }
 
+    // "None" is 0 ensuring a user is never ND Admin by default.
     public enum TenancyType
     {
-        NdAdmin, Practice, Clinic
+        None = 0, NdAdmin, Practice, Clinic
     }
     
 }

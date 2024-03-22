@@ -17,15 +17,31 @@ public class RoomService(IRoomRepository _roomRepo, IUserService _userService) :
         await _roomRepo.Update(room);
     }
 
+    /// <summary>
+    /// Get all a Clinic's rooms. Tenancy filters are in effect.
+    /// </summary>
     public async Task<List<RoomLite>> GetClinicRooms()
     {
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         return await _roomRepo.GetClinicRoomsLite(clinicId);
     }
 
+    /// <summary>
+    /// Get any room by ID, tenancy filters are in effect.
+    /// </summary>
     public async Task<RoomDto> GetRoom(int roomId)
     {
         return await _roomRepo.GetRoom(roomId);
+    }
+
+    /// <summary>
+    /// Get all rooms suitable for booking by a practitioner.
+    /// Tenancy filters are NOT in effect.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<List<RoomDto>> GetRoomsForBooking()
+    {
+        return await _roomRepo.GetRoomsAvailableForBooking();
     }
     
 }

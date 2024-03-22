@@ -61,6 +61,7 @@ try
     builder.Services.AddScoped<ITenancyService, TenancyService>();
     builder.Services.AddScoped<IMcpRepository, McpRepository>();
     builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+//    builder.Services.AddScoped<IRoomReservationRepository, RoomReservationRepository>();
 
     builder.Services.AddScoped<TenancyMiddleware>();
     builder.Services.AddScoped<CentralScrutinizerMiddleware>();

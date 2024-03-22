@@ -68,6 +68,14 @@ namespace HBKPlatform.Globals
                Active,
                Suspended
           }
-     
+
+          public enum ReservationStatus
+          {
+               Requested,
+               Approved,
+               Denied,
+               Cancelled
+          }
+
      }
 }

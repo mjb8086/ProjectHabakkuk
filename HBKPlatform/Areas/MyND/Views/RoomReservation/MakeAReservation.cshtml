@@ -1,0 +1,19 @@
+@model List<HBKPlatform.Models.DTO.RoomDto>
+@{
+    Layout = "_MyND";
+    ViewBag.CurrentNav = "Reservations|MakeAReservation";
+}
+@await Html.PartialAsync("_RoomReservationsPartial")
+
+<h1>Make A Reservation</h1>
+<p>Available Rooms</p>
+
+<div class="table1OuterWrap">
+<table class="table1">
+    <thead class="table1Item"><tr class="table1Item"><td>Name</td> <td>Description</td> <td>Clinic</td> <td>Cost</td> <td>Action</td> </tr></thead>
+    @foreach (var room in Model)
+    {
+        <tr class="table1Item"><td>@room.Title</td> <td>@room.Description</td> <td>????</td> <td>@room.PricePerUse</td> <td>Book It</td></tr>
+    }
+</table>
+</div>

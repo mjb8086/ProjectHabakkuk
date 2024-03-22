@@ -45,6 +45,7 @@ namespace HBKPlatform.Database
         public DbSet<Attribute> Attributes { get; set; } = default!;
         public DbSet<RoomAttribute> RoomAttributes { get; set; } = default!;
         public DbSet<Clinic> Clinics { get; set; } = default!;
+        public DbSet<RoomReservation> RoomReservations { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -141,7 +142,6 @@ namespace HBKPlatform.Database
             ProcessEntities();
             return base.SaveChanges();
         }
-    
     
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

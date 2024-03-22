@@ -5,3 +5,14 @@
 }
 
 <h2>Reservations.</h2>
+<p>X reservations to approve or deny</p>
+
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Name</td> <td>Date & Time</td> <td>Actions</td></tr></thead>
+        @foreach (var reservation in Model.Reservations)
+        {
+            <tr class="table1Item"><td class="roomTitle">@reservation.Title</td> <td><a asp-area="Clinic" asp-controller="Reservation" asp-action="" asp-route-reservationId="@reservation.Id">View Details</a></td> </tr>
+        }
+    </table>
+</div>
