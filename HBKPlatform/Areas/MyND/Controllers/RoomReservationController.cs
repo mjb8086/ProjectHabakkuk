@@ -25,5 +25,20 @@ namespace HBKPlatform.Areas.MyND.Controllers
         {
             return View(await _roomService.GetRoomsForBooking());
         }
+
+        public async Task<IActionResult> ChooseDateTime(int roomId)
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> ConfirmReservation(int roomId, int weekNum, int timeslotId)
+        {
+            return Ok();
+        }
+
+        public async Task<IActionResult> DoMakeReservation(int roomId, int weekNum, int timeslotId)
+        {
+            return Ok();
+        }
     }
 }

@@ -74,7 +74,8 @@ namespace HBKPlatform.Globals
                Requested,
                Approved,
                Denied,
-               Cancelled
+               CancelledByPractitioner,
+               CancelledByClinic
           }
 
      }
