@@ -13,6 +13,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         await _db.RoomReservations.AddAsync(new RoomReservation() 
             {
                 RoomId = reservation.RoomId,
+                ClinicId = reservation.ClinicId,
                 TimeslotId = reservation.TimeslotId,
                 PractitionerId = reservation.PractitionerId,
                 PracticeNote = reservation.PracticeNote,
@@ -38,13 +39,17 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.ReservationStatus, status));
     }
 
-    public async Task<List<RoomReservationDto>> GetUpcomingReservationsClinic(int currentWeekNum)
+    /// <summary>
+    /// Get upcoming reservations for the current clinic. Ignore query filters because these will have been created
+    /// by another tenant - namely, the practitioner.
+    /// </summary>
+    public async Task<List<RoomReservationDto>> GetUpcomingReservationsClinic(int clinicId, int currentWeekNum)
     {
         var now = DateTime.UtcNow;
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
         return await _db.RoomReservations.Include("Timeslot").IgnoreQueryFilters()
-            .Where(x => (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+            .Where(x => x.ClinicId == clinicId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
             .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
             .ToListAsync();
     }

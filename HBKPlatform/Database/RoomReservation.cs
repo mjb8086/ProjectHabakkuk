@@ -13,6 +13,7 @@ namespace HBKPlatform.Database;
 public class RoomReservation : HbkBaseEntity
 {
     public int RoomId { get; set; }
+    public int ClinicId { get; set; }
     public int PractitionerId { get; set; }
     public int TimeslotId { get; set; }
     
@@ -24,6 +25,7 @@ public class RoomReservation : HbkBaseEntity
     
     // EF Navigations
     public virtual Room Room { get; set; }
+    public virtual Clinic Clinic { get; set; }
     public virtual Practitioner Practitioner { get; set; }
     public virtual Timeslot Timeslot { get; set; }
 }

@@ -1,6 +1,7 @@
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View.Clinic;
 using HBKPlatform.Models.View.MyND.RoomReservation;
 using HBKPlatform.Repository;
 
@@ -14,8 +15,9 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     public async Task Create(int roomId, int weekNum, int timeslotId)
     {
         var practitionerId = _userService.GetClaimFromCookie("PractitionerId");
+        var room = _cache.GetRoom(roomId);
         // todo: clash check here?
-        await _roomResRepo.Create(new RoomReservationDto() {RoomId = roomId, PractitionerId = practitionerId, WeekNum = weekNum, TimeslotId = timeslotId});
+        await _roomResRepo.Create(new RoomReservationDto() { RoomId = roomId, PractitionerId = practitionerId, WeekNum = weekNum, TimeslotId = timeslotId, ClinicId = room.ClinicId });
     }
 
     public async Task CancelAsPractitioner(int reservationId)
@@ -80,6 +82,24 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         
         _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.Id);
         _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
+
+        model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
+        model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
+        model.Denied = BuildRoomResList(Enums.ReservationStatus.Denied, dbStartDate);
+
+        return model;
+    }
+    
+    public async Task<RoomReservationOverview> GetUpcomingReservationsClinic()
+    {
+        var model = new RoomReservationOverview();
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
+        var clinicId = _userService.GetClaimFromCookie("ClinicId");
+        
+        // FIXME: Timeslots are always filtered out because they currently are Practice-tenancy only!
+        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.Id);
+        _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum);
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
         model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);

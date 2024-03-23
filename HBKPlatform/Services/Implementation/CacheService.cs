@@ -179,7 +179,7 @@ namespace HBKPlatform.Services.Implementation
                 return room ?? new RoomDto();
             }
             
-            room = _db.Rooms.IgnoreQueryFilters().Select(x => new RoomDto() { Id = x.Id, Title = x.Title, Description = x.Description }).FirstOrDefault(x => x.Id == roomId);
+            room = _db.Rooms.IgnoreQueryFilters().Select(x => new RoomDto() { Id = x.Id, Title = x.Title, Description = x.Description, ClinicId = x.ClinicId }).FirstOrDefault(x => x.Id == roomId);
             if (room == null) 
                 throw new IdxNotFoundException($"No room of roomId {roomId} exists");
         
