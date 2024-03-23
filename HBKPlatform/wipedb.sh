@@ -18,6 +18,7 @@ delete from tenancies;
 delete from attributes;
 delete from room_attributes;
 delete from rooms;
+delete from room_reservations;
 
 EOF
 

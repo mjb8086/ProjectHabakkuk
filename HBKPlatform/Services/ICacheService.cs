@@ -13,6 +13,8 @@ namespace HBKPlatform.Services
         public Task<List<ClientDetailsLite>> GetPracticeClientDetailsLite();
         public Task<Dictionary<string, SettingDto>> GetAllTenancySettings();
         public Task<Dictionary<int, TreatmentDto>> GetTreatments();
+        public RoomDto GetRoom(int roomId);
+        public void ClearRoom(int roomId);
 
 
         // Clearing methods - call after any DB update action on the entities.

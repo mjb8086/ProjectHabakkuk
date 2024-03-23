@@ -14,11 +14,11 @@ namespace HBKPlatform.Areas.MyND.Controllers
     /// © 2024 NowDoctor Ltd.
     /// </summary>
     [Area("MyND"), Authorize(Roles="Practitioner")]
-    public class RoomReservationController(IRoomService _roomService): Controller
+    public class RoomReservationController(IRoomService _roomService, IRoomReservationService _roomRes): Controller
     {
         public async Task<IActionResult> MyReservations()
         {
-            return View();
+            return View(await _roomRes.GetUpcomingReservationsPractitioner());
         }
         
         public async Task<IActionResult> MakeAReservation()
@@ -26,19 +26,28 @@ namespace HBKPlatform.Areas.MyND.Controllers
             return View(await _roomService.GetRoomsForBooking());
         }
 
-        public async Task<IActionResult> ChooseDateTime(int roomId)
+        public async Task<IActionResult> TimeslotSelect(int roomId)
         {
-            return Ok();
+            return View(await _roomRes.GetTimeslotSelectView(roomId));
         }
 
         public async Task<IActionResult> ConfirmReservation(int roomId, int weekNum, int timeslotId)
         {
-            return Ok();
+            return View(await _roomRes.GetConfirmReservationView(roomId, weekNum, timeslotId));
         }
 
         public async Task<IActionResult> DoMakeReservation(int roomId, int weekNum, int timeslotId)
         {
-            return Ok();
+            await _roomRes.Create(roomId, weekNum, timeslotId);
+            TempData["Message"] = "Reservation request created. Please wait for the clinic's approval.";
+            return RedirectToRoute(new { area = "MyNd", controller = "RoomReservation", action = "MyReservations" });
+        }
+
+        public async Task<IActionResult> CancelReservation(int reservationId)
+        {
+            await _roomRes.CancelAsPractitioner(reservationId);
+            TempData["Message"] = "Reservation request cancelled.";
+            return RedirectToRoute(new { area = "MyNd", controller = "RoomReservation", action = "MyReservations" });
         }
     }
 }

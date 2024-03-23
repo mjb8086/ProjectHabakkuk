@@ -1,4 +1,3 @@
-using System.Data;
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
@@ -35,36 +34,8 @@ namespace HBKPlatform.Services.Implementation
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks")).Value);
             var now = _dateTime.Now;
-            var thisWeek = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
-            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
-            var nowTime = new TimeOnly(now.Hour, now.Minute, now.Second);
-
-            var futureTs = new List<TimeslotDto>(allTimeslots.Count);
-
-            var maxWeek = thisWeek + bookingAdvance;
-            var currentWeekNum = thisWeek;
-            while (currentWeekNum < maxWeek)
-            {
-                foreach (var ts in allTimeslots)
-                {
-                    var newTs = ts.Clone();
-                    // split the timeslots at NOW, half will be this week, the preceding will be 'shifted' to the final week
-                    if (currentWeekNum == thisWeek && (ts.Day < today || ts.Day == today && ts.Time < nowTime))
-                    {
-                        newTs.WeekNum = maxWeek;
-                    }
-                    else 
-                    {
-                        newTs.WeekNum = currentWeekNum;
-                    } 
-                    newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, newTs));
-                    futureTs.Add(newTs);
-                }
-
-                currentWeekNum++;
-            }
-
-            return futureTs;
+            
+            return TimeslotHelper.GetPopulatedFutureTimeslots(now, allTimeslots, dbStartDate, bookingAdvance);
         }
     
         public async Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId)

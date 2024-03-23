@@ -4,7 +4,7 @@ using HBKPlatform.Repository;
 namespace HBKPlatform.Services.Implementation;
 
 // Hello,
-public class RoomService(IRoomRepository _roomRepo, IUserService _userService) : IRoomService // set a wake up call at 4am please... rooms 601-604. Thanks!
+public class RoomService(IRoomRepository _roomRepo, IUserService _userService, ICacheService _cache) : IRoomService // set a wake up call at 4am please... rooms 601-604. Thanks!
 {
     public async Task Create(RoomDto room)
     {
@@ -15,6 +15,7 @@ public class RoomService(IRoomRepository _roomRepo, IUserService _userService) :
     public async Task Update(RoomDto room)
     {
         await _roomRepo.Update(room);
+        _cache.ClearRoom(room.Id);
     }
 
     /// <summary>

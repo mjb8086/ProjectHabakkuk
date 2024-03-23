@@ -1,5 +1,6 @@
 using HBKPlatform.Database;
 using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +19,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
                 WeekNum = reservation.WeekNum,
                 ReservationStatus = Enums.ReservationStatus.Requested
             });
+        await _db.SaveChangesAsync();
     }
 
     /// <summary>
@@ -36,13 +38,25 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
             .ExecuteUpdateAsync(x => x.SetProperty(p => p.ReservationStatus, status));
     }
 
-    public async Task GetUpcomingReservationsClinic()
+    public async Task<List<RoomReservationDto>> GetUpcomingReservationsClinic(int currentWeekNum)
     {
+        var now = DateTime.UtcNow;
+        var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
+        return await _db.RoomReservations.Include("Timeslot").IgnoreQueryFilters()
+            .Where(x => (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+            .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
+            .ToListAsync();
     }
 
-    public async Task GetUpcomingReservationsPractitioner(int currentWeekNum, int currentTimeslot)
+    public async Task<List<RoomReservationDto>> GetUpcomingReservationsPractitioner(int practitionerId, int currentWeekNum)
     {
+        var now = DateTime.UtcNow;
+        var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
+        return await _db.RoomReservations.Include("Timeslot")
+            .Where(x => x.PractitionerId == practitionerId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+            .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
+            .ToListAsync();
     }
 }

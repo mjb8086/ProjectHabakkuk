@@ -13,7 +13,7 @@
         <thead class="table1Item"><tr class="table1Item"><td>Name</td> <td>Description</td> <td>Clinic</td> <td>Cost</td> <td>Action</td> </tr></thead>
         @foreach (var room in Model)
         {
-            <tr class="table1Item"><td>@room.Title</td> <td>@room.Description</td> <td>????</td> <td>@room.PricePerUse</td> <td><a asp-area="MyND" asp-controller="RoomReservation" asp-action="ChooseDateTime" asp-route-roomId="@room.Id">Book It</a> </td></tr>
+            <tr class="table1Item"><td>@room.Title</td> <td>@room.Description</td> <td>????</td> <td>@room.PricePerUse</td> <td><a asp-area="MyND" asp-controller="RoomReservation" asp-action="TimeslotSelect" asp-route-roomId="@room.Id">Book It</a> </td></tr>
         }
     </table>
 </div>

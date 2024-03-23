@@ -83,7 +83,7 @@ try
     builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
     builder.Services.AddTransient<IMcpService, McpService>();
     builder.Services.AddTransient<IRoomService, RoomService>(); // yes, we come with room service. 100% satisfaction guarantee
-    builder.Services.AddTransient<IRoomReservationRepository, RoomReservationRepository>();
+    builder.Services.AddTransient<IRoomReservationService, RoomReservationService>();
 
     // Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
     builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();

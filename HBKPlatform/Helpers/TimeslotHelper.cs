@@ -1,5 +1,6 @@
 using HBKPlatform.Database;
 using HBKPlatform.Globals;
+using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Helpers
 {
@@ -24,6 +25,44 @@ namespace HBKPlatform.Helpers
             }
 
             return timeslots;
+        }
+        
+        /// <summary>
+        /// Get a list of timeslots in the future, from this week day until the upper bound of the BookingAdvanceWeeks
+        /// value. Each Ts DTO will have its weekNum field populated.
+        /// </summary>
+        public static List<TimeslotDto> GetPopulatedFutureTimeslots(DateTime now, List<TimeslotDto> allTimeslots, string dbStartDate, int bookingAdvance)
+        {
+            var thisWeek = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+            var nowTime = new TimeOnly(now.Hour, now.Minute, now.Second);
+
+            var futureTs = new List<TimeslotDto>(allTimeslots.Count);
+
+            var maxWeek = thisWeek + bookingAdvance;
+            var currentWeekNum = thisWeek;
+            while (currentWeekNum < maxWeek)
+            {
+                foreach (var ts in allTimeslots)
+                {
+                    var newTs = ts.Clone();
+                    // split the timeslots at NOW, half will be this week, the preceding will be 'shifted' to the final week
+                    if (currentWeekNum == thisWeek && (ts.Day < today || ts.Day == today && ts.Time < nowTime))
+                    {
+                        newTs.WeekNum = maxWeek;
+                    }
+                    else 
+                    {
+                        newTs.WeekNum = currentWeekNum;
+                    } 
+                    newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, newTs));
+                    futureTs.Add(newTs);
+                }
+
+                currentWeekNum++;
+            }
+
+            return futureTs;
         }
     }
 }

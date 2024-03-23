@@ -68,5 +68,12 @@ namespace HBKPlatform.Models.DTO
         public int Id { get; set; }
         public string Title { get; set; }
     }
+
+    public class RoomReservationLite
+    {
+        public string RoomTitle { get; set; }
+        public string When { get; set; }
+        public int Id { get; set; }
+    }
     
 }

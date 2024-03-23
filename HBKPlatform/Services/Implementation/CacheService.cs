@@ -63,6 +63,7 @@ namespace HBKPlatform.Services.Implementation
     
         public void ClearPractitionerDetails(int practitionerId)
         {
+            _logger.LogDebug($"Clearing practitionerId {practitionerId} details from cache.");
             _memoryCache.Remove($"Practitioner-t{TenancyId}-{practitionerId}");
         }
     
@@ -82,6 +83,7 @@ namespace HBKPlatform.Services.Implementation
     
         public void ClearClientDetails(int clientId)
         {
+            _logger.LogDebug($"Clearing clientId {clientId} details from cache.");
             _memoryCache.Remove($"Client-t{TenancyId}-{clientId}");
         }
 
@@ -111,6 +113,7 @@ namespace HBKPlatform.Services.Implementation
     
         public void ClearPracticeClientDetails()
         {
+            _logger.LogDebug($"Clearing Practice client details from cache.");
             _memoryCache.Remove($"PracticeClients-t{TenancyId}");
         }
 
@@ -136,6 +139,7 @@ namespace HBKPlatform.Services.Implementation
     
         public void ClearSettings()
         {
+            _logger.LogDebug($"Clearing settings from cache.");
             _memoryCache.Remove($"Settings-t{TenancyId}");
         }
 
@@ -163,7 +167,30 @@ namespace HBKPlatform.Services.Implementation
 
         public void ClearTreatments()
         {
+            _logger.LogDebug($"Clearing treatments from cache.");
             _memoryCache.Remove($"Treatments-t{TenancyId}");
+        }
+
+        public RoomDto GetRoom(int roomId)
+        {
+            string key = $"Room-r{roomId}";
+            if (_memoryCache.TryGetValue(key, out RoomDto? room))
+            {
+                return room ?? new RoomDto();
+            }
+            
+            room = _db.Rooms.IgnoreQueryFilters().Select(x => new RoomDto() { Id = x.Id, Title = x.Title, Description = x.Description }).FirstOrDefault(x => x.Id == roomId);
+            if (room == null) 
+                throw new IdxNotFoundException($"No room of roomId {roomId} exists");
+        
+            _memoryCache.Set(key,  room, CacheEntryOptions);
+            return room;
+        }
+        
+        public void ClearRoom(int roomId)
+        {
+            _logger.LogDebug($"Clearing room Id {roomId} from cache.");
+            _memoryCache.Remove($"Room-r{roomId}");
         }
 
         public void ClearAll()
@@ -173,7 +200,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 concreteMemoryCache.Clear();
             } 
-            _logger.LogWarning("Memory cache has been cleared.");
+            _logger.LogWarning("All memory cache contents were cleared.");
         }
     }
 }
