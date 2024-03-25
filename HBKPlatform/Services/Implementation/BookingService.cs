@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
@@ -28,7 +29,7 @@ namespace HBKPlatform.Services.Implementation
         /// value. Each Ts DTO will have its weekNum field populated.
         /// Timeslots returned from this method do not exclude unavailable - we don't know the conditions just yet!
         /// </summary>
-        private async Task<List<TimeslotDto>> GetPopulatedFutureTimeslots()
+        private async Task<SortedSet<TimeslotDto>> GetPopulatedFutureTimeslots()
         {
             var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
@@ -46,8 +47,8 @@ namespace HBKPlatform.Services.Implementation
             var treatments = await _cacheService.GetTreatments();
             var practitionerId = _cacheService.GetLeadPractitionerId(practiceId);
         
-            var availableTs =  await GetPopulatedFutureTimeslots();
-            availableTs = (await FilterOutUnsuitableTimeslots(availableTs, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            var availableTsSet =  await GetPopulatedFutureTimeslots();
+            var availableTs = (await FilterOutUnsuitableTimeslots(availableTsSet, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
             if (treatments.TryGetValue(treatmentId, out var treatment) && treatment.Requestability == Enums.TreatmentRequestability.ClientAndPrac) // security filter
             {
@@ -65,7 +66,7 @@ namespace HBKPlatform.Services.Implementation
         /// <summary>
         /// Takes a list of timeslots and returns only those available to book with the specified practitioner
         /// </summary>
-        private async Task<List<TimeslotDto>> FilterOutUnsuitableTimeslots(List<TimeslotDto> timeslots, int pracId)
+        private async Task<List<TimeslotDto>> FilterOutUnsuitableTimeslots(SortedSet<TimeslotDto> timeslots, int pracId)
         {
             var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now);
             // populate lookups for IsAvailable check
@@ -292,9 +293,9 @@ namespace HBKPlatform.Services.Implementation
             var treatments = await _cacheService.GetTreatments();
             var clients = await _cacheService.GetPracticeClientDetailsLite();
             var timeslots = await GetPopulatedFutureTimeslots();
-            timeslots = (await FilterOutUnsuitableTimeslots(timeslots, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
+            var tsList = (await FilterOutUnsuitableTimeslots(timeslots, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
-            var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, timeslots);
+            var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, tsList);
             var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);
 
             return new BookClientTreatment()

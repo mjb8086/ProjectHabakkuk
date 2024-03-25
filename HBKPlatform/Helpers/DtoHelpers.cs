@@ -4,7 +4,7 @@ namespace HBKPlatform.Helpers
 {
     public static class DtoHelpers
     {
-        public static List<TimeslotLite> ConvertTimeslotsToLite(string dbStartDate, List<TimeslotDto> timeslots)
+        public static List<TimeslotLite> ConvertTimeslotsToLite(string dbStartDate, IEnumerable<TimeslotDto> timeslots)
         {
             var lites = new List<TimeslotLite>();
             foreach (var timeslot in timeslots)

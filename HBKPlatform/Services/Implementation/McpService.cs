@@ -27,8 +27,7 @@ namespace HBKPlatform.Services.Implementation
 
         public async Task RegisterPractice(PracticeRegistrationDto model)
         {
-            var tenancy = await _mcpRepo.RegisterPractice(model);
-            await _timeslotRepo.Create(TimeslotHelper.GenerateDefaultTimeslots(tenancy));
+            await _mcpRepo.RegisterPractice(model);
         }
 
         public async Task<UserAccountFunctions> GetUacView()

@@ -14,6 +14,7 @@ namespace HBKPlatform.Database.Helpers
         public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             var tenancySrv = new TenancyService();
+            List<Timeslot> timeslots;
             
             using (var ctx = new ApplicationDbContext(
                provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), new HttpContextAccessor(), tenancySrv))
@@ -42,7 +43,20 @@ namespace HBKPlatform.Database.Helpers
                     clinicMgrRole = new IdentityRole() { Name = "ClinicManager", NormalizedName = "ClinicManager".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
                     await roleStore.CreateAsync(clinicMgrRole);
                 }
-                    
+
+
+                if (ctx.Timeslots.Any())
+                {
+                    timeslots = ctx.Timeslots.ToList();
+                }
+                else
+                {
+                    timeslots = TimeslotHelper.GenerateDefaultTimeslots(TimeslotHelper.DEFAULT_START,
+                        TimeslotHelper.DEFAULT_END);
+                    await ctx.AddRangeAsync(timeslots);
+                    await ctx.SaveChangesAsync();
+                }
+
                 if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Practices.Any()) {
 
                     var ndTenancy = new Tenancy()
@@ -315,9 +329,6 @@ namespace HBKPlatform.Database.Helpers
                     ctx.Add(treatment1);
                     ctx.Add(treatment2);
 
-                    var timeslots = TimeslotHelper.GenerateDefaultTimeslots(t);
-                    
-                    ctx.AddRange(timeslots);
                     ctx.SaveChanges();
 
                     var appointments = new Appointment[] { 
