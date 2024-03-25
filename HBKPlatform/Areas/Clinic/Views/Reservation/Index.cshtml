@@ -1,3 +1,4 @@
+@using HBKPlatform.Globals
 @model HBKPlatform.Models.View.Clinic.RoomReservationOverview
 @{
     ViewBag.Title = "Clinic Reception";
@@ -14,7 +15,7 @@
         <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Actions</td></tr></thead>
         @foreach (var reservation in Model.Requested)
         {
-            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td><a asp-area="Clinic" asp-controller="Reservation" asp-action="ActionReservation" asp-route-reservationId="@reservation.Id" asp-route-action="approve">Approve</a> | <a asp-area="Clinic" asp-controller="Reservation" asp-action="ActionReservation" asp-route-reservationId="@reservation.Id" asp-route-action="deny">Deny</a></td> </tr>
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td><a asp-area="Clinic" asp-controller="Reservation" asp-action="ApproveReservation" asp-route-reservationId="@reservation.Id">Approve</a> | <a asp-area="Clinic" asp-controller="Reservation" asp-action="DenyReservation" asp-route-reservationId="@reservation.Id">Deny</a></td> </tr>
         }
     </table>
 </div>
@@ -37,6 +38,17 @@
         @foreach (var reservation in Model.Denied)
         {
             <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>???</td> </tr>
+        }
+    </table>
+</div>
+
+<h2>Cancellations</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>By Whom</td></tr></thead>
+        @foreach (var reservation in Model.Cancelled)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Status</td> </tr>
         }
     </table>
 </div>

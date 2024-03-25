@@ -24,20 +24,10 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     {
         await _roomResRepo.UpdateStatusPractitioner(reservationId, Enums.ReservationStatus.CancelledByPractitioner);
     }
-    
-    public async Task CancelAsClinic(int reservationId)
-    {
-        await _roomResRepo.UpdateStatusClinic(reservationId, Enums.ReservationStatus.CancelledByClinic);
-    }
 
     public async Task UpdateStatusClinic(int id, Enums.ReservationStatus status, string? note)
     {
         await _roomResRepo.UpdateStatusClinic(id, status, note);
-    }
-    
-    public async Task UpdateStatusPractitioner(int id, Enums.ReservationStatus status)
-    {
-        await _roomResRepo.UpdateStatusPractitioner(id, status);
     }
 
     public async Task<ConfirmReservation> GetConfirmReservationView(int roomId, int weekNum, int timeslotId)
@@ -86,6 +76,8 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
         model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
         model.Denied = BuildRoomResList(Enums.ReservationStatus.Denied, dbStartDate);
+        model.Cancelled = BuildRoomResList(Enums.ReservationStatus.CancelledByClinic, dbStartDate);
+        model.Cancelled.AddRange(BuildRoomResList(Enums.ReservationStatus.CancelledByPractitioner, dbStartDate));
 
         return model;
     }
@@ -104,6 +96,8 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
         model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
         model.Denied = BuildRoomResList(Enums.ReservationStatus.Denied, dbStartDate);
+        model.Cancelled = BuildRoomResList(Enums.ReservationStatus.CancelledByClinic, dbStartDate);
+        model.Cancelled.AddRange(BuildRoomResList(Enums.ReservationStatus.CancelledByPractitioner, dbStartDate));
 
         return model;
     }
@@ -124,7 +118,8 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
                 Id = res.Id,
                 RoomTitle = _cache.GetRoom(res.RoomId).Title,
                 When = DateTimeHelper.GetFriendlyDateTimeString(
-                    DateTimeHelper.FromTimeslot(dbStartDate, ts, res.WeekNum))
+                    DateTimeHelper.FromTimeslot(dbStartDate, ts, res.WeekNum)),
+                Status = res.Status
             });
         }
         

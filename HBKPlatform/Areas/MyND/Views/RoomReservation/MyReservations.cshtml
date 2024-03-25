@@ -18,6 +18,10 @@
     </table>
 </div>
 
+<div>
+    <a asp-area="MyND" asp-controller="RoomReservation" asp-action="MakeAReservation">Book Another</a>
+</div>
+
 <h2>Awaiting clinic approval</h2>
 <div class="table1OuterWrap">
     <table class="table1">
@@ -40,7 +44,14 @@
     </table>
 </div>
 
-<div>
-    <a asp-area="MyND" asp-controller="RoomReservation" asp-action="MakeAReservation">Book Another</a>
+<h2>Cancellations</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>By Whom</td></tr></thead>
+        @foreach (var reservation in Model.Cancelled)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Status</td> </tr>
+        }
+    </table>
 </div>
-<p>Cancel A Reservation</p>
+

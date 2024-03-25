@@ -1,3 +1,5 @@
+using HBKPlatform.Exceptions;
+using HBKPlatform.Globals;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,13 +23,24 @@ public class ReservationController(IRoomReservationService _roomRes): Controller
         return View(await _roomRes.GetUpcomingReservationsClinic());
     }
 
-    public async Task<IActionResult> ActionReservation(int reservationId, string action)
+    public async Task<IActionResult> ApproveReservation(int reservationId)
     {
-        return Ok();
+        await _roomRes.UpdateStatusClinic(reservationId, Enums.ReservationStatus.Approved);
+        TempData["Message"] = $"Reservation request has been successfully approved.";
+        return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
+    }
+    
+    public async Task<IActionResult> DenyReservation(int reservationId)
+    {
+        await _roomRes.UpdateStatusClinic(reservationId, Enums.ReservationStatus.Denied);
+        TempData["Message"] = $"Reservation request has been DENIED.";
+        return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
     }
     
     public async Task<IActionResult> CancelReservation(int reservationId)
     {
-        return Ok();
+        await _roomRes.UpdateStatusClinic(reservationId, Enums.ReservationStatus.CancelledByClinic);
+        TempData["Message"] = $"Reservation has been cancelled.";
+        return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
     }
 }
