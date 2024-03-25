@@ -18,8 +18,7 @@ namespace HBKPlatform.Areas.Client.Controllers
     {
         public async Task <IActionResult> Index()
         {
-            var data = await practiceService.GetClientReceptionData();
-            return View(data);
+            return View(await practiceService.GetClientReceptionData());
         }
     }
 }

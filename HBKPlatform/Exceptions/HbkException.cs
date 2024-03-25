@@ -68,3 +68,19 @@ public class MissingMemberException : HbkException
     public MissingMemberException(string message, Exception inner) : base(message, inner) { } 
 }
 
+/// <summary>
+/// Throw when attempting to add a duplicate key to the DB.
+/// </summary>
+public class DuplicateKeyException : HbkException
+{
+    public DuplicateKeyException() : base() { }
+    public DuplicateKeyException(string message) : base(message) { }
+    public DuplicateKeyException(string message, Exception inner) : base(message, inner) { } 
+}
+
+public class InvalidKeyException : HbkException
+{
+    public InvalidKeyException() : base() { }
+    public InvalidKeyException(string key) : base($"{key} is not a valid settings key") {  }
+    public InvalidKeyException(string key, Exception inner) : base( $"{key} is not a valid settings key", inner) { } 
+}

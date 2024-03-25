@@ -2,7 +2,7 @@ using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Globals
 {
-    public struct DefaultSettings
+    public static class DefaultSettings
     {
         public const int DEFAULT_PASSWORD_LENGTH = 14;
         public const bool LOCKOUT_ON_FAILURE = true;
@@ -15,6 +15,16 @@ namespace HBKPlatform.Globals
             { "BookingAdvanceWeeks", new SettingDto() { Value = "2" }},
             { "SelfBookingEnabled", new SettingDto() { Value = "Yes" }},
         };
+
+        /// <summary>
+        /// Check whether a new setting key is valid. Uses the default setting dictionary to ensure that every key
+        /// will have a default.
+        /// </summary>
+        public static bool IsSettingKeyValid(string key)
+        {
+            return DefaultSetting.ContainsKey(key);
+        }
+        
     }
 
     public struct Consts

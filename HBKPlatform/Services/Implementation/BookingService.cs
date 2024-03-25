@@ -19,7 +19,8 @@ namespace HBKPlatform.Services.Implementation
     /// © 2024 NowDoctor Ltd.
     /// </summary>
     public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, 
-        IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime, IAvailabilityRepository _avaRepo) : IBookingService
+        IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime, IAvailabilityRepository _avaRepo,
+        ILogger<BookingService> _logger) : IBookingService
     {
         private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
         private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
@@ -182,6 +183,7 @@ namespace HBKPlatform.Services.Implementation
         {
             return new ClientUpcomingAppointmentsView()
             {
+                SelfBookingEnabled = await _config.IsSettingEnabled("SelfBookingEnabled"),
                 UpcomingAppointments =
                     await GetUpcomingAppointmentsForClient(_userService.GetClaimFromCookie("ClientId"))
             };
@@ -226,6 +228,11 @@ namespace HBKPlatform.Services.Implementation
 
         public async Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum)
         {
+            if (!(await _config.IsSettingEnabled("SelfBookingEnabled")))
+            {
+                _logger.LogWarning("Client attempted booking but self booking has been disabled.");
+                throw new InvalidUserOperationException("Cannot create a booking as a client. This feature has been disabled.");
+            }
             var practiceId = _userService.GetClaimFromCookie("PracticeId");
             var clientId = _userService.GetClaimFromCookie("ClientId");
             var pracId = _cacheService.GetLeadPractitionerId(practiceId);

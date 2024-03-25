@@ -10,4 +10,7 @@
 {
     <p>@appointment.TreatmentTitle with @appointment.PractitionerName on @appointment.DateString at @appointment.TimeString. <a asp-area="Client" asp-controller="Appointment" asp-action="CancelBooking" asp-route-appointmentId="@appointment.Id">Cancel...</a></p>
 }
-<p><a asp-area="Client" asp-controller="Appointment" asp-action="Booking">Book another appointment.</a></p>
+
+@if(Model.SelfBookingEnabled) {
+    <p><a asp-area="Client" asp-controller="Appointment" asp-action="Booking">Book another appointment.</a></p>
+}

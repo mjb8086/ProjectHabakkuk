@@ -20,7 +20,7 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2023 NowDoctor Ltd.
     /// </summary>
-    public class PracticeService(ICacheService _cache, IUserService _userSrv, IClientMessageRepository _messageRepo, IUserRepository _userRepo) : IPracticeService
+    public class PracticeService(ICacheService _cache, IUserService _userSrv, IClientMessageRepository _messageRepo, IUserRepository _userRepo, IConfigurationService _config) : IPracticeService
     {
         public async Task<bool> VerifyClientPractitionerMembership(int clientId, int practitionerId)
         {
@@ -44,6 +44,7 @@ namespace HBKPlatform.Services.Implementation
                 data.PracId = practitionerDetailsLite[leadPracId].Id;
                 data.MyPracName = practitionerDetailsLite[leadPracId].Name;
                 data.NumUnreadMessages = await _messageRepo.GetUnreadMessagesAsClient(leadPracId, clientId);
+                data.SelfBookingEnabled = await _config.IsSettingEnabled("SelfBookingEnabled");
             }
 
             return data;

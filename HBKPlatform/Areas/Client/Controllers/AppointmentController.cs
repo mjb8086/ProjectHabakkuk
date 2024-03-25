@@ -15,7 +15,7 @@ namespace HBKPlatform.Areas.Client.Controllers
     /// © 2024 NowDoctor Ltd.
     /// </summary>
     [Area("Client"), Authorize(Roles="Client")]
-    public class AppointmentController(IBookingService _bookingService, ITreatmentService _treatmentService) : Controller
+    public class AppointmentController(IBookingService _bookingService, ITreatmentService _treatmentService, IConfigurationService _config) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -25,26 +25,42 @@ namespace HBKPlatform.Areas.Client.Controllers
         [Route("booking/")]
         public async Task<IActionResult> Booking()
         {
-            return View("Booking/Index", await _treatmentService.GetTreatmentsViewForClient());
+            if (await _config.IsSettingEnabled("SelfBookingEnabled"))
+            {
+                return View("Booking/Index", await _treatmentService.GetTreatmentsViewForClient());
+            }
+            return RedirectToRoute(new { controller = "Appointment", action = "Index" });
         }
     
         [Route("booking/timeslotselect")]
         public async Task<IActionResult> TimeslotSelect(int treatmentId)
         {
-            return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsClientView(treatmentId));
+            if (await _config.IsSettingEnabled("SelfBookingEnabled"))
+            {
+                return View("Booking/TimeslotSelect", await _bookingService.GetAvailableTimeslotsClientView(treatmentId));
+            }
+            return RedirectToRoute(new { controller = "Appointment", action = "Index" });
         }
     
         [Route("booking/bookingconfirm")]
         public async Task<IActionResult> BookingConfirm(int treatmentId,  int timeslotId, int weekNum)
         {
-            return View("Booking/BookingConfirm", await _bookingService.GetBookingConfirmModel(treatmentId, timeslotId, weekNum));
+            if (await _config.IsSettingEnabled("SelfBookingEnabled"))
+            {
+                return View("Booking/BookingConfirm", await _bookingService.GetBookingConfirmModel(treatmentId, timeslotId, weekNum));
+            }
+            return RedirectToRoute(new { controller = "Appointment", action = "Index" });
         }
     
         [Route("booking/bookingconfirmed")]
         public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum)
         {
-            var model = await _bookingService.DoBookingClient(treatmentId, timeslotId, weekNum);
-            return View("Booking/BookingConfirmed", model);
+            if (await _config.IsSettingEnabled("SelfBookingEnabled"))
+            {
+                var model = await _bookingService.DoBookingClient(treatmentId, timeslotId, weekNum);
+                return View("Booking/BookingConfirmed", model);
+            }
+            return RedirectToRoute(new { controller = "Appointment", action = "Index" });
         }
     
         [Route("booking/cancel")]

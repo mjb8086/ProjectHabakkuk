@@ -4,6 +4,7 @@ using HBKPlatform.Models.DTO;
 using HBKPlatform.Repository;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace HBK.Test
@@ -97,7 +98,7 @@ namespace HBK.Test
             mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now))
                 .ReturnsAsync(appointments);
 
-            return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object);
+            return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object, new Mock<ILogger<BookingService>>().Object);
         }
         
         //////////////////////////////////////////////////////////////////////////////// 
