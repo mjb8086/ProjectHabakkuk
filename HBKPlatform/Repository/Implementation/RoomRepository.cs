@@ -46,7 +46,7 @@ public class RoomRepository (ApplicationDbContext _db): IRoomRepository
     
     public async Task<RoomDto> GetRoom(int roomId)
     {
-        return await _db.Rooms.Select(x => SelectDto(x)).FirstOrDefaultAsync(x => x.Id == roomId) ?? 
+        return await _db.Rooms.Where(x => x.Id == roomId).Select(x => SelectDto(x)).FirstOrDefaultAsync() ?? 
                throw new IdxNotFoundException($"RoomId {roomId} does not exist.");
     }
     
