@@ -10,12 +10,15 @@ namespace HBKPlatform.Models.DTO
         public int TreatmentId { get; set; }
         public int WeekNum { get; set; }
         public int TimeslotId { get; set; }
-        public string Note { get; set; }
+        public int? RoomId { get; set; }
+        public int? RoomReservationId { get; set; }
+        public string? Note { get; set; }
         public string DateString { get; set; }
         public string TimeString { get; set; }
         public string ClientName { get; set; }
         public string PractitionerName { get; set; }
         public string TreatmentTitle { get; set; }
+        public string? RoomDetails { get; set; }
         public Enums.AppointmentStatus Status { get; set; }
 
         public TimeslotDto Timeslot { get; set; }

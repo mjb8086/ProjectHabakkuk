@@ -13,9 +13,9 @@ namespace HBKPlatform.Services
         public Task<UpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView();
         public Task<ClientUpcomingAppointmentsView> GetClientUpcomingAppointmentsView();
         public Task<BookingConfirm> GetBookingConfirmModel(PractitionerBookingFormModel model);
-        public Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? clientId = null);
+        public Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? roomResId = null, int? clientId = null);
         public Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum);
-        public Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId);
+        public Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId = null);
         public Task<BookClientTreatment> GetBookClientTreatmentView();
         public Task<BookingCancel> GetBookingCancelView(int appointmentId);
         public Task DoCancelBooking(int appointmentId, string reason, Enums.AppointmentStatus actioner);

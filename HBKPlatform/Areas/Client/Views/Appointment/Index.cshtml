@@ -8,7 +8,7 @@
 <h2>Upcoming appointments.</h2>
 @foreach (var appointment in Model.UpcomingAppointments)
 {
-    <p>@appointment.TreatmentTitle with @appointment.PractitionerName on @appointment.DateString at @appointment.TimeString. <a asp-area="Client" asp-controller="Appointment" asp-action="CancelBooking" asp-route-appointmentId="@appointment.Id">Cancel...</a></p>
+    <p>@appointment.TreatmentTitle with @appointment.PractitionerName on @appointment.DateString at @appointment.TimeString. @(!string.IsNullOrEmpty(appointment.RoomDetails) ? $"Location: {appointment.RoomDetails}" : "")  <a asp-area="Client" asp-controller="Appointment" asp-action="CancelBooking" asp-route-appointmentId="@appointment.Id">Cancel...</a></p>
 }
 
 @if(Model.SelfBookingEnabled) {

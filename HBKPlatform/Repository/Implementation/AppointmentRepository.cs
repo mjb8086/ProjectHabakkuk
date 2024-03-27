@@ -26,7 +26,9 @@ namespace HBKPlatform.Repository.Implementation
                 PractitionerId = appointmentDto.PractitionerId,
                 TimeslotId = appointmentDto.TimeslotId,
                 WeekNum = appointmentDto.WeekNum,
-                TreatmentId = appointmentDto.TreatmentId
+                TreatmentId = appointmentDto.TreatmentId,
+                RoomId = appointmentDto.RoomId,
+                RoomReservationId = appointmentDto.RoomReservationId
             };
             await _db.AddAsync(appointment);
             await _db.SaveChangesAsync();
@@ -46,7 +48,7 @@ namespace HBKPlatform.Repository.Implementation
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {
-                    Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status,
+                    Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
                         Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
@@ -60,7 +62,7 @@ namespace HBKPlatform.Repository.Implementation
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {
-                    Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status,
+                    Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
                         Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
@@ -82,7 +84,7 @@ namespace HBKPlatform.Repository.Implementation
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {
-                    Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status,
+                    Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
                         Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
@@ -107,6 +109,12 @@ namespace HBKPlatform.Repository.Implementation
             appointment.Status = cancelActioner;
             appointment.CancellationReason = reason;
             await _db.SaveChangesAsync();
+        }
+
+        public async Task<bool> CheckForDoubleBookingsAnyTenant(int weekNum, int timeslotId, int roomId)
+        {
+            return await _db.Appointments.IgnoreQueryFilters().AnyAsync(x =>
+                x.WeekNum == weekNum && x.TimeslotId == timeslotId && x.RoomId == roomId);
         }
 
     }

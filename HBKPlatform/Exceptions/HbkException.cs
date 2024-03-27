@@ -84,3 +84,10 @@ public class InvalidKeyException : HbkException
     public InvalidKeyException(string key) : base($"{key} is not a valid settings key") {  }
     public InvalidKeyException(string key, Exception inner) : base( $"{key} is not a valid settings key", inner) { } 
 }
+
+public class DoubleBookingException : HbkException
+{
+    public DoubleBookingException() : base() { }
+    public DoubleBookingException(string message) : base(message) { }
+    public DoubleBookingException(string message, Exception inner) : base(message, inner) { } 
+}

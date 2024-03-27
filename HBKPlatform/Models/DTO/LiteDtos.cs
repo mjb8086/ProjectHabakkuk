@@ -51,6 +51,7 @@ namespace HBKPlatform.Models.DTO
         public string TimeslotWeekNum { get; set; }
         public int TreatmentId { get; set; }
         public int ClientId { get; set; }
+        public int RoomResId { get; set; }
 
         public int[] ParseTsWeekNum()
         {

@@ -1,4 +1,5 @@
 using HBKPlatform.Globals;
+using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.Clinic;
 using HBKPlatform.Models.View.MyND.RoomReservation;
 
@@ -13,4 +14,8 @@ public interface IRoomReservationService
     public Task UpdateStatusClinic(int id, Enums.ReservationStatus status, string? note = null);
     public Task<TimeslotSelect> GetTimeslotSelectView(int roomId);
     public Task<MyReservations> GetUpcomingReservationsPractitioner();
+    public Task<List<RoomReservationLite>> GetHeldReservationsPractitioner();
+    public Task<RoomLite> GetRoomDetailsFromReservation(int roomResId);
+
+    public Task<RoomReservationDto> GetReservation(int reservationId);
 }

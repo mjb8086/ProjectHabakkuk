@@ -2,6 +2,7 @@ using HBKPlatform.Services;
 
 namespace HBKPlatform.Middleware
 {
+    // JoRo's Bizarre Adventure Pt II: Battle Tenancy
     public class TenancyMiddleware(ITenancyService _tenancySrv) : IMiddleware
     {
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)

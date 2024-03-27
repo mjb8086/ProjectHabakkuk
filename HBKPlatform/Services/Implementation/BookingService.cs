@@ -20,7 +20,7 @@ namespace HBKPlatform.Services.Implementation
     /// </summary>
     public class BookingService(ITimeslotRepository _timeslotRepo, IUserService _userService, ICacheService _cacheService, 
         IAppointmentRepository _appointmentRepo, IConfigurationService _config, IDateTimeWrapper _dateTime, IAvailabilityRepository _avaRepo,
-        ILogger<BookingService> _logger) : IBookingService
+        IRoomReservationService _roomRes, ILogger<BookingService> _logger) : IBookingService
     {
         private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
         private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
@@ -87,6 +87,7 @@ namespace HBKPlatform.Services.Implementation
         /// <returns>TRUE - timeslot clashes with another appointment, or is set to unavailable.</returns>
         private async Task<bool> ClashCheck(int timeslotId, int pracId, int weekNum)
         {
+            // TODO: Replace this with simple check like in Room double booking check
             var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
             _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
             _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(pracId);
@@ -106,6 +107,34 @@ namespace HBKPlatform.Services.Implementation
             }
             return false;
         }
+
+        /// <summary>
+        /// Will check that
+        /// a) the reservation weeknum and timeslot matches that of the appointment
+        /// b) no other appointments exist on any tenancy at the same weeknum and ts using this room
+        /// c) the room is still set as available by the clinic on this timeslot && weeknum
+        /// </summary>
+        private async Task RoomResClashCheck(int roomResId, int timeslotId, int weekNum)
+        {
+            var roomRes = await _roomRes.GetReservation(roomResId);
+               
+            // ensure this is actually allowed
+            if (roomRes.TimeslotId != timeslotId || roomRes.WeekNum != weekNum)
+            {
+                throw new InvalidUserOperationException(
+                    "Cannot book a room outside of its reservation's date and time.");
+            }
+            
+            // ensure no other appointments exist with this room booked on the same date and time
+            if (await _appointmentRepo.CheckForDoubleBookingsAnyTenant(weekNum, timeslotId, roomRes.RoomId))
+            {
+                throw new DoubleBookingException("Room is double booked, cannot proceed.");
+            }
+            
+            // ensure the room is set as available by the clinic
+        } 
+        
+        
     
         /// <summary>
         /// Determine whether the timeslot is available. Check both definite (weekly) and indefinite timeslots.
@@ -142,6 +171,9 @@ namespace HBKPlatform.Services.Implementation
                 appointment.DateString = dateTime.ToShortDateString();
                 appointment.TimeString = dateTime.ToShortTimeString();
                 appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
+                appointment.RoomDetails = appointment.RoomId.HasValue
+                    ? _cacheService.GetRoom(appointment.RoomId.Value).Title
+                    : null;
             }
             return appointments;
         }
@@ -159,6 +191,9 @@ namespace HBKPlatform.Services.Implementation
                 appointment.TimeString = dateTime.ToShortTimeString();
                 appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
                 appointment.ClientName = _cacheService.GetClientName(appointment.ClientId);
+                appointment.RoomDetails = appointment.RoomId.HasValue
+                    ? _cacheService.GetRoom(appointment.RoomId.Value).Title
+                    : null;
             }
             return appointments;
         }
@@ -192,13 +227,14 @@ namespace HBKPlatform.Services.Implementation
         public async Task<BookingConfirm> GetBookingConfirmModel(PractitionerBookingFormModel model)
         {
             var tsWeekNum = model.ParseTsWeekNum();
-            return await GetBookingConfirmModel(model.TreatmentId, tsWeekNum[0], tsWeekNum[1], model.ClientId);
+            return await GetBookingConfirmModel(model.TreatmentId, tsWeekNum[0], tsWeekNum[1], model.RoomResId, model.ClientId);
         }
     
         /// <summary>
-        /// Get booking confirm model. Used by both Client and Practitioner views. In client view, clientId is null.
+        /// Get booking confirm model. Used by both Client and Practitioner views.
+        /// In client view, clientId and roomResId are null.
         /// </summary>
-        public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? clientId)
+        public async Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? roomResId, int? clientId)
         {
             var practiceId = _userService.GetClaimFromCookie("PracticeId");
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
@@ -212,18 +248,24 @@ namespace HBKPlatform.Services.Implementation
         
             var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        
-            return new BookingConfirm()
+            var model = new BookingConfirm();
+
+            if (roomResId.HasValue && roomResId.Value > 0)
             {
-                TreatmentId = treatmentId,
-                WeekNum = weekNum,
-                TimeslotId = timeslotId,
-                PracctitionerName = _cacheService.GetPractitionerName(pracId),
-                ClientId = clientId,
-                ClientName = clientId.HasValue ? _cacheService.GetClientName(clientId.Value) : "",
-                TreatmentTitle = treatment.Title,
-                BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
-            };
+                model.RoomReservationId = roomResId;
+                model.RoomReservationDetails = (await _roomRes.GetRoomDetailsFromReservation(roomResId.Value)).Title;
+            }
+        
+            model.TreatmentId = treatmentId;
+            model.WeekNum = weekNum;
+            model.TimeslotId = timeslotId;
+            model.RoomReservationId = roomResId;
+            model.PractitionerName = _cacheService.GetPractitionerName(pracId);
+            model.ClientId = clientId;
+            model.ClientName = clientId.HasValue ? _cacheService.GetClientName(clientId.Value) : "";
+            model.TreatmentTitle = treatment.Title;
+            model.BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum));
+            return model;
         }
 
         public async Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum)
@@ -237,22 +279,34 @@ namespace HBKPlatform.Services.Implementation
             var clientId = _userService.GetClaimFromCookie("ClientId");
             var pracId = _cacheService.GetLeadPractitionerId(practiceId);
 
-            return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, true);
+            return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, null, true);
         }
 
-        public async Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId)
+        public async Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId)
         {
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
 
-            return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, false);
+            return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, roomResId, false);
         }
     
-        private async Task<BookingConfirm> DoBooking(int timeslotId, int pracId, int weekNum, int clientId, int treatmentId, bool isClientAction)
+        private async Task<BookingConfirm> DoBooking(int timeslotId, int pracId, int weekNum, int clientId, int treatmentId, int? roomResId, bool isClientAction)
         {
+            var appt = new AppointmentDto();
+            RoomLite? roomDetails = null;
             // first check for no clashes
             if (await ClashCheck(timeslotId, pracId, weekNum))
             {
-                throw new InvalidUserOperationException("Another appointment has already been booked into the timeslot.");
+                throw new DoubleBookingException("Another appointment has already been booked into the timeslot.");
+            }
+        
+            if (roomResId.HasValue && roomResId.Value > 0)
+            {
+                // TODO do room clash check, ensure reservation is available and has the correct status, clinic hasn't
+                // changed availability to exclude this ts.
+                roomDetails = await _roomRes.GetRoomDetailsFromReservation(roomResId.Value);
+                await RoomResClashCheck(roomResId.Value, timeslotId, weekNum);
+                appt.RoomId = roomDetails.Id;
+                appt.RoomReservationId = roomResId;
             }
 
             var treatments = await _cacheService.GetTreatments();
@@ -264,11 +318,17 @@ namespace HBKPlatform.Services.Implementation
             // all clear? then create the booking
             try
             {
-                await _appointmentRepo.CreateAppointment(new AppointmentDto()
+                appt.ClientId = clientId;
+                appt.PractitionerId = pracId;
+                appt.TreatmentId = treatmentId;
+                appt.WeekNum = weekNum;
+                appt.TimeslotId = timeslotId;
+                await _appointmentRepo.CreateAppointment(appt);
+                
+                if (roomResId.HasValue)
                 {
-                    ClientId = clientId, PractitionerId = pracId, TreatmentId = treatmentId, WeekNum = weekNum,
-                    TimeslotId = timeslotId
-                });
+                    await _roomRes.UpdateStatusClinic(roomResId.Value, Enums.ReservationStatus.Booked);
+                }
             }
             catch (Exception e)
             {
@@ -285,9 +345,11 @@ namespace HBKPlatform.Services.Implementation
                 TreatmentId = treatmentId,
                 WeekNum = weekNum,
                 TimeslotId = timeslotId,
-                PracctitionerName = _cacheService.GetPractitionerName(pracId),
+                PractitionerName = _cacheService.GetPractitionerName(pracId),
                 ClientName = _cacheService.GetClientName(clientId),
                 TreatmentTitle = treatment.Title,
+                RoomReservationDetails = roomDetails?.Title ?? "",
+                RoomReservationId = roomResId,
                 BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
             };
         }
@@ -298,18 +360,15 @@ namespace HBKPlatform.Services.Implementation
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         
             var treatments = await _cacheService.GetTreatments();
-            var clients = await _cacheService.GetPracticeClientDetailsLite();
             var timeslots = await GetPopulatedFutureTimeslots();
             var tsList = (await FilterOutUnsuitableTimeslots(timeslots, practitionerId)).OrderBy(x => x.WeekNum).ThenBy(x => x.Day).ThenBy(x => x.Time).ToList();
         
-            var timeslotsLite = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, tsList);
-            var treatmentsLite = DtoHelpers.ConvertTreatmentsToLite(treatments.Values);
-
             return new BookClientTreatment()
             {
-                Clients = clients,
-                Timeslots = timeslotsLite,
-                Treatments = treatmentsLite
+                Clients = await _cacheService.GetPracticeClientDetailsLite(),
+                Timeslots = DtoHelpers.ConvertTimeslotsToLite(dbStartDate, tsList),
+                Treatments = DtoHelpers.ConvertTreatmentsToLite(treatments.Values),
+                HeldReservations = await _roomRes.GetHeldReservationsPractitioner()
             };
         }
 

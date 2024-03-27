@@ -10,4 +10,6 @@ public interface IRoomReservationRepository
     public Task UpdateStatusPractitioner(int reservationId, Enums.ReservationStatus status);
     public Task<List<RoomReservationDto>> GetUpcomingReservationsPractitioner(int practitionerId, int currentWeekNum);
     public Task<List<RoomReservationDto>> GetUpcomingReservationsClinic(int clinicId, int currentWeekNum);
+    public Task<RoomReservationDto> GetReservation(int roomResId);
+    public Task<bool> CheckForExistingReservation(int weekNum, int timeslotId, int roomId);
 }

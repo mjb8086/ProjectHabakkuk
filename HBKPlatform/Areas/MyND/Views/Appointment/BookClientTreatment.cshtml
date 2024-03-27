@@ -42,6 +42,25 @@
       }
     </select>
   </fieldset>
+ @if(Model.HeldReservations.Any()) {
+   <fieldset>
+     <label for="heldReservations" class="form-textfield">Clinic Room</label>
+     <select id="heldReservations" name="roomResId">
+      <option value="-1">None</option>
+       @foreach (var res in Model.HeldReservations)
+       {
+         <option value="@res.Id">@res.RoomTitle on @res.When</option>
+       }
+     </select>
+   </fieldset>
+   }
+ else
+ {
+   <fieldset>
+     <p>No room reservations currently available.</p>
+   </fieldset>
+ }
+  
   <fieldset>
   <button>Book Client</button>
   </fieldset>

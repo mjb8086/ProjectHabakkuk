@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
@@ -63,5 +64,26 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
             .Where(x => x.PractitionerId == practitionerId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
             .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
             .ToListAsync();
+    }
+    
+    public async Task<RoomReservationDto> GetReservation(int roomResId)
+    {
+        return await _db.RoomReservations
+                   .Select(x => new RoomReservationDto()
+                   {
+                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum,
+                       PractitionerId = x.PractitionerId, Status = x.ReservationStatus
+                   })
+                   .FirstOrDefaultAsync(x => x.Id == roomResId) ??
+               throw new IdxNotFoundException($"No reservation with Id {roomResId} exists");
+    }
+
+    /// <summary>
+    /// Check whether or not a reservation exists for the roomId across all tenancies.
+    /// </summary>
+    public async Task<bool> CheckForExistingReservation(int weekNum, int timeslotId, int roomId)
+    {
+        return await _db.RoomReservations.IgnoreQueryFilters()
+            .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum);
     }
 }
