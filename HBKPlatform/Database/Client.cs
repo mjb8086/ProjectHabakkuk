@@ -18,8 +18,8 @@ namespace HBKPlatform.Database
         public int PracticeId { get; set; }
     
         // EF Navigations
-        public virtual Practice Practice { get; set; }
-        public virtual User User { get; set; }
+        public Practice Practice { get; set; }
+        public User User { get; set; }
         public virtual ICollection<ClientMessage> ClientMessages { get; set; }
         public virtual ICollection<ClientPractitioner> ClientPractitioners { get; set; }
     }

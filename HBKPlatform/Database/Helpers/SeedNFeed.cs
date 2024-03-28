@@ -100,6 +100,7 @@ namespace HBKPlatform.Database.Helpers
                     await ctx.SaveChangesAsync();
                     
                     // Set tenancyId to demo tenancy to avoid FK violations on CREATE actions (see AppDbCtx).
+                    // CREATE PRACS on T1
                     tenancySrv.SetTenancyId(t.Id);
                     
                     var user1 = new User()
@@ -219,40 +220,12 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t
                     };
                     
-                    var client3Email = "les@primus.com";
-                    var client3User = new User()
-                    {
-                        Email = client3Email,
-                        NormalizedEmail = client3Email.ToUpper(),
-                        UserName = client3Email,
-                        NormalizedUserName = client3Email.ToUpper(),
-                        EmailConfirmed = true,
-                        LockoutEnabled = true,
-                        PhoneNumber = "98989",
-                        PhoneNumberConfirmed = true,
-                        Tenancy = t
-                    };
-                    client3User.PasswordHash = passwordHasher.HashPassword(client1User, "johnthefisherman");
-                    
-                    var client3 = new Client()
-                    {
-                        Forename = "Les",
-                        Surname = "Claypool",
-                        Title = Enums.Title.Mr,
-                        Address = "Rancho Relaxo",
-                        DateOfBirth = new DateOnly(1968, 07, 08),
-                        Img = "samples/les.jpg",
-                        Telephone = "919191",
-                        User = client3User,
-                        Tenancy = t
-                    };
-                    
                     var practice = new Practice()
                     {
                         EmailAddress = "foo@bar.com",
                         Description = "Hill Valley Practice",
                         Telephone = "0898 333 201",
-                        Clients = new List<Client>() {client1, client2, client3},
+                        Clients = new List<Client>() {client1, client2},
                         Practitioners = new List<Practitioner>() {prac1, prac2},
                         Tenancy = t
                     };
@@ -261,17 +234,17 @@ namespace HBKPlatform.Database.Helpers
                     ctx.SaveChanges();
 
                     practice.LeadPractitioner = prac1;
-                    ctx.SaveChanges();
-
+                    
                     var clientPracs = new List<ClientPractitioner>()
                     {
                         new () {Client = client1, Practitioner = prac1, Tenancy = t},
                         new () {Client = client2, Practitioner = prac1, Tenancy = t},
-                        new () {Client = client3, Practitioner = prac2, Tenancy = t},
                     };
 
                     ctx.AddRange(clientPracs);
+                    ctx.SaveChanges();
 
+                    
                     var roles = new List<IdentityUserRole<string>>
                     {
                         new () { UserId = user1.Id, RoleId = pracRole.Id },
@@ -464,6 +437,110 @@ namespace HBKPlatform.Database.Helpers
                     };
                     await ctx.AddAsync(clinic1);
                     await ctx.SaveChangesAsync();
+                    
+                    
+                    // BEGIN T2 CLINIC
+                    var t2 = new Tenancy()
+                    {
+                        OrgName = "Tom's Rhinoplasty",
+                        ContactEmail = "bastardo@primusville.com",
+                        LicenceStatus = Enums.LicenceStatus.Active,
+                        RegistrationDate = DateTime.UtcNow,
+                        OrgTagline = "never smelt better.",
+                        Type = TenancyType.Practice
+                    };
+                    
+                    await ctx.AddAsync(t2);
+                    await ctx.SaveChangesAsync();
+                    tenancySrv.SetTenancyId(t2.Id);
+                    
+                    var t2ClientEmail = "mrg@sphigh.com";
+                    var t2Client= new Client()
+                    {
+                        Forename = "hermit",
+                        Surname = "garrison",
+                        Title = Enums.Title.Mr,
+                        Address = "south park",
+                        DateOfBirth = new DateOnly(1962, 07, 08),
+                        Img = "samples/hermitg.jpg",
+                        Telephone = "28228282",
+                        Tenancy = t2,
+                        User =  new() {
+                            Email = t2ClientEmail,
+                            NormalizedEmail = t2ClientEmail.ToUpper(),
+                            UserName = t2ClientEmail,
+                            NormalizedUserName = t2ClientEmail.ToUpper(),
+                            EmailConfirmed = true,
+                            LockoutEnabled = true,
+                            PhoneNumber = "2828282",
+                            PhoneNumberConfirmed = true,
+                            Tenancy = t2
+                        }
+                    };
+                    t2Client.User.PasswordHash = passwordHasher.HashPassword(t2Client.User, "misterslave");
+                    
+                    var selfBookingT2 = new Setting()
+                    {
+                        Key = "SelfBookingEnabled",
+                        Value = "False"
+                    };
+                    ctx.Add(selfBookingT2);
+                    
+                    var client3Email = "les@primusville.com";
+                    var t2Prac = new Practitioner()
+                    {
+                        Forename = "Les",
+                        Surname = "Claypool",
+                        Title = Enums.Title.Mr,
+                        DateOfBirth = new DateOnly(1968, 07, 08),
+                        Img = "samples/les.jpg",
+                        Tenancy = t2,
+                        User = new() {
+                            Email = client3Email,
+                            NormalizedEmail = client3Email.ToUpper(),
+                            UserName = client3Email,
+                            NormalizedUserName = client3Email.ToUpper(),
+                            EmailConfirmed = true,
+                            LockoutEnabled = true,
+                            PhoneNumber = "98989",
+                            PhoneNumberConfirmed = true,
+                            Tenancy = t2
+                        }
+                    };
+                    t2Prac.User.PasswordHash = passwordHasher.HashPassword(t2Prac.User, "johnthefisherman");
+                    
+                    var t2practice = new Practice()
+                    {
+                        EmailAddress = "nose@jobs.com",
+                        Description = "Tom's Rhinoplasty",
+                        Telephone = "0898 333 201",
+                        Clients = new List<Client>() {t2Client},
+                        Practitioners = new List<Practitioner>() {t2Prac},
+                        Tenancy = t2
+                    };
+                    
+                    ctx.Add(t2practice);
+                    
+                    var t2ClientPracs = new List<ClientPractitioner>()
+                    {
+                        new () {Client = t2Client, Practitioner = t2Prac, Tenancy = t2},
+                    };
+
+                    await ctx.AddRangeAsync(t2ClientPracs);
+                    await ctx.SaveChangesAsync();
+
+                    t2practice.LeadPractitioner = t2Prac;
+
+                    var t2Roles = new List<IdentityUserRole<string>>
+                    {
+                        new () { UserId = t2Prac.User.Id, RoleId = pracRole.Id },
+                        new () { UserId = t2Client.User.Id, RoleId = clientRole.Id },
+                    };
+                    
+                    await ctx.AddRangeAsync(t2Roles);
+                    await ctx.SaveChangesAsync();
+                    
+                    // END T2
                 }
             }
         }

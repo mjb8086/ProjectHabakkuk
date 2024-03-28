@@ -28,6 +28,7 @@ namespace HBKPlatform.Services.Implementation
         {
             treatment.PracticeId = _userService.GetClaimFromCookie("PracticeId");
             await _treatmentRepo.CreateTreatment(treatment);
+            _cacheService.ClearTreatments();
         }
 
         public async Task DeleteTreatment(int treatmentId)
