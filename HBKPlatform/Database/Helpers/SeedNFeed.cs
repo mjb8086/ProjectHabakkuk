@@ -457,12 +457,12 @@ namespace HBKPlatform.Database.Helpers
                     var t2ClientEmail = "mrg@sphigh.com";
                     var t2Client= new Client()
                     {
-                        Forename = "hermit",
+                        Forename = "herbert",
                         Surname = "garrison",
                         Title = Enums.Title.Mr,
                         Address = "south park",
                         DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = "samples/hermitg.jpg",
+                        Img = "samples/herbertg.jpg",
                         Telephone = "28228282",
                         Tenancy = t2,
                         User =  new() {
@@ -519,7 +519,16 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t2
                     };
                     
+                    var t2treatment = new Treatment()
+                    {
+                        Title = "nose job",
+                        Description = "Never smelt better",
+                        Cost = 8.99,
+                        Tenancy = t2
+                    };
+                    
                     ctx.Add(t2practice);
+                    ctx.Add(t2treatment);
                     
                     var t2ClientPracs = new List<ClientPractitioner>()
                     {

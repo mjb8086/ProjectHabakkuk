@@ -111,8 +111,19 @@ namespace HBKPlatform.Repository.Implementation
             await _db.SaveChangesAsync();
         }
 
-        public async Task<bool> CheckForDoubleBookingsAnyTenant(int weekNum, int timeslotId, int roomId)
+        
+        /// <summary>
+        /// Check all tenancies for a matching booking for the room on the WeekNum and TimeslotId. If there is a 'current'
+        /// room reservation Id, then this is not a clash, so it is excluded from consideration. (i.e. used by the
+        /// practitioner when creating an appointment with the reservation)
+        /// </summary>
+        public async Task<bool> CheckForDoubleBookingsAnyTenant(int weekNum, int timeslotId, int roomId, int? currentRoomResId)
         {
+            if (currentRoomResId.HasValue)
+            {
+                return await _db.Appointments.IgnoreQueryFilters().AnyAsync(x =>
+                    x.WeekNum == weekNum && x.TimeslotId == timeslotId && x.RoomId == roomId && x.RoomReservationId != currentRoomResId);
+            }
             return await _db.Appointments.IgnoreQueryFilters().AnyAsync(x =>
                 x.WeekNum == weekNum && x.TimeslotId == timeslotId && x.RoomId == roomId);
         }

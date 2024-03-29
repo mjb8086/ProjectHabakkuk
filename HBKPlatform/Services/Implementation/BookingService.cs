@@ -114,23 +114,10 @@ namespace HBKPlatform.Services.Implementation
         /// b) no other appointments exist on any tenancy at the same weeknum and ts using this room
         /// c) the room is still set as available by the clinic on this timeslot && weeknum
         /// </summary>
-        private async Task RoomResClashCheck(int roomResId, int timeslotId, int weekNum)
+        private async Task VerifyRoomReservation(RoomReservationDto roomRes, int timeslotId, int weekNum)
         {
-            var roomRes = await _roomRes.GetReservation(roomResId);
-               
-            // ensure this is actually allowed
-            if (roomRes.TimeslotId != timeslotId || roomRes.WeekNum != weekNum)
-            {
-                throw new InvalidUserOperationException(
-                    "Cannot book a room outside of its reservation's date and time.");
-            }
-            
-            // ensure no other appointments exist with this room booked on the same date and time
-            if (await _appointmentRepo.CheckForDoubleBookingsAnyTenant(weekNum, timeslotId, roomRes.RoomId))
-            {
-                throw new DoubleBookingException("Room is double booked, cannot proceed.");
-            }
-            
+            // Check for clashes against other room bookings and appointments.
+
             // ensure the room is set as available by the clinic
         } 
         
@@ -301,11 +288,9 @@ namespace HBKPlatform.Services.Implementation
         
             if (roomResId.HasValue && roomResId.Value > 0)
             {
-                // TODO do room clash check, ensure reservation is available and has the correct status, clinic hasn't
-                // changed availability to exclude this ts.
-                roomDetails = await _roomRes.GetRoomDetailsFromReservation(roomResId.Value);
-                await RoomResClashCheck(roomResId.Value, timeslotId, weekNum);
-                appt.RoomId = roomDetails.Id;
+                var roomRes = await _roomRes.GetReservation(roomResId.Value);
+                await _roomRes.VerifyRoomReservationPractitioner(roomRes, timeslotId, weekNum);
+                appt.RoomId = roomRes.RoomId;
                 appt.RoomReservationId = roomResId;
             }
 
@@ -316,6 +301,7 @@ namespace HBKPlatform.Services.Implementation
             }
         
             // all clear? then create the booking
+            // TODO: Consider a means of making this resilient - may involve consolidating more to the one repository
             try
             {
                 appt.ClientId = clientId;
@@ -327,13 +313,12 @@ namespace HBKPlatform.Services.Implementation
                 
                 if (roomResId.HasValue)
                 {
-                    await _roomRes.UpdateStatusClinic(roomResId.Value, Enums.ReservationStatus.Booked);
+                    await _roomRes.ConfirmRoomBookingPractitioner(roomResId.Value);
                 }
             }
             catch (Exception e)
             {
-                // todo: log exact exception
-                throw new InvalidUserOperationException("Problem when creating booking. Please try again.");
+                throw new InvalidUserOperationException($"Problem when creating booking: {e.Message}.");
             }
 
             // todo: notify, email

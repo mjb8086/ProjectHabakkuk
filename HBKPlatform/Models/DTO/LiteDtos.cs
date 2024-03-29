@@ -74,6 +74,7 @@ namespace HBKPlatform.Models.DTO
     {
         public string RoomTitle { get; set; }
         public string When { get; set; }
+        public string Whom { get; set; }
         public int Id { get; set; }
         public Enums.ReservationStatus Status { get; set; }
     }

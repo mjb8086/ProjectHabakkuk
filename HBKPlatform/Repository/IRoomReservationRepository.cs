@@ -11,5 +11,8 @@ public interface IRoomReservationRepository
     public Task<List<RoomReservationDto>> GetUpcomingReservationsPractitioner(int practitionerId, int currentWeekNum);
     public Task<List<RoomReservationDto>> GetUpcomingReservationsClinic(int clinicId, int currentWeekNum);
     public Task<RoomReservationDto> GetReservation(int roomResId);
-    public Task<bool> CheckForExistingReservation(int weekNum, int timeslotId, int roomId);
+    public Task<RoomReservationDto> GetReservationAnyTenancy(int roomResId);
+
+    public Task<bool> CheckForExistingReservationAnyTenant(int weekNum, int timeslotId, int roomId);
+    public Task<bool> CheckForDoubleBookingAnyTenant(int weekNum, int timeslotId, int roomId, int currentResId);
 }

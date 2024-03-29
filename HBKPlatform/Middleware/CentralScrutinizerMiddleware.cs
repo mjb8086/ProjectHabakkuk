@@ -20,10 +20,12 @@ public class CentralScrutinizerMiddleware (ICentralScrutinizerService _centralSc
         // Update service with the user's action
         _centralScrutinizer.RecordAction(context);
 
+        await next(context);
+        
         // Format exceptions - use when logging to file
         try
         {
-            await next(context);
+            // await next here
         }
         catch (Exception ex)
         {

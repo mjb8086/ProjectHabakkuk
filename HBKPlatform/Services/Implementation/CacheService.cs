@@ -46,13 +46,16 @@ namespace HBKPlatform.Services.Implementation
             return practice.LeadPractitionerId.Value;
         }
 
+        /// <summary>
+        /// Warning: Cross-Tenancy
+        /// </summary>
         public PractitionerDetailsLite GetPractitionerDetailsLite(int pracId)
         {
-            string key = $"Practitioner-t{TenancyId}-{pracId}";
+            string key = $"Practitioner-{pracId}";
             if (_memoryCache.TryGetValue(key, out PractitionerDetailsLite? practitionerDetails)) 
                 return practitionerDetails ?? throw new IdxNotFoundException();
 
-            var practitioner = _db.Practitioners.FirstOrDefault(x => x.Id == pracId);
+            var practitioner = _db.Practitioners.IgnoreQueryFilters().FirstOrDefault(x => x.Id == pracId);
             if (practitioner == null) throw new IdxNotFoundException($"No practitioner of id {pracId} exists");
         
             practitionerDetails = new PractitionerDetailsLite()
@@ -171,6 +174,9 @@ namespace HBKPlatform.Services.Implementation
             _memoryCache.Remove($"Treatments-t{TenancyId}");
         }
 
+        /// <summary>
+        /// Warning: Cross-Tenancy
+        /// </summary>
         public RoomDto GetRoom(int roomId)
         {
             string key = $"Room-r{roomId}";

@@ -12,10 +12,11 @@ public interface IRoomReservationService
     public Task<RoomReservationOverview> GetUpcomingReservationsClinic();
     public Task<ConfirmReservation> GetConfirmReservationView(int roomId, int weekNum, int timeslotId);
     public Task UpdateStatusClinic(int id, Enums.ReservationStatus status, string? note = null);
+    public Task ConfirmRoomBookingPractitioner(int id);
     public Task<TimeslotSelect> GetTimeslotSelectView(int roomId);
     public Task<MyReservations> GetUpcomingReservationsPractitioner();
     public Task<List<RoomReservationLite>> GetHeldReservationsPractitioner();
     public Task<RoomLite> GetRoomDetailsFromReservation(int roomResId);
-
     public Task<RoomReservationDto> GetReservation(int reservationId);
+    public Task VerifyRoomReservationPractitioner(RoomReservationDto roomRes, int bookingTimeslotId, int bookingWeekNum);
 }

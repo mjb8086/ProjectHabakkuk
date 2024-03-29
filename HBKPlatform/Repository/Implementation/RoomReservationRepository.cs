@@ -66,9 +66,26 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
             .ToListAsync();
     }
     
+    
+    /// <summary>
+    /// Warning: Cross-Tenancy. Get a room reservation. Works across tenancies because it is used by Clash checking
+    /// by the clinic.
+    /// </summary>
+    public async Task<RoomReservationDto> GetReservationAnyTenancy(int roomResId)
+    {
+        return await _db.RoomReservations.IgnoreQueryFilters()
+                   .Select(x => new RoomReservationDto()
+                   {
+                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum,
+                       PractitionerId = x.PractitionerId, Status = x.ReservationStatus
+                   })
+                   .FirstOrDefaultAsync(x => x.Id == roomResId) ??
+               throw new IdxNotFoundException($"No reservation with Id {roomResId} exists");
+    }
+    
     public async Task<RoomReservationDto> GetReservation(int roomResId)
     {
-        return await _db.RoomReservations
+        return await _db.RoomReservations.IgnoreQueryFilters()
                    .Select(x => new RoomReservationDto()
                    {
                        Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum,
@@ -79,11 +96,26 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     }
 
     /// <summary>
-    /// Check whether or not a reservation exists for the roomId across all tenancies.
+    /// Check whether or not an Approved or Booked reservation exists for the roomId across all tenancies.
+    /// Will disregard Requested or Cancelled reservations - they are prospective and the clinic may choose to book any
+    /// of the requests on the same week and timeslot. First come first served.
     /// </summary>
-    public async Task<bool> CheckForExistingReservation(int weekNum, int timeslotId, int roomId)
+    public async Task<bool> CheckForExistingReservationAnyTenant(int weekNum, int timeslotId, int roomId)
     {
         return await _db.RoomReservations.IgnoreQueryFilters()
-            .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum);
+            .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum && 
+                           (x.ReservationStatus == Enums.ReservationStatus.Booked || 
+                            x.ReservationStatus == Enums.ReservationStatus.Approved));
+    }
+    
+    /// <summary>
+    /// Check that on the same Timeslot and WeekNum there are no other Booked reservations for the room Id
+    /// Excludes the current reservationId because that is our reservation and therefore not a double booking
+    /// </summary>
+    public async Task<bool> CheckForDoubleBookingAnyTenant(int weekNum, int timeslotId, int roomId, int currentResId)
+    {
+        return await _db.RoomReservations.IgnoreQueryFilters()
+            .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum && x.Id != currentResId &&
+                           (x.ReservationStatus == Enums.ReservationStatus.Booked));
     }
 }
