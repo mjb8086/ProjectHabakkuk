@@ -100,7 +100,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     /// Will disregard Requested or Cancelled reservations - they are prospective and the clinic may choose to book any
     /// of the requests on the same week and timeslot. First come first served.
     /// </summary>
-    public async Task<bool> CheckForExistingReservationAnyTenant(int weekNum, int timeslotId, int roomId)
+    public async Task<bool> CheckForClashingReservationAnyTenant(int weekNum, int timeslotId, int roomId)
     {
         return await _db.RoomReservations.IgnoreQueryFilters()
             .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum && 

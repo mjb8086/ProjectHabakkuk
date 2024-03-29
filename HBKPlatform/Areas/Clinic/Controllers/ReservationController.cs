@@ -25,21 +25,21 @@ public class ReservationController(IRoomReservationService _roomRes): Controller
 
     public async Task<IActionResult> ApproveReservation(int reservationId)
     {
-        await _roomRes.UpdateStatusClinic(reservationId, Enums.ReservationStatus.Approved);
+        await _roomRes.ApproveReservation(reservationId);
         TempData["Message"] = $"Reservation request has been successfully approved.";
         return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
     }
     
     public async Task<IActionResult> DenyReservation(int reservationId)
     {
-        await _roomRes.UpdateStatusClinic(reservationId, Enums.ReservationStatus.Denied);
+        await _roomRes.DenyReservation(reservationId);
         TempData["Message"] = $"Reservation request has been DENIED.";
         return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
     }
     
     public async Task<IActionResult> CancelReservation(int reservationId)
     {
-        await _roomRes.UpdateStatusClinic(reservationId, Enums.ReservationStatus.CancelledByClinic);
+        await _roomRes.CancelAsClinic(reservationId);
         TempData["Message"] = $"Reservation has been cancelled.";
         return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
     }

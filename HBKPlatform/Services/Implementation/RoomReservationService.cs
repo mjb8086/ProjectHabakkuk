@@ -28,11 +28,28 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         await _roomResRepo.UpdateStatusPractitioner(reservationId, Enums.ReservationStatus.CancelledByPractitioner);
     }
 
-    public async Task UpdateStatusClinic(int id, Enums.ReservationStatus status, string? note)
+    public async Task ApproveReservation(int id, string? note)
     {
         var res = await _roomResRepo.GetReservationAnyTenancy(id);
+        if (res.Status == Enums.ReservationStatus.Approved) return;
         await ClashCheck(res.RoomId, res.TimeslotId, res.WeekNum);
-        await _roomResRepo.UpdateStatusClinic(id, status, note);
+        await _roomResRepo.UpdateStatusClinic(id, Enums.ReservationStatus.Approved, note);
+    }
+    
+    public async Task DenyReservation(int id, string? note)
+    {
+        var res = await _roomResRepo.GetReservationAnyTenancy(id);
+        if (res.Status == Enums.ReservationStatus.Denied) return;
+        if (res.Status == Enums.ReservationStatus.Booked) throw new InvalidUserOperationException("Cannot deny a reservation with an appointment booked");
+        await _roomResRepo.UpdateStatusClinic(id, Enums.ReservationStatus.Denied, note);
+    }
+    
+    public async Task CancelAsClinic(int id)
+    {
+        var res = await _roomResRepo.GetReservationAnyTenancy(id);
+        if (res.Status == Enums.ReservationStatus.CancelledByClinic) return;
+        if (res.Status == Enums.ReservationStatus.Booked) throw new InvalidUserOperationException("Cannot cancel a reservation with an appointment booked");
+        await _roomResRepo.UpdateStatusClinic(id, Enums.ReservationStatus.CancelledByClinic);
     }
     
     public async Task ConfirmRoomBookingPractitioner(int id)
@@ -180,7 +197,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     private async Task ClashCheck(int roomId, int timeslotId, int weekNum)
     {
         // first, check if there is a reservation already made for the time
-        if(await _roomResRepo.CheckForExistingReservationAnyTenant(weekNum, timeslotId, roomId))
+        if(await _roomResRepo.CheckForClashingReservationAnyTenant(weekNum, timeslotId, roomId))
         {
             throw new DoubleBookingException("A reservation already exists on this date and time. Cannot continue.");
         } 

@@ -13,6 +13,6 @@ public interface IRoomReservationRepository
     public Task<RoomReservationDto> GetReservation(int roomResId);
     public Task<RoomReservationDto> GetReservationAnyTenancy(int roomResId);
 
-    public Task<bool> CheckForExistingReservationAnyTenant(int weekNum, int timeslotId, int roomId);
+    public Task<bool> CheckForClashingReservationAnyTenant(int weekNum, int timeslotId, int roomId);
     public Task<bool> CheckForDoubleBookingAnyTenant(int weekNum, int timeslotId, int roomId, int currentResId);
 }
