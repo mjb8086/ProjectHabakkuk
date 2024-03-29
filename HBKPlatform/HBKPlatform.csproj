@@ -25,6 +25,11 @@
     <None Remove="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" />
   </ItemGroup>
   <ItemGroup>
+    <AdditionalFiles Include="Areas\MCP\Views\ClinicManagement\Index.cshtml" />
+    <AdditionalFiles Include="Areas\MCP\Views\ClinicManagement\ListPractices.cshtml" />
+    <AdditionalFiles Include="Areas\MCP\Views\ClinicManagement\PasswordReset.cshtml" />
+    <AdditionalFiles Include="Areas\MCP\Views\ClinicManagement\RegisterPractice.cshtml" />
+    <AdditionalFiles Include="Areas\MCP\Views\ClinicManagement\ViewPractice.cshtml" />
     <AdditionalFiles Include="Views\Home\Index.cshtml" />
     <AdditionalFiles Include="Views\Home\Privacy.cshtml" />
   </ItemGroup>

@@ -6,6 +6,7 @@ namespace HBKPlatform.Models.View.MCP
     public class UserAccountFunctions
     {
         public List<SelectListItem> Practices { get; set; }
+        public List<SelectListItem> Clinics { get; set; }
     }
 
     public class UacRequest

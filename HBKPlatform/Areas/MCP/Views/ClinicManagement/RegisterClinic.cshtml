@@ -1,0 +1,77 @@
+@using HBKPlatform.Globals
+@model HBKPlatform.Models.DTO.ClinicRegistrationDto;
+@{
+    ViewData["Title"] = "MCP Clinic Management - Register a new clinic";
+    ViewBag.CurrentNav = "ClinicManagement";
+    ViewBag.Css = "mcp-practicemgmt.css";
+    Layout = "_McpShared";
+}
+<h1>New Clinic</h1>
+<div id="uacWrapper">
+<form id="treatmentDetails" asp-area="MCP" asp-controller="ClinicManagement" asp-action="DoRegisterClinic" method="post"> 
+    <fieldset>
+        <legend for="orgName" class="form-textfield">Organisation Name</legend>
+        <input type="text" id="orgName" asp-for="OrgName" value="" placeholder="Pearce & Pearce" >
+    </fieldset>
+
+    <fieldset>
+        <legend for="orgTagline" class="form-textfield">Organisation Tagline</legend>
+        <input type="text" id="orgTagline" asp-for="OrgTagline" value="" placeholder="Merges and Executions" >
+    </fieldset>
+
+    <fieldset>
+        <legend for="licence" class="form-textfield">Licence Status</legend>
+        <select id="licence" asp-for="LicenceStatus" 
+                asp-items="Html.GetEnumSelectList<Enums.LicenceStatus>()">
+        </select> 
+    </fieldset>
+    
+    <fieldset>
+        <legend for="orgEmail" class="form-textfield">Organisation Email</legend>
+        <input type="text" id="orgEmail" asp-for="Email" value="" placeholder="billg@microsoft.com" >
+    </fieldset>
+
+    <fieldset>
+        <legend for="telephone" class="form-textfield">Telephone</legend>
+        <input type="text" name="telephone" id="telephone" value=""/>
+    </fieldset>
+  
+    <fieldset>
+      <legend for="address" class="form-textfield">Address</legend>
+      <textarea name="streetAddress" id="address">
+
+      </textarea> 
+    </fieldset>
+
+    <h3>Clinic Manager Details</h3>
+    <fieldset>
+        <legend for="managerTitle" class="form-textfield">Title</legend>
+        <select id="managerTitle" asp-for="LeadManagerTitle" asp-items="Html.GetEnumSelectList<Enums.Title>()">
+        </select> 
+    </fieldset>
+    
+    <fieldset>
+        <legend for="managerForename" class="form-textfield">Forename</legend>
+        <input type="text" id="managerForename" asp-for="LeadManagerForename" placeholder="Patrick">
+    </fieldset>
+    
+    <fieldset>
+        <legend for="managerSurname" class="form-textfield">Surname</legend>
+        <input type="text" id="managerSurname" asp-for="LeadManagerSurname" placeholder="Bateman" >
+    </fieldset>
+    
+    <fieldset>
+        <legend for="dateOfBirth" class="form-textfield">Date of birth</legend>
+        <input asp-for="LeadManagerDOB" id="dateOfBirth" value="1970-01-01" type="date"/>
+    </fieldset>
+    
+    <fieldset>
+        <legend for="managerEmail" class="form-textfield">Email</legend>
+        <input type="text" id="managerEmail" asp-for="LeadManagerEmail" placeholder="bateman@pandp.com" >
+    </fieldset>
+    
+    <fieldset>
+        <input type="submit" id="btnSave" value="Register Clinic" />
+    </fieldset>
+</form>
+</div>
