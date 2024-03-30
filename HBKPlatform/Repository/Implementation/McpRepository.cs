@@ -164,7 +164,6 @@ namespace HBKPlatform.Repository.Implementation
                 .Select(x => new UserDto(){TenancyId = x.TenancyId, UserEmail = x.Email ?? "", LastLogin = x.LastLogin, UserRole = "TODO", LoginCount = x.LoginCount, LockoutEnd = x.LockoutEnd}).ToListAsync();
         }
         
-        
         public async Task<string> GetPracUserId(int pracId)
         {
             var practitioner = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == pracId);
@@ -174,7 +173,103 @@ namespace HBKPlatform.Repository.Implementation
             }
             return practitioner.UserId;
         }
-    
+        
+        //////////////////////////////////////////////////////////////////////////////// 
+        // CLINIC METHODS
+        //////////////////////////////////////////////////////////////////////////////// 
+        public async Task<List<ClinicLite>> GetClinicDetailsLite()
+        {
+            return await _db.Clinics.IgnoreQueryFilters().Include("Tenancy").OrderBy(x => x.Id).Select(x => new ClinicLite() { Id = x.Id, Name = x.Tenancy.OrgName }).ToListAsync();
+        }
+        
+        public async Task<ClinicDetailsDto> GetClinicAlone(int clinicId)
+        {
+            return await _db.Clinics.IgnoreQueryFilters().Include("ManagerUser").Include("Tenancy").Where(x => x.Id == clinicId).Select(x => new ClinicDetailsDto()
+            {
+                OrgName = x.Tenancy.OrgName,
+                OrgEmail = x.EmailAddress,
+                Id = x.Id,
+                LicenceStatus = x.Tenancy.LicenceStatus,
+                Telephone = x.Telephone,
+                RegistrationDate = x.Tenancy.RegistrationDate,
+                StreetAddress = x.StreetAddress ?? "",
+                LeadManagerFullName  = x.ManagerUser.FullName ?? "",
+                LeadManagerEmail = x.ManagerUser.Email ?? ""
+            }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Could not find clinic ID {clinicId}");
+        }
+        
+        public async Task RegisterClinic(ClinicRegistrationDto clinic)
+        {
+            if (await _userRepo.IsEmailInUse(clinic.LeadManagerEmail)) 
+                throw new InvalidUserOperationException("Email address already in use");
+
+            var saTenancyId = _tenancySrv.TenancyId;
+        
+            var tenancy = new Tenancy()
+            {
+                OrgName = clinic.OrgName,
+                RegistrationDate = DateTime.UtcNow,
+                LicenceStatus = clinic.LicenceStatus,
+                ContactEmail = clinic.OrgEmail
+            };
+        
+            await _db.AddAsync(tenancy);
+            await _db.SaveChangesAsync();
+        
+            // Questionable - but required workaround to ensure new users do not get the 'NowDoctor Admin' as their tenancy.
+            _tenancySrv.SetTenancyId(tenancy.Id);
+
+            var user = new User()
+            {
+                FullName = $"{clinic.LeadManagerTitle} {clinic.LeadManagerForename} {clinic.LeadManagerSurname}",
+                Email = clinic.LeadManagerEmail,
+                NormalizedEmail = clinic.LeadManagerEmail.ToUpper(),
+                UserName = clinic.LeadManagerEmail,
+                NormalizedUserName = clinic.LeadManagerEmail.ToUpper(),
+                EmailConfirmed = true,
+                LockoutEnabled = true,
+                PhoneNumber = "",
+                PhoneNumberConfirmed = true,
+                Tenancy = tenancy
+            };
+        
+            var pwdGen = new PasswordGenerator.Password(DefaultSettings.DEFAULT_PASSWORD_LENGTH);
+            var pwd = pwdGen.Next();
+            // TODO: REMOVE THIS!!!
+            Console.WriteLine($"DEBUG: PASSWORD IS ====>\n{pwd}\n");
+            user.PasswordHash = passwordHasher.HashPassword(user, pwd);
+            await _db.AddAsync(user);
+            await _db.SaveChangesAsync();
+        
+            var dbClinic = new Clinic()
+            {
+                EmailAddress = clinic.OrgEmail,
+                Telephone = clinic.Telephone,
+                StreetAddress = clinic.StreetAddress,
+                Tenancy = tenancy,
+                ManagerUser = user
+            };
+        
+            await _db.AddAsync(dbClinic);
+            // todo - make resilient?
+            await _userMgr.AddToRoleAsync(user, "ClinicManager");
+            await _db.SaveChangesAsync();
+        
+            // Now the DB has committed the changes, set the tenancy back to what it was.
+            _tenancySrv.SetTenancyId(saTenancyId);
+        }
+        
+        public async Task UpdateClinicDetails(ClinicDto clinic)
+        {
+            var dbClinic = await _db.Clinics.IgnoreQueryFilters().Include("Tenancy").FirstOrDefaultAsync(x => x.Id == clinic.Id) ??
+                           throw new IdxNotFoundException($"Could not find clinic ID {clinic.Id}");
+            dbClinic.Tenancy.OrgName = clinic.OrgName;
+            dbClinic.Telephone = clinic.Telephone;
+            dbClinic.Tenancy.LicenceStatus = clinic.LicenceStatus;
+            dbClinic.EmailAddress = clinic.OrgEmail;
+            dbClinic.StreetAddress = clinic.StreetAddress;
+            await _db.SaveChangesAsync();
+        }
     
     }
 }

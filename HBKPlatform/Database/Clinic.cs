@@ -13,7 +13,6 @@ namespace HBKPlatform.Database;
 /// </summary>
 public class Clinic : HbkBaseEntity
 {
-    public string OrgName { get; set; }
     [DataType(DataType.MultilineText)]
     public string? StreetAddress { get; set; }
     public string Telephone { get; set; }

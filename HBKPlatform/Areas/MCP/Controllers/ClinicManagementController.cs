@@ -22,29 +22,30 @@ namespace HBKPlatform.Areas.MCP.Controllers
             return View();
         }
     
-        public async Task<IActionResult> ViewClinic(int practiceId)
+        public async Task<IActionResult> ViewClinic(int clinicId)
         {
- //           return View(await _mcpService.GetClinicModel(practiceId));
-            return View();
+           return View(await _mcpService.GetClinicModel(clinicId));
         }
 
         [HttpPost]
-        public async Task<IActionResult> DoUpdateClinic(int practiceId, [FromForm] ClinicDto model)
+        public async Task<IActionResult> DoUpdateClinic(int clinicId, [FromForm] ClinicDto model)
         {
-//            model.Id = practiceId;
+            model.Id = clinicId;
             if (!ModelState.IsValid) throw new MissingFieldException("all your fields are belong to us");
-//            await _mcpService.UpdateClinic(model);
-            return RedirectToRoute(new { controller = "ClinicManagement", action = "ViewClinic", practiceId=practiceId });
+            await _mcpService.UpdateClinic(model);
+            TempData["Message"] = "Clinic data successfully updated.";
+            return RedirectToRoute(new { controller = "ClinicManagement", action = "ViewClinic", clinicId=clinicId });
         }
     
         public async Task<IActionResult> ListClinics()
         {
-//            return View(await _mcpService.GetListClinicsView());
-            return View();
+            return View(await _mcpService.GetListClinicsView());
         }
 
         public async Task<IActionResult> PasswordReset()
         {
+            // TODO - UacActions under their own controller?
+            return Ok("WIP");
             return View(await _mcpService.GetUacView());
         }
     
@@ -57,23 +58,19 @@ namespace HBKPlatform.Areas.MCP.Controllers
         public async Task<IActionResult> DoRegisterClinic([FromForm] ClinicRegistrationDto model)
         {
             if (!ModelState.IsValid) throw new MissingFieldException("Someone set us up the model");
-//            await _mcpService.RegisterClinic(model);
-            TempData["Message"] = "Successfully registered new practice and created lead practitioner user.";
+            await _mcpService.RegisterClinic(model);
+            TempData["Message"] = "Successfully registered new clinic and created lead manager user.";
             return RedirectToRoute(new { controller = "ClinicManagement", action = "ListClinics" });
         }
 
         [HttpPost]
         public async Task<IActionResult> DoUacAction([FromForm] UacRequest model)
         {
+            return Ok("Deprecated?");
             if (!ModelState.IsValid) throw new MissingFieldException("The model is bad gentlemen make your time");
             await _userService.DoUacAction(model);
             TempData["Message"] = $"Successfully completed action {model.Action}.";
             return RedirectToRoute(new { controller = "ClinicManagement", action = "PasswordReset" });
-        }
-
-        public async Task<IActionResult> GetClinicPracs(int practiceId)
-        {
-            return Ok(await _mcpService.GetPracPracs(practiceId));
         }
 
 

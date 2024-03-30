@@ -53,6 +53,30 @@ namespace HBKPlatform.Services.Implementation
         {
             return await _mcpRepo.GetRecentLogins();
         }
+        
+        //////////////////////////////////////////////////////////////////////////////// 
+        // CLINIC METHODS
+        //////////////////////////////////////////////////////////////////////////////// 
+        public async Task<List<ClinicLite>> GetListClinicsView()
+        {
+            return await _mcpRepo.GetClinicDetailsLite();
+        }
+        
+        public async Task<ClinicDetailsDto> GetClinicModel(int clinicId)
+        {
+            return await _mcpRepo.GetClinicAlone(clinicId);
+        }
+        
+        public async Task RegisterClinic(ClinicRegistrationDto model)
+        {
+            await _mcpRepo.RegisterClinic(model);
+        }
+        
+        public async Task UpdateClinic(ClinicDto model)
+        {
+            await _mcpRepo.UpdateClinicDetails(model);
+        }
+
 
     }
 }

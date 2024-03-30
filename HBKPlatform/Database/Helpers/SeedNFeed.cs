@@ -392,7 +392,8 @@ namespace HBKPlatform.Database.Helpers
                     var clinicTenancy = new Tenancy() {
                         OrgName = "The Coachman",
                         LicenceStatus = Enums.LicenceStatus.Active,
-                        Type = TenancyType.Clinic
+                        Type = TenancyType.Clinic,
+                        ContactEmail = "coachm@btinternet.com"
                     };
                     await ctx.AddAsync(clinicTenancy);
                     await ctx.SaveChangesAsync();
@@ -410,6 +411,7 @@ namespace HBKPlatform.Database.Helpers
                         PhoneNumber = "98989",
                         PhoneNumberConfirmed = true,
                         Tenancy = clinicTenancy,
+                        FullName = "mr. davey"
                     };
                     managerUser.PasswordHash = passwordHasher.HashPassword(client1User, "vip_pass_mode");
                     await ctx.AddAsync(managerUser);
@@ -423,10 +425,9 @@ namespace HBKPlatform.Database.Helpers
                     await ctx.AddAsync(mgrUser);
                     var clinic1 = new Clinic()
                     {
-                        OrgName = "The Coachman",
+                        EmailAddress = "coachm@btinternet.com",
                         StreetAddress = "Broad Street\nMagherafelt",
                         Telephone = "1690",
-                        EmailAddress = "coachm@btinternet.com",
                         ManagerUserId = managerUser.Id,
                         Rooms = new List<Room>()
                         {
@@ -439,7 +440,7 @@ namespace HBKPlatform.Database.Helpers
                     await ctx.SaveChangesAsync();
                     
                     
-                    // BEGIN T2 CLINIC
+                    // BEGIN T2 PRACTICE
                     var t2 = new Tenancy()
                     {
                         OrgName = "Tom's Rhinoplasty",

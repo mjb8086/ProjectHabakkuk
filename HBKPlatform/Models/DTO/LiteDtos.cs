@@ -78,5 +78,11 @@ namespace HBKPlatform.Models.DTO
         public int Id { get; set; }
         public Enums.ReservationStatus Status { get; set; }
     }
+
+    public class ClinicLite
+    {
+        public string Name { get; set; }
+        public int Id { get; set; }
+    }
     
 }

@@ -12,6 +12,10 @@ namespace HBKPlatform.Services
         public Task RegisterPractice(PracticeRegistrationDto model);
         public Task<UserAccountFunctions> GetUacView();
         public Task<List<UserDto>> GetRecentLogins();
+        public Task<List<ClinicLite>> GetListClinicsView();
+        public Task<ClinicDetailsDto> GetClinicModel(int clinicId);
+        public Task RegisterClinic(ClinicRegistrationDto model);
+        public Task UpdateClinic(ClinicDto model);
     
         // API Methods
         public Task<PracticePractitioners> GetPracPracs(int practiceId);
