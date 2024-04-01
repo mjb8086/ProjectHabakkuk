@@ -112,7 +112,7 @@ div#hbkFlasher {
     border-radius: 15px;
     cursor: pointer;
 }
-div.hbkStatusError {
+div#hbkFlasher.error {
     background-color: #f42626;
 }
 div#hbkFlasherMessage {
