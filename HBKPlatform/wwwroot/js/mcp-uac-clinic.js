@@ -35,7 +35,11 @@ $(document).ready(function () {
             success: function (data) {
                 managerData = data;
                 displayLockout();
+            },
+            error: function() {
+                Globals.HBKFlasher("ERROR!", "error");
             }
+            
         });
     }
     

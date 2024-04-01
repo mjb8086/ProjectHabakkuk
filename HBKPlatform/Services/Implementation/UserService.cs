@@ -42,7 +42,8 @@ namespace HBKPlatform.Services.Implementation
             }
             else if (model.ClinicId.HasValue)
             {
-                userId = await _mcpRepo.GetLeadManagerUserId(model.ClinicId.Value);
+                userId = await _mcpRepo.GetLeadManagerUserId(model.ClinicId.Value) ?? 
+                         throw new InvalidUserOperationException("Clinic manager Id is missing on the clinic");
             }
             else if (model.ClientId.HasValue)
             {

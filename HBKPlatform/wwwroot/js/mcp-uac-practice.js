@@ -54,6 +54,9 @@ $(document).ready(function () {
             success: function (data) {
                 practitionerData = data.users;
                 updatePractitionerList(practitionerData);
+            },
+            error: function() {
+                Globals.HBKFlasher("ERROR!", "error");
             }
         });
     }

@@ -16,7 +16,7 @@ namespace HBKPlatform.Repository
         public Task<List<UserDto>> GetRecentLogins();
         public Task<int> GetRegisteredUserCount();
         public Task<string> GetPracUserId(int pracId);
-        public Task<string> GetLeadManagerUserId(int clinicId);
+        public Task<string?> GetLeadManagerUserId(int clinicId);
         public Task<string> GetClientUserId(int clientId);
         public Task<List<ClinicLite>> GetClinicDetailsLite();
         public Task<ClinicDetailsDto> GetClinicAlone(int clinicId);

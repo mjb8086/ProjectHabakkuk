@@ -157,7 +157,7 @@ namespace HBKPlatform.Repository.Implementation
                 .Where(x => x.Id == clinicId && x.ManagerUser.LockoutEnabled)
                 .Select(x => new UserDetailsUac()
                 {
-                    Id = x.Id, Name = x.ManagerUser.FullName ?? "", HasLockout = x.ManagerUser.LockoutEnd > DateTime.UtcNow,
+                    Id = x.Id, Name = x.ManagerUser.FullName ?? "", HasLockout = x.ManagerUser.LockoutEnd.HasValue &&  x.ManagerUser.LockoutEnd.Value > DateTime.UtcNow,
                     LockoutEnd = x.ManagerUser.LockoutEnd
                 })
                 .FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Could not find lead manager for clinicId {clinicId}");
@@ -209,7 +209,7 @@ namespace HBKPlatform.Repository.Implementation
             return client.UserId;
         }
         
-        public async Task<string> GetLeadManagerUserId(int clinicId)
+        public async Task<string?> GetLeadManagerUserId(int clinicId)
         {
             var userId = (await _db.Clinics.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == clinicId))?.ManagerUserId;
 
