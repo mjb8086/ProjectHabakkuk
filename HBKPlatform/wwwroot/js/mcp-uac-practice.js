@@ -52,7 +52,7 @@ $(document).ready(function () {
             contentType: "application/json",
             method: "get",
             success: function (data) {
-                practitionerData = data.pracs;
+                practitionerData = data.users;
                 updatePractitionerList(practitionerData);
             }
         });

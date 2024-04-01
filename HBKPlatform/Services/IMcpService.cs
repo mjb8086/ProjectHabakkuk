@@ -10,7 +10,8 @@ namespace HBKPlatform.Services
         public Task<ListPractices> GetListPracticesView();
         public Task UpdatePractice(PracticeDto model);
         public Task RegisterPractice(PracticeRegistrationDto model);
-        public Task<UserAccountFunctions> GetUacView();
+        public Task<UserAccountFunctions> GetUacViewPractices();
+        public Task<UserAccountFunctions> GetUacViewClinic();
         public Task<List<UserDto>> GetRecentLogins();
         public Task<List<ClinicLite>> GetListClinicsView();
         public Task<ClinicDetailsDto> GetClinicModel(int clinicId);
@@ -18,6 +19,7 @@ namespace HBKPlatform.Services
         public Task UpdateClinic(ClinicDto model);
     
         // API Methods
-        public Task<PracticePractitioners> GetPracPracs(int practiceId);
+        public Task<UacUserSelect> GetPracPracs(int practiceId);
+        public Task<UserDetailsUac> GetLeadManager(int clinicId);
     }
 }

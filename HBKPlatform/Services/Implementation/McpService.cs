@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HBKPlatform.Services.Implementation
 {
-    public class McpService(IMcpRepository _mcpRepo, ITimeslotRepository _timeslotRepo, ICacheService _cacheService): IMcpService
+    public class McpService(IMcpRepository _mcpRepo): IMcpService
     {
     
         /* MCP Methods */
@@ -30,7 +30,7 @@ namespace HBKPlatform.Services.Implementation
             await _mcpRepo.RegisterPractice(model);
         }
 
-        public async Task<UserAccountFunctions> GetUacView()
+        public async Task<UserAccountFunctions> GetUacViewPractices()
         {
             var practices = await _mcpRepo.GetPracticeDetailsLite();
             return new UserAccountFunctions()
@@ -38,15 +38,29 @@ namespace HBKPlatform.Services.Implementation
                 Practices = practices.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToList(),
             };
         }
+        
+        public async Task<UserAccountFunctions> GetUacViewClinic()
+        {
+            var clinics = await _mcpRepo.GetClinicDetailsLite();
+            return new UserAccountFunctions()
+            {
+                Clinics = clinics.Select(x => new SelectListItem() { Text = x.Name, Value = x.Id.ToString() }).ToList(),
+            };
+        }
 
-        public async Task<PracticePractitioners> GetPracPracs(int practiceId)
+        public async Task<UacUserSelect> GetPracPracs(int practiceId)
         {
             var pracDetailsUac = await _mcpRepo.GetPractitionerLockoutStatusDict(practiceId);
         
-            return new PracticePractitioners()
+            return new UacUserSelect()
             {
-                Pracs = pracDetailsUac
+                Users = pracDetailsUac
             };
+        }
+        
+        public async Task<UserDetailsUac> GetLeadManager(int clinicId)
+        {
+            return await _mcpRepo.GetLeadManagerLockoutStatus(clinicId);
         }
 
         public async Task<List<UserDto>> GetRecentLogins()

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Repository;
@@ -32,7 +33,26 @@ namespace HBKPlatform.Services.Implementation
     
         public async Task DoUacAction(UacRequest model)
         {
-            var userId = await _mcpRepo.GetPracUserId(model.PractitionerId);
+            string userId;
+            
+            // For which type of user?
+            if (model.PractitionerId.HasValue)
+            {
+                userId = await _mcpRepo.GetPracUserId(model.PractitionerId.Value);
+            }
+            else if (model.ClinicId.HasValue)
+            {
+                userId = await _mcpRepo.GetLeadManagerUserId(model.ClinicId.Value);
+            }
+            else if (model.ClientId.HasValue)
+            {
+                userId = await _mcpRepo.GetClientUserId(model.ClientId.Value);
+            }
+            else
+            {
+                throw new InvalidUserOperationException("No entity Id value supplied.");
+            }
+            
             switch (model.Action)
             {
                 case UacAction.PasswordReset:

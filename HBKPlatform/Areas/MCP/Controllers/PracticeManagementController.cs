@@ -43,7 +43,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
 
         public async Task<IActionResult> PasswordReset()
         {
-            return View(await _mcpService.GetUacView());
+            return View(await _mcpService.GetUacViewPractices());
         }
     
         public async Task<IActionResult> RegisterPractice()
@@ -69,6 +69,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
             return RedirectToRoute(new { controller = "PracticeManagement", action = "PasswordReset" });
         }
 
+        // API METHODS
         public async Task<IActionResult> GetPracticePracs(int practiceId)
         {
             return Ok(await _mcpService.GetPracPracs(practiceId));

@@ -35,6 +35,7 @@ namespace HBKPlatform.Repository.Implementation
         /// </summary>
         public async Task ToggleLockout(string userId)
         {
+            // Are we a super admin or a customer user?
             IQueryable<User> userQuery = _ctx.HttpContext != null && _ctx.HttpContext.User.IsInRole("SuperAdmin") ?
                 _db.Users.IgnoreQueryFilters() : _db.Users;
         

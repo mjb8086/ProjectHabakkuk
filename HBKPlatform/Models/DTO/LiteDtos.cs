@@ -16,7 +16,7 @@ namespace HBKPlatform.Models.DTO
         public int PracticeId { get; set; }
     }
 
-    public class PractitionerDetailsUac : PractitionerDetailsLite
+    public class UserDetailsUac : PractitionerDetailsLite
     {
         public bool HasLockout { get; set; } 
         public DateTimeOffset? LockoutEnd { get; set; }

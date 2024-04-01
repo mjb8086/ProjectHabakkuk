@@ -10,10 +10,13 @@ namespace HBKPlatform.Repository
         public Task<List<PracticeDetailsLite>> GetPracticeDetailsLite();
         public Task UpdatePracticeDetails(PracticeDto practice);
         public Task<Tenancy> RegisterPractice(PracticeRegistrationDto practice);
-        public Task<List<PractitionerDetailsUac>> GetPracticePracs(int practiceId);
-        public Task<Dictionary<int, PractitionerDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId);
+        public Task<List<UserDetailsUac>> GetPracticePracs(int practiceId);
+        public Task<Dictionary<int, UserDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId);
+        public Task<UserDetailsUac> GetLeadManagerLockoutStatus(int clinicId);
         public Task<List<UserDto>> GetRecentLogins();
         public Task<string> GetPracUserId(int pracId);
+        public Task<string> GetLeadManagerUserId(int clinicId);
+        public Task<string> GetClientUserId(int clientId);
         public Task<List<ClinicLite>> GetClinicDetailsLite();
         public Task<ClinicDetailsDto> GetClinicAlone(int clinicId);
         public Task RegisterClinic(ClinicRegistrationDto clinic);

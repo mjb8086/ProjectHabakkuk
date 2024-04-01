@@ -23,7 +23,7 @@ namespace HBKPlatform.Repository.Implementation
     /// © 2024 NowDoctor Ltd.
     /// </summary>
     public class McpRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, UserManager<User> _userMgr, 
-        IUserRepository _userRepo, ITenancyService _tenancySrv) : IMcpRepository
+        IUserRepository _userRepo, ITenancyService _tenancySrv, ILogger<McpRepository> _logger) : IMcpRepository
     {
     
         /// <summary>
@@ -139,16 +139,28 @@ namespace HBKPlatform.Repository.Implementation
             return tenancy;
         }
     
-        public async Task<List<PractitionerDetailsUac>> GetPracticePracs(int practiceId)
+        public async Task<List<UserDetailsUac>> GetPracticePracs(int practiceId)
         {
             return await _db.Practitioners.IgnoreQueryFilters().Where(x => x.PracticeId == practiceId)
-                .Select(x => new PractitionerDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}"}).ToListAsync();
+                .Select(x => new UserDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}"}).ToListAsync();
         }
 
-        public async Task<Dictionary<int, PractitionerDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId)
+        public async Task<Dictionary<int, UserDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId)
         {
             return await _db.Practitioners.IgnoreQueryFilters().Include("User").Where(x => x.UserId != null && x.User.LockoutEnabled)
-                .ToDictionaryAsync(x => x.Id, x => new PractitionerDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}", HasLockout = x.User.LockoutEnd > DateTime.UtcNow, LockoutEnd = x.User.LockoutEnd });
+                .ToDictionaryAsync(x => x.Id, x => new UserDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}", HasLockout = x.User.LockoutEnd > DateTime.UtcNow, LockoutEnd = x.User.LockoutEnd });
+        }
+        
+        public async Task<UserDetailsUac> GetLeadManagerLockoutStatus(int clinicId)
+        {
+            return await _db.Clinics.IgnoreQueryFilters().Include("ManagerUser")
+                .Where(x => x.Id == clinicId && x.ManagerUser.LockoutEnabled)
+                .Select(x => new UserDetailsUac()
+                {
+                    Id = x.Id, Name = x.ManagerUser.FullName ?? "", HasLockout = x.ManagerUser.LockoutEnd > DateTime.UtcNow,
+                    LockoutEnd = x.ManagerUser.LockoutEnd
+                })
+                .FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Could not find lead manager for clinicId {clinicId}");
         }
         
         /// <summary>
@@ -169,9 +181,37 @@ namespace HBKPlatform.Repository.Implementation
             var practitioner = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == pracId);
             if (practitioner == null || string.IsNullOrWhiteSpace(practitioner.UserId))
             {
+                throw new MissingMemberException("Could not find practitioner user");
+            }
+            
+            if (string.IsNullOrWhiteSpace(practitioner.UserId))
+                _logger.LogWarning($"UAC attempted on null userId for pracId {pracId}");
+            
+            return practitioner.UserId;
+        }
+        
+        public async Task<string> GetClientUserId(int clientId)
+        {
+            var client = await _db.Clients.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == clientId);
+            if (client == null || string.IsNullOrWhiteSpace(client.UserId))
+            {
                 throw new MissingMemberException("UserID is null");
             }
-            return practitioner.UserId;
+
+            if (string.IsNullOrWhiteSpace(client.UserId))
+                _logger.LogWarning($"UAC attempted on null userId for clientId {clientId}");
+            
+            return client.UserId;
+        }
+        
+        public async Task<string> GetLeadManagerUserId(int clinicId)
+        {
+            var userId = (await _db.Clinics.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == clinicId))?.ManagerUserId;
+
+            if (string.IsNullOrWhiteSpace(userId))
+                _logger.LogWarning($"UAC attempted on null lead manager user Id for clinicId {clinicId}");
+            
+            return userId;
         }
         
         //////////////////////////////////////////////////////////////////////////////// 

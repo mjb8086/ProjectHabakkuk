@@ -44,9 +44,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
 
         public async Task<IActionResult> PasswordReset()
         {
-            // TODO - UacActions under their own controller?
-            return Ok("WIP");
-            return View(await _mcpService.GetUacView());
+            return View(await _mcpService.GetUacViewClinic());
         }
     
         public async Task<IActionResult> RegisterClinic()
@@ -66,11 +64,16 @@ namespace HBKPlatform.Areas.MCP.Controllers
         [HttpPost]
         public async Task<IActionResult> DoUacAction([FromForm] UacRequest model)
         {
-            return Ok("Deprecated?");
             if (!ModelState.IsValid) throw new MissingFieldException("The model is bad gentlemen make your time");
             await _userService.DoUacAction(model);
             TempData["Message"] = $"Successfully completed action {model.Action}.";
             return RedirectToRoute(new { controller = "ClinicManagement", action = "PasswordReset" });
+        }
+        
+        // API METHODS
+        public async Task<IActionResult> GetLeadManager(int clinicId)
+        {
+            return Ok(await _mcpService.GetLeadManager(clinicId));
         }
 
 
