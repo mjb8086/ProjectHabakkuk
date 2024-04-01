@@ -147,7 +147,7 @@ namespace HBKPlatform.Repository.Implementation
 
         public async Task<Dictionary<int, UserDetailsUac>> GetPractitionerLockoutStatusDict(int practiceId)
         {
-            return await _db.Practitioners.IgnoreQueryFilters().Include("User").Where(x => x.UserId != null && x.User.LockoutEnabled)
+            return await _db.Practitioners.IgnoreQueryFilters().Include("User").Where(x => x.UserId != null && x.User.LockoutEnabled && x.PracticeId == practiceId)
                 .ToDictionaryAsync(x => x.Id, x => new UserDetailsUac() { Id = x.Id, Name = $"{x.Title}. {x.Forename} {x.Surname}", HasLockout = x.User.LockoutEnd > DateTime.UtcNow, LockoutEnd = x.User.LockoutEnd });
         }
         
@@ -174,6 +174,11 @@ namespace HBKPlatform.Repository.Implementation
             return await _db.Users.IgnoreQueryFilters().Where(x => x.LastLogin.HasValue && x.LastLogin > oneWeekAgo)
                 .OrderBy(x => x.LastLogin)
                 .Select(x => new UserDto(){TenancyId = x.TenancyId, UserEmail = x.Email ?? "", LastLogin = x.LastLogin, UserRole = "TODO", LoginCount = x.LoginCount, LockoutEnd = x.LockoutEnd}).ToListAsync();
+        }
+
+        public async Task<int> GetRegisteredUserCount()
+        {
+            return await _db.Users.IgnoreQueryFilters().CountAsync();
         }
         
         public async Task<string> GetPracUserId(int pracId)

@@ -1,12 +1,13 @@
-using HBKPlatform.Helpers;
+using System.Text.RegularExpressions;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Repository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HBKPlatform.Services.Implementation
 {
-    public class McpService(IMcpRepository _mcpRepo): IMcpService
+    public class McpService(IMcpRepository _mcpRepo, ICentralScrutinizerService _css, [FromServices] IConfiguration config ): IMcpService
     {
     
         /* MCP Methods */
@@ -66,6 +67,37 @@ namespace HBKPlatform.Services.Implementation
         public async Task<List<UserDto>> GetRecentLogins()
         {
             return await _mcpRepo.GetRecentLogins();
+        }
+
+        public async Task<SystemStats> GetStatsView()
+        {
+            var dbString = config.GetSection("ConnectionStrings").GetSection("HbkContext")?.Value ??
+                           "HbkContext not defined?";
+            string pattern = @"(Database=([^;]+);)|(Host=([^;]+);)";
+            MatchCollection matches = Regex.Matches(dbString, pattern);
+
+            string host = "";
+            string database = "";
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups[4].Success)
+                {
+                    host = match.Groups[4].Value;
+                }
+                else if (match.Groups[2].Success)
+                {
+                    database = match.Groups[2].Value;
+                }
+            }
+            
+            return new SystemStats()
+            {
+                NumOnline = _css.GetActiveCount(),
+                NumRegistered = await _mcpRepo.GetRegisteredUserCount(),
+                Db = database,
+                Host = host
+            };
         }
         
         //////////////////////////////////////////////////////////////////////////////// 
