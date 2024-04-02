@@ -91,3 +91,10 @@ public class DoubleBookingException : HbkException
     public DoubleBookingException(string message) : base(message) { }
     public DoubleBookingException(string message, Exception inner) : base(message, inner) { } 
 }
+
+public class TimeslotUnavailableException : HbkException
+{
+    public TimeslotUnavailableException() : base() { }
+    public TimeslotUnavailableException(string message) : base(message) { }
+    public TimeslotUnavailableException(string message, Exception inner) : base(message, inner) { } 
+}

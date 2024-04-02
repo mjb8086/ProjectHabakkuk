@@ -16,10 +16,14 @@ namespace HBKPlatform.Repository
         
         public Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeek(int roomId, int weekNum);
         public Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndef(int roomId);
-        public Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeks(int roomId, int[] weekNums);
         public Task UpdateRoomForWeek(int weekNum, int roomId, Dictionary<int, bool> tsAvaDict);
         public Task UpdateRoomForIndef(int roomId, Dictionary<int, bool> tsAvaDict);
         public Task ClearRoomForWeek(int weekNum, int pracId);
         public Task ClearRoomForIndef(int pracId);
+        
+        
+        public Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeksAnyTenancy(int roomId, int[] weekNums);
+        public Task<bool> IsRoomAvailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId);
+        public Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndefAnyTenancy(int roomId);
     }
 }

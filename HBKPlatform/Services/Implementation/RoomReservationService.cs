@@ -9,10 +9,12 @@ using HBKPlatform.Repository;
 namespace HBKPlatform.Services.Implementation;
 
 public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUserService _userService, ITimeslotRepository _timeslotRepo, IConfigurationService _config, ICacheService _cache, 
-    IAppointmentRepository _appointmentRepo): IRoomReservationService
+    IAppointmentRepository _appointmentRepo, IAvailabilityRepository _avaRepo, ITimeslotService _tsSrv, IDateTimeWrapper _dateTime): IRoomReservationService
 {
     private List<RoomReservationDto> _reservations;
     private Dictionary<int, TimeslotDto> _tsDict;
+    private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
+    private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
     
     public async Task Create(int roomId, int weekNum, int timeslotId)
     {
@@ -55,6 +57,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     public async Task ConfirmRoomBookingPractitioner(int id)
     {
         var res = await _roomResRepo.GetReservationAnyTenancy(id);
+        // TODO check practitioner owns this reservation
         await _roomResRepo.UpdateStatusPractitioner(id, Enums.ReservationStatus.Booked);
     }
 
@@ -82,10 +85,13 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks")).Value);
         var room = _cache.GetRoom(roomId);
         
-        // For now do not regard the availability, just return all timeslots
+        // Get availability for the weeks ahead
+        var timeslots = await _tsSrv.GetPopulatedFutureTimeslots();
+        var tsList = await FilterOutUnsuitableTimeslots(timeslots, roomId);
+        
         return new TimeslotSelect()
         {
-            AvailableTimeslots = TimeslotHelper.GetPopulatedFutureTimeslots(DateTime.UtcNow, allTimeslots, dbStartDate, bookingAdvance),
+            AvailableTimeslots = tsList,
             RoomId = roomId,
             RoomTitle = room.Title
         };
@@ -209,6 +215,10 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         }
         
         // finally check the room availability
+        if (await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomId, weekNum, timeslotId))
+        {
+            throw new TimeslotUnavailableException("The room is not available at this time.");
+        }
     }
    
    /// <summary>
@@ -240,6 +250,45 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             throw new DoubleBookingException("An appointment already exists in the room on this date and time. Cannot continue.");
         }
         // finally check the room availability
+        if (await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.TimeslotId))
+        {
+            throw new TimeslotUnavailableException("The room is not available at this time.");
+        }
     }
+   
+        /// <summary>
+        /// Takes a list of timeslots and returns only those available to book with the specified roomId
+        /// </summary>
+        private async Task<SortedSet<TimeslotDto>> FilterOutUnsuitableTimeslots(SortedSet<TimeslotDto> timeslots, int roomId)
+        {
+            var occupiedTimeslots = await _appointmentRepo.GetFutureOccupiedTimeslotsForRoomAnyTenancy(roomId, _dateTime.Now);
+            // populate lookups for IsAvailable check
+            _weeklyAvaLookup = await _avaRepo.GetRoomLookupForWeeksAnyTenancy(roomId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
+            _indefAvaLookup = await _avaRepo.GetRoomLookupForIndef(roomId);
+        
+            // If the ts is unavailable, return true. Fixme: may be inefficient?
+            return new SortedSet<TimeslotDto>(timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.Id)));
+        }
+        
+        /// <summary>
+        /// Determine whether the timeslot is available. Check both definite (weekly) and indefinite timeslots.
+        /// Assumes these lookups are populated already.
+        /// </summary>
+        private bool IsAvailable(int weekNum, int tsId)
+        {
+            // first check definite (weekly) timeslots
+            TimeslotAvailabilityDto? weekAva;
+            if ((weekAva = _weeklyAvaLookup.FirstOrDefault(y => y.WeekNum == weekNum && y.TimeslotId == tsId)) != null)
+            {
+                return weekAva.Availability == Enums.TimeslotAvailability.Available;
+            }
+            // then indefinite
+            if (_indefAvaLookup.TryGetValue(tsId, out var ava))
+            {
+                return ava.Availability == Enums.TimeslotAvailability.Available;
+            }
+            // else we know it is available
+            return true;
+        }
     
 }

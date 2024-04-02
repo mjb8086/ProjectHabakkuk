@@ -72,6 +72,7 @@ namespace HBKPlatform.Repository.Implementation
     
         /// <summary>
         /// Get upcoming appointments for the practitionerId.
+        /// TODO: Return only timeslots for booking clash checking
         /// </summary>
         public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now)
         {
@@ -80,7 +81,7 @@ namespace HBKPlatform.Repository.Implementation
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
             return await _db.Appointments.Include("Timeslot")
-                .Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+                .Where(x => x.PractitionerId == pracId && x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {
@@ -126,6 +127,24 @@ namespace HBKPlatform.Repository.Implementation
             }
             return await _db.Appointments.IgnoreQueryFilters().AnyAsync(x =>
                 x.WeekNum == weekNum && x.TimeslotId == timeslotId && x.RoomId == roomId);
+        }
+        
+        /// <summary>
+        /// Get future and occupied timeslots for the roomId.
+        /// </summary>
+        public async Task<List<TimeslotDto>> GetFutureOccupiedTimeslotsForRoomAnyTenancy(int roomId, DateTime now)
+        {
+            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+            var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+        
+            return await _db.Appointments.Include("Timeslot").IgnoreQueryFilters()
+                .Where(x => x.RoomId == roomId && x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
+                .Select(x => new TimeslotDto()
+                {
+                    Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
+                }).AsNoTracking().ToListAsync();
         }
 
     }

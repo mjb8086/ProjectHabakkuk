@@ -92,12 +92,6 @@ namespace HBKPlatform.Repository.Implementation
                 .ToDictionaryAsync(x => x.TimeslotId, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotId});
         }
     
-        public async Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeks(int roomId, int[] weekNums)
-        {
-            return await _db.TimeslotAvailability.Include("Timeslot")
-                .Where(x => weekNums.Contains(x.WeekNum) && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
-                .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.TimeslotId, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
-        }
 
         /// <summary>
         /// service should ensure this week is current or in the future
@@ -140,6 +134,38 @@ namespace HBKPlatform.Repository.Implementation
         public async Task ClearRoomForIndef(int pracId)
         {
             await _db.TimeslotAvailability.Include("Timeslot").Where(x => x.IsIndefinite && x.RoomId == pracId).ExecuteDeleteAsync();
+        }
+
+        public async Task<bool> IsRoomAvailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId)
+        {
+            // Any per-week availability?
+            var isPerWeekUnavailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
+                x.TimeslotId == timeslotId && x.WeekNum == weekNum && x.RoomId == roomId &&
+                x.Entity == Enums.AvailabilityEntity.Room && x.Availability != Enums.TimeslotAvailability.Unavailable).AnyAsync();
+            
+            if (isPerWeekUnavailable) return false;
+
+            // If not, check Indef. If any Indef exists and is unavailable, return false. Else true.
+             var isIndefUnavailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
+                x.TimeslotId == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
+                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Unavailable).AnyAsync();
+             
+             if (isIndefUnavailable) return false;
+             return true;
+        }
+        
+        public async Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeksAnyTenancy(int roomId, int[] weekNums)
+        {
+            return await _db.TimeslotAvailability.Include("Timeslot").IgnoreQueryFilters()
+                .Where(x => weekNums.Contains(x.WeekNum) && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
+                .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.TimeslotId, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
+        }
+        
+        public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndefAnyTenancy(int roomId)
+        {
+            return await _db.TimeslotAvailability.Include("Timeslot")
+                .Where(x => x.IsIndefinite && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
+                .ToDictionaryAsync(x => x.TimeslotId, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotId});
         }
         
         //////////////////////////////////////////////////////////////////////////////// 

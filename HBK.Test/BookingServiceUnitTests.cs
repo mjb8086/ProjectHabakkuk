@@ -98,9 +98,10 @@ namespace HBK.Test
             mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now))
                 .ReturnsAsync(appointments);
 
+            // TODO: Need to setup the timeslot service
             return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, 
                 mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object, 
-                new Mock<IRoomReservationService>().Object, new Mock<ILogger<BookingService>>().Object);
+                new Mock<IRoomReservationService>().Object, new Mock<ITimeslotService>().Object, new Mock<ILogger<BookingService>>().Object);
         }
         
         //////////////////////////////////////////////////////////////////////////////// 
