@@ -84,16 +84,16 @@ namespace HBK.Test
             mockCacheService.Setup(x => x.GetTreatments()).ReturnsAsync(FAKE_TREATMENTS);
             if (weekNums != null)
             {
-                mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRACTITIONER_ID, weekNums))
+                mockAvaRepo.Setup(x => x.GetPractitionerLookupForWeeks(FAKE_PRACTITIONER_ID, weekNums))
                     .ReturnsAsync(new List<TimeslotAvailabilityDto>());
             }
             else
             {
-                mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRACTITIONER_ID, It.IsAny<int[]>()))
+                mockAvaRepo.Setup(x => x.GetPractitionerLookupForWeeks(FAKE_PRACTITIONER_ID, It.IsAny<int[]>()))
                     .ReturnsAsync(new List<TimeslotAvailabilityDto>());
             }
             // Return empty availability when not specified - a missing availability value for any week is reckoned as available
-            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForIndef(FAKE_PRACTITIONER_ID))
+            mockAvaRepo.Setup(x => x.GetPractitionerLookupForIndef(FAKE_PRACTITIONER_ID))
                 .ReturnsAsync(indefAvailability);
             mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now))
                 .ReturnsAsync(appointments);

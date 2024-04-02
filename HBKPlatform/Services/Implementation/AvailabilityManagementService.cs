@@ -48,8 +48,8 @@ namespace HBKPlatform.Services.Implementation
         
             var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
-            _currentAvailability = await _availabilityRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
-            _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef( pracId);
+            _currentAvailability = await _availabilityRepo.GetPractitionerLookupForWeek(pracId, weekNum);
+            _indefiniteAvailability = await _availabilityRepo.GetPractitionerLookupForIndef( pracId);
         
             return new AvailabilityModel()
             {
@@ -69,7 +69,7 @@ namespace HBKPlatform.Services.Implementation
             var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
             // identical for indef model construction
-            _indefiniteAvailability = await _availabilityRepo.GetAvailabilityLookupForIndef(pracId);
+            _indefiniteAvailability = await _availabilityRepo.GetPractitionerLookupForIndef(pracId);
             _currentAvailability = _indefiniteAvailability.Values.ToList();
         
             return new AvailabilityModel()
@@ -144,7 +144,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 throw new InvalidUserOperationException("Week number out of permitted range.");
             }
-            await _availabilityRepo.UpdateAvailabilityForWeek(weekNum, pracId, model.Updated);
+            await _availabilityRepo.UpdatePracForWeek(weekNum, pracId, model.Updated);
         }
 
         public async Task RevertAvailabilityForWeek(int weekNum)
@@ -158,7 +158,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 throw new InvalidUserOperationException("Week number out of permitted range.");
             }
-            await _availabilityRepo.RevertAvailabilityForWeek(weekNum, pracId);
+            await _availabilityRepo.ClearPractitionerForWeek(weekNum, pracId);
         }
     
         public async Task UpdateAvailabilityForIndef(UpdatedAvailability model)
@@ -170,7 +170,7 @@ namespace HBKPlatform.Services.Implementation
         public async Task RevertAvailabilityForIndef()
         {
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
-            await _availabilityRepo.RevertAvailabilityForIndef(pracId);
+            await _availabilityRepo.ClearPractitionerForIndef(pracId);
         }
     
     }

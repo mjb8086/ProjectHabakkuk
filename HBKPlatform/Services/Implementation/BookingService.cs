@@ -71,8 +71,8 @@ namespace HBKPlatform.Services.Implementation
         {
             var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now);
             // populate lookups for IsAvailable check
-            _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeeks(pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
-            _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(pracId);
+            _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeeks(pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
+            _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
         
             // TODO: If new appointment statuses are added, update predicate
             var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
@@ -89,8 +89,8 @@ namespace HBKPlatform.Services.Implementation
         {
             // TODO: Replace this with simple check like in Room double booking check
             var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
-            _weeklyAvaLookup = await _avaRepo.GetAvailabilityLookupForWeek(pracId, weekNum);
-            _indefAvaLookup = await _avaRepo.GetAvailabilityLookupForIndef(pracId);
+            _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeek(pracId, weekNum);
+            _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
         
             // If the ts is unavailable, return true
             if (!IsAvailable(weekNum, timeslotId)) return true;
