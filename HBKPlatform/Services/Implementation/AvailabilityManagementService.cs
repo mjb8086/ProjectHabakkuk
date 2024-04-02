@@ -15,12 +15,19 @@ namespace HBKPlatform.Services.Implementation
         private List<TimeslotAvailabilityDto> _currentAvailability;
         private Dictionary<int, TimeslotAvailabilityDto> _indefiniteAvailability;
     
-        public async Task<AvailabilityManagementIndex> GetAvailabilityManagementIndexModel()
+        /// <summary>
+        /// Used by both Practitioner and Room availability.
+        /// If RoomId is null, the model will just return a list of weekNums up to the limit.
+        /// </summary>
+        /// <param name="roomId">RoomId for the availability management model, if null, this is for a
+        /// practitioner.</param>
+        /// <returns></returns>
+        public async Task<AvailabilityManagementIndex> GetAvailabilityManagementIndexModel(int? roomId)
         {
             var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
             var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
 
-            var avIdx = new AvailabilityManagementIndex() { WeekDates = new Dictionary<int, string>() };
+            var avIdx = new AvailabilityManagementIndex() { WeekDates = new Dictionary<int, string>(), RoomId=roomId };
             avIdx.WeekDates[currentWeek] = DateTimeHelper.GetDateRangeStringForThisWeek(dbStartDate);
             for (int i = currentWeek+1; i < currentWeek + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS; i++)
             {
@@ -30,7 +37,11 @@ namespace HBKPlatform.Services.Implementation
             return avIdx;
         }
 
-        public async Task<AvailabilityModel> GetAvailabilityModelForWeek(int weekNum)
+        ////////////////////////////////////////////////////////////////////////////////  
+        // PRACTITIONER METHODS
+        ////////////////////////////////////////////////////////////////////////////////  
+        
+        public async Task<AvailabilityModel> GetPractitionerModelForWeek(int weekNum)
         {
             var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
@@ -62,7 +73,7 @@ namespace HBKPlatform.Services.Implementation
         /// <summary>
         /// Get the availability model for all weeks.
         /// </summary>
-        public async Task<AvailabilityModel> GetAvailabilityModelForIndef()
+        public async Task<AvailabilityModel> GetPractitionerModelForIndef()
         {
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
         
@@ -78,10 +89,144 @@ namespace HBKPlatform.Services.Implementation
             };
         }
 
+
+        public async Task UpdatePractitionerForWeek(int weekNum, UpdatedAvailability model)
+        {
+            var pracId = _userService.GetClaimFromCookie("PractitionerId");
+            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
+            var currentWeekNum = DateTimeHelper.CurrentWeekNum(dbStartDate);
+            
+            // Check week number is in range
+            if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
+            {
+                throw new InvalidUserOperationException("Week number out of permitted range.");
+            }
+            await _availabilityRepo.UpdatePracForWeek(weekNum, pracId, model.Updated);
+        }
+
+        public async Task RevertPractitionerForWeek(int weekNum)
+        {
+            var pracId = _userService.GetClaimFromCookie("PractitionerId");
+            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
+            var currentWeekNum = DateTimeHelper.CurrentWeekNum(dbStartDate);
+            
+            // Check week number is in range
+            if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
+            {
+                throw new InvalidUserOperationException("Week number out of permitted range.");
+            }
+            await _availabilityRepo.ClearPractitionerForWeek(weekNum, pracId);
+        }
+    
+        public async Task UpdatePractitionerForIndef(UpdatedAvailability model)
+        {
+            var pracId = _userService.GetClaimFromCookie("PractitionerId");
+            await _availabilityRepo.UpdatePractitionerForIndef(pracId, model.Updated);
+        }
+
+        public async Task ClearPractitonerForIndef()
+        {
+            var pracId = _userService.GetClaimFromCookie("PractitionerId");
+            await _availabilityRepo.ClearPractitionerForIndef(pracId);
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////////////////////  
+        // ROOM METHODS
+        ////////////////////////////////////////////////////////////////////////////////  
+        
+        public async Task<AvailabilityModel> GetRoomModelForWeek(int roomId, int weekNum)
+        {
+            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
+        
+            var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
+            
+            if (weekNum < currentWeek || weekNum > currentWeek + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
+            {
+                throw new InvalidUserOperationException("Week number out of permitted range.");
+            }
+            
+            var dateRangeStr = currentWeek == weekNum
+                ? DateTimeHelper.GetDateRangeStringForThisWeek(dbStartDate)
+                : DateTimeHelper.GetDateRangeStringFromWeekNum(dbStartDate, weekNum);
+        
+            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+
+            _currentAvailability = await _availabilityRepo.GetRoomLookupForWeek(roomId, weekNum);
+            _indefiniteAvailability = await _availabilityRepo.GetRoomLookupForIndef(roomId);
+        
+            return new AvailabilityModel()
+            {
+                WeekStr = dateRangeStr,
+                WeekNum = weekNum,
+                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
+                RoomId = roomId
+            };
+        }
+    
+        /// <summary>
+        /// Get the availability model for all weeks.
+        /// </summary>
+        public async Task<AvailabilityModel> GetRoomModelForIndef(int roomId)
+        {
+            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+
+            // identical for indef model construction
+            _indefiniteAvailability = await _availabilityRepo.GetRoomLookupForIndef(roomId);
+            _currentAvailability = _indefiniteAvailability.Values.ToList();
+        
+            return new AvailabilityModel()
+            {
+                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
+                RoomId = roomId
+            };
+        }
+
+
+        public async Task UpdateRoomForWeek(int roomId, int weekNum, UpdatedAvailability model)
+        {
+            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
+            var currentWeekNum = DateTimeHelper.CurrentWeekNum(dbStartDate);
+            
+            // Check week number is in range
+            if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
+            {
+                throw new InvalidUserOperationException("Week number out of permitted range.");
+            }
+            await _availabilityRepo.UpdateRoomForWeek(weekNum, roomId, model.Updated);
+        }
+
+        public async Task ClearRoomForWeek(int roomId, int weekNum)
+        {
+            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
+            var currentWeekNum = DateTimeHelper.CurrentWeekNum(dbStartDate);
+            
+            // Check week number is in range
+            if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
+            {
+                throw new InvalidUserOperationException("Week number out of permitted range.");
+            }
+            await _availabilityRepo.ClearRoomForWeek(weekNum, roomId);
+        }
+    
+        public async Task UpdateRoomForIndef(int roomId, UpdatedAvailability model)
+        {
+            await _availabilityRepo.UpdateRoomForIndef(roomId, model.Updated);
+        }
+
+        public async Task ClearRoomForIndef(int roomId)
+        {
+            await _availabilityRepo.ClearRoomForIndef(roomId);
+        }
+        
+        //////////////////////////////////////////////////////////////////////////////// 
+        // HELPERS
+        //////////////////////////////////////////////////////////////////////////////// 
+        
         /// <summary>
         /// Build availability dictionary from timeslots. Used both per-week and for all weeks.
         /// </summary>
-        public Dictionary<Enums.Day, List<AvailabilityLite>> BuildAvaLiteDict(List<TimeslotDto> allTimeslots)
+        private Dictionary<Enums.Day, List<AvailabilityLite>> BuildAvaLiteDict(List<TimeslotDto> allTimeslots)
         {
             if (_currentAvailability == null) throw new MissingMemberException("Current availability is not populated.");
             if (_indefiniteAvailability == null) throw new MissingMemberException("Indefinite availability is not populated.");
@@ -130,47 +275,6 @@ namespace HBKPlatform.Services.Implementation
             }
 
             return avaDto.IsIndefinite && avaDto.Availability == Enums.TimeslotAvailability.Unavailable;
-
-        }
-
-        public async Task UpdateAvailabilityForWeek(int weekNum, UpdatedAvailability model)
-        {
-            var pracId = _userService.GetClaimFromCookie("PractitionerId");
-            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
-            var currentWeekNum = DateTimeHelper.CurrentWeekNum(dbStartDate);
-            
-            // Check week number is in range
-            if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
-            {
-                throw new InvalidUserOperationException("Week number out of permitted range.");
-            }
-            await _availabilityRepo.UpdatePracForWeek(weekNum, pracId, model.Updated);
-        }
-
-        public async Task RevertAvailabilityForWeek(int weekNum)
-        {
-            var pracId = _userService.GetClaimFromCookie("PractitionerId");
-            var dbStartDate = (await _configService.GetSettingOrDefault("DbStartDate")).Value;
-            var currentWeekNum = DateTimeHelper.CurrentWeekNum(dbStartDate);
-            
-            // Check week number is in range
-            if (weekNum < currentWeekNum || weekNum > currentWeekNum + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
-            {
-                throw new InvalidUserOperationException("Week number out of permitted range.");
-            }
-            await _availabilityRepo.ClearPractitionerForWeek(weekNum, pracId);
-        }
-    
-        public async Task UpdateAvailabilityForIndef(UpdatedAvailability model)
-        {
-            var pracId = _userService.GetClaimFromCookie("PractitionerId");
-            await _availabilityRepo.UpdateAvailabilityForIndef(pracId, model.Updated);
-        }
-
-        public async Task RevertAvailabilityForIndef()
-        {
-            var pracId = _userService.GetClaimFromCookie("PractitionerId");
-            await _availabilityRepo.ClearPractitionerForIndef(pracId);
         }
     
     }

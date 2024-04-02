@@ -57,12 +57,12 @@ $(document).ready(function () {
     });
     
     $("#btnExit").on('click', function() {
-        window.location.href = `${Globals.BaseUrl}/mynd/appointment/availabilitymanagement`;
+        window.location.href = `${Globals.BaseUrl}/clinic/room/list`;
     });
     
     $("#btnApply").on('click', function(e) {
         $.ajax({
-            url: `${Globals.BaseUrl}/mynd/appointment/dosetavailability` + (e.target.dataset.weeknum ? `?weekNum=${e.target.dataset.weeknum}` : ""),
+            url: `${Globals.BaseUrl}/clinic/room/dosetavailability?roomId=${roomId}` + (e.target.dataset.weeknum ? `&weekNum=${e.target.dataset.weeknum}` : ""),
             contentType: "application/json",
             method: "POST",
             data: JSON.stringify({
@@ -80,7 +80,7 @@ $(document).ready(function () {
     
     $("#btnRevert").on('click', function(e) {
         $.ajax({
-            url: `${Globals.BaseUrl}/mynd/appointment/dorevertavailability` + (e.target.dataset.weeknum ? `?weekNum=${e.target.dataset.weeknum}` : ""),
+            url: `${Globals.BaseUrl}/clinic/room/dorevertavailability?roomId=${roomId}` + (e.target.dataset.weeknum ? `&weekNum=${e.target.dataset.weeknum}` : ""),
             method: "GET",
             success: function (data) {
                 Globals.HBKFlasher("Successfully reverted availability. All time periods are now available for this week.");

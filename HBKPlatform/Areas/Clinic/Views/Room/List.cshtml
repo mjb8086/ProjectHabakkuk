@@ -14,7 +14,7 @@
         <thead class="table1Item"><tr class="table1Item"><td>Name</td> <td>Actions</td></tr></thead>
         @foreach (var room in Model)
         {
-            <tr class="table1Item"><td class="roomTitle">@room.Title</td> <td><a asp-area="Clinic" asp-controller="Room" asp-action="AddEdit" asp-route-roomId="@room.Id">Modify</a> | Delete</td> </tr>
+            <tr class="table1Item"><td class="roomTitle">@room.Title</td> <td><a asp-area="Clinic" asp-controller="Room" asp-action="AddEdit" asp-route-roomId="@room.Id">Modify</a> | <a asp-area="Clinic" asp-controller="Room" asp-action="AvailabilityManagement" asp-route-roomId="@room.Id">Availability</a> | Delete</td> </tr>
         }
     </table>
 </div>

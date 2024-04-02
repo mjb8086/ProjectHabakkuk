@@ -1,0 +1,17 @@
+@model HBKPlatform.Models.View.MyND.AvailabilityManagementIndex;
+@{
+    Layout = "_Clinic";
+    ViewBag.CurrentNav = "Appointment|Availability";
+}
+
+<h1>Availability Management</h1>
+<p>Open a week and set your availability for each timeslot. Availability may be set for up to 52 weeks in advance.</p>
+
+<div id="table1Wrap">
+    <div class="table1Item"><span>Week Range</span> <span>Option</span></div>
+    <div class="table1Item"><span style="font-weight: bold">All Weeks</span> <span><a asp-area="Clinic" asp-controller="Room" asp-action="SetIndefAvailability" asp-route-roomId="@Model.RoomId" >Set global availability preference</a></span></div>
+    @foreach (var weekNum in Model.WeekDates.Keys)
+    {
+        <div class="table1Item"><span>@Model.WeekDates[weekNum]</span> <span><a asp-area="Clinic" asp-controller="Room" asp-action="SetWeekAvailability" asp-route-weekNum="@weekNum" asp-route-roomId="@Model.RoomId" >Set availability</a></span></div>
+    }
+</div>

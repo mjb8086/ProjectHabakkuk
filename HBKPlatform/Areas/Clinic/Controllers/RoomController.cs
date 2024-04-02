@@ -1,3 +1,4 @@
+using HBKPlatform.Models;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -14,16 +15,11 @@ namespace HBKPlatform.Areas.Clinic.Controllers;
 /// © 2024 NowDoctor Ltd.
 /// </summary>
 [Area("Clinic"), Authorize(Roles="ClinicManager")]
-public class RoomController(IRoomService _roomService): Controller
+public class RoomController(IRoomService _roomService, IAvailabilityManagementService _availabilityMgmt): Controller
 {
     public async Task <IActionResult> Index()
     {
         return RedirectToRoute(new { area = "Clinic", controller = "Room", action = "List" });
-    }
-    
-    public async Task <IActionResult> Availability()
-    {
-        return View();
     }
     
     public async Task <IActionResult> List()
@@ -53,5 +49,53 @@ public class RoomController(IRoomService _roomService): Controller
         await _roomService.Update(room);
         TempData["Message"] = "Room data updated.";
         return RedirectToRoute(new { area = "Clinic", controller = "Room", action = "List" });
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////// 
+    // AVAILABILITY METHODS
+    //////////////////////////////////////////////////////////////////////////////// 
+    public async Task<IActionResult> AvailabilityManagement(int roomId)
+    {
+        if (roomId < 1) throw new MissingFieldException("RoomId required.");
+        return View(await _availabilityMgmt.GetAvailabilityManagementIndexModel(roomId));
+    }
+
+    public async Task<IActionResult> SetWeekAvailability(int roomId, int weekNum)
+    {
+        return View(await _availabilityMgmt.GetRoomModelForWeek(roomId, weekNum));
+    }
+
+    public async Task<IActionResult> SetIndefAvailability(int roomId)
+    {
+        return View(await _availabilityMgmt.GetRoomModelForIndef(roomId));
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DoSetAvailability(int roomId, int? weekNum, [FromBody] UpdatedAvailability model)
+    {
+        if (!ModelState.IsValid) throw new MissingFieldException("Missing data");
+        if (weekNum.HasValue)
+        {
+            await _availabilityMgmt.UpdateRoomForWeek(roomId, weekNum.Value, model);
+        }
+        else
+        {
+            await _availabilityMgmt.UpdateRoomForIndef(roomId, model);
+        }
+        return Ok();
+    }
+
+    public async Task<IActionResult> DoRevertAvailability(int roomId, int? weekNum)
+    {
+        if (weekNum.HasValue)
+        {
+            await _availabilityMgmt.ClearRoomForWeek(roomId, weekNum.Value);
+        }
+        else
+        {
+            await _availabilityMgmt.ClearRoomForIndef(roomId);
+        }
+
+        return Ok();
     }
 }
