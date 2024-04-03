@@ -38,6 +38,11 @@ namespace HBKPlatform.Globals
                Unavailable, Available
           }
 
+          public enum AvailabilityEntity
+          {
+               Practitioner, Room
+          }
+
           public enum AppointmentStatus
           {
                Live, 
@@ -63,6 +68,16 @@ namespace HBKPlatform.Globals
                Active,
                Suspended
           }
-     
+
+          public enum ReservationStatus
+          {
+               Requested,
+               Approved,
+               Denied,
+               CancelledByPractitioner,
+               CancelledByClinic,
+               Booked
+          }
+
      }
 }

@@ -63,7 +63,6 @@ namespace HBKPlatform.Repository.Implementation
             var dbClientRecord = new ClientRecord()
             {
                 ClientId = recordDto.ClientId,
-                ClinicId = recordDto.ClinicId,
                 PractitionerId = recordDto.PractitionerId,
                 RecordVisibility = recordDto.Visibility,
                 Title = recordDto.Title,

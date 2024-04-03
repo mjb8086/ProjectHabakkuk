@@ -1,0 +1,53 @@
+@model HBKPlatform.Models.View.Clinic.RoomReservationOverview
+@{
+    ViewBag.Title = "Clinic Reception";
+    ViewBag.CurrentNav = "Reservations";
+    Layout = "_Clinic";
+}
+
+<h2>Reservations.</h2>
+<p>There are currently @Model.Requested.Count requested reservations to approve or deny.</p>
+
+<h2>Awaiting approval</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Whom</td> <td>Actions</td></tr></thead>
+        @foreach (var reservation in Model.Requested)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Whom</td> <td><a asp-area="Clinic" asp-controller="Reservation" asp-action="ApproveReservation" asp-route-reservationId="@reservation.Id">Approve</a> | <a asp-area="Clinic" asp-controller="Reservation" asp-action="DenyReservation" asp-route-reservationId="@reservation.Id">Deny</a></td> </tr>
+        }
+    </table>
+</div>
+
+<h2>Upcoming approved</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Whom</td> <td>Actions</td></tr></thead>
+        @foreach (var reservation in Model.Approved)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Whom</td> <td><a asp-area="Clinic" asp-controller="Reservation" asp-action="CancelReservation" asp-route-reservationId="@reservation.Id">Cancel</a></td> </tr>
+        }
+    </table>
+</div>
+
+<h2>Denied</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Whom</td> <td>Reason</td></tr></thead>
+        @foreach (var reservation in Model.Denied)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Whom</td> <td>???</td> </tr>
+        }
+    </table>
+</div>
+
+<h2>Cancellations</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Whom</td> <td>Initiator</td></tr></thead>
+        @foreach (var reservation in Model.Cancelled)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Whom</td> <td>@reservation.Status</td> </tr>
+        }
+    </table>
+</div>

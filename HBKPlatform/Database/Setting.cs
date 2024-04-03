@@ -16,7 +16,5 @@ namespace HBKPlatform.Database
         public string Key { get; set; }
         public string Value { get; set; }
         public string? Value2 { get; set; }
-        public int ClinicId { get; set; }
-        public virtual Clinic Clinic { get; set; }
     }
 }

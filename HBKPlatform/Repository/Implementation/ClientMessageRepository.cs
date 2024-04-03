@@ -64,8 +64,18 @@ namespace HBKPlatform.Repository.Implementation
             return convo;
         }
 
+        public async Task<int> GetUnreadMessagesAsClient(int pracId, int clientId)
+        {
+            return await _db.ClientMessages.CountAsync(x => x.PractitionerId == pracId && x.ClientId == clientId && x.MessageOrigin == Enums.MessageOrigin.Practitioner && x.MessageStatusClient == Enums.MessageStatus.Unread);
+        }
+
+        public async Task<int> GetUnreadMessagesAsPractitioner(int pracId)
+        {
+            return await _db.ClientMessages.CountAsync(x => x.PractitionerId == pracId && x.MessageOrigin == Enums.MessageOrigin.Client && x.MessageStatusPractitioner == Enums.MessageStatus.Unread);
+        }
+
         /// <summary>
-        /// Crude method to set all messages as 'Read'.
+        /// Express method to set all messages as 'Read'.
         /// </summary>
         public async Task UpdateReadReceiptsClient(int clientId, int pracId)
         {
@@ -74,7 +84,7 @@ namespace HBKPlatform.Repository.Implementation
         }
     
         /// <summary>
-        /// Crude method to set all messages as 'Read'.
+        /// Express method to set all messages as 'Read'.
         /// </summary>
         public async Task UpdateReadReceiptsPractitioner(int clientId, int pracId)
         {

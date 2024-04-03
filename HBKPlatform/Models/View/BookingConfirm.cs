@@ -6,9 +6,11 @@ namespace HBKPlatform.Models.View
         public int TreatmentId { get; set; }
         public int TimeslotId { get; set; }
         public int? ClientId { get; set; }
+        public int? RoomReservationId { get; set; }
         public string TreatmentTitle { get; set; }
-        public string PracctitionerName { get; set; }
+        public string PractitionerName { get; set; }
         public string ClientName { get; set; }
         public string BookingDate { get; set; }
+        public string RoomReservationDetails { get; set; }
     }
 }

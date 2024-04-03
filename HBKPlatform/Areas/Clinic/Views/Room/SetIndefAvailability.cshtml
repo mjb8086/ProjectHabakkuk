@@ -1,0 +1,24 @@
+@model HBKPlatform.Models.AvailabilityModel;
+@{
+    Layout = "_Clinic";
+    ViewBag.CurrentNav = "RoomManagement|Availability";
+    ViewBag.Title = $"Set availability for all weeks";
+    ViewBag.Css = "mynd-setweekavailability.css";
+    ViewBag.Modules = "clinic-setweekavailability.js";
+}
+
+<h1>Default Availability</h1>
+<p>Set room availability all weeks. You may also use the per-week view to override these preferences.</p>
+
+@await Html.PartialAsync("Components/_AvailabilitySelect", Model)
+
+<button id="btnApply" class="changeBtn" disabled="disabled">Apply</button>
+<button id="btnDiscard" class="changeBtn" disabled="disabled">Discard</button>
+<button id="btnRevert" >Revert</button>
+<button id="btnExit">Exit</button>
+<div id="changesMade" style="display: none">You have unsaved changes. Click 'Apply' to save them or 'Discard' to revert.</div>
+<div><b>Usage notes:</b><br>Per-week availability will override any all-week availability.<br>Clicking 'Revert' will revert all timeslots back to being available.</div>
+<script>
+const isIndefView = true;
+const roomId = "@Model.RoomId";
+</script>

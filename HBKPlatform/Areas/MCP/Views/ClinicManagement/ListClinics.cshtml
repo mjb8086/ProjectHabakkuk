@@ -1,4 +1,4 @@
-@model HBKPlatform.Models.View.MCP.ListClinics;
+@model List<HBKPlatform.Models.DTO.ClinicLite>
 @{
     ViewData["Title"] = "MCP Clinic Management";
     ViewBag.CurrentNav = "ClinicManagement";
@@ -6,9 +6,10 @@
 }
 
 <h1>Current registrants</h1>
-<p>Open a clinic to: modify details, send a password reset to the lead practitioner, modify activation or delete it from the system.</p>
+<p>Open a clinic to: modify details, send a password reset to the manager, modify activation or delete it from the system.</p>
+
 <div id="table1Wrap">
-@foreach (var clinic in Model.Clinics)
+@foreach (var clinic in Model)
 {
     <div class="table1Item"><span>@clinic.Name</span> <a asp-area="MCP" asp-controller="ClinicManagement" asp-action="ViewClinic" asp-route-clinicId="@clinic.Id">View Clinic</a></div>
 }

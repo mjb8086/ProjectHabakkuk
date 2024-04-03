@@ -24,14 +24,13 @@ namespace HBKPlatform.Repository.Implementation
                 Id = x.Id,
                 Title = x.Title,
                 Description = x.Description,
-                ClinicId = x.ClinicId,
                 Cost = x.Cost,
                 Requestability = x.TreatmentRequestability,
                 Img = x.Img
             }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException("Could not find treatment Id");
         }
     
-        public async Task<List<TreatmentLite>> GetClinicTreatments(bool clientOnly)
+        public async Task<List<TreatmentLite>> GetPracticeTreatments(bool clientOnly)
         {
             var query = clientOnly ? _db.Treatments.Where(x => x.TreatmentRequestability == Enums.TreatmentRequestability.ClientAndPrac) : _db.Treatments;
             return await query.Select(x => new TreatmentLite()
@@ -44,7 +43,6 @@ namespace HBKPlatform.Repository.Implementation
         {
             var treatment = new Treatment()
             {
-                ClinicId = treatmentDto.ClinicId,
                 Title = treatmentDto.Title,
                 Description = treatmentDto.Description,
                 Cost = treatmentDto.Cost,

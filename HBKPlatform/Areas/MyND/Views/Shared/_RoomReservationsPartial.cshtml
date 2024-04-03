@@ -1,0 +1,11 @@
+@functions
+{
+    public string GetActiveClass(string navPath){
+        if (ViewBag.CurrentNav == null) return "";
+        return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
+    }
+}
+<div id="myNdNavReservations" class="subNav">
+    <a asp-area="MyND" asp-controller="RoomReservation" asp-action="MyReservations" class="@GetActiveClass("Reservation|RoomReservationOverview")">My Reservations</a> 
+    <a asp-area="MyND" asp-controller="RoomReservation" asp-action="MakeAReservation" class="@GetActiveClass("Reservation|MakeAReservation")">Make A Reservation</a> 
+</div>

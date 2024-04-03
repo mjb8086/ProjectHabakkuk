@@ -14,12 +14,13 @@ namespace HBKPlatform.Database.Helpers
         public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             var tenancySrv = new TenancyService();
+            List<Timeslot> timeslots;
             
             using (var ctx = new ApplicationDbContext(
                provider.GetRequiredService<DbContextOptions<ApplicationDbContext>>(), new HttpContextAccessor(), tenancySrv))
             {
                 var roleStore = new RoleStore<IdentityRole>(ctx);
-                IdentityRole? superAdminRole, pracRole, clientRole;
+                IdentityRole? superAdminRole, pracRole, clientRole, clinicMgrRole;
 
                 if ((superAdminRole = ctx.Roles.FirstOrDefault(r => r.Name == "SuperAdmin")) == null)
                 {
@@ -37,8 +38,26 @@ namespace HBKPlatform.Database.Helpers
                     clientRole = new IdentityRole() { Name = "Client", NormalizedName = "Client".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
                     await roleStore.CreateAsync(clientRole);
                 }
-                    
-                if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Clinics.Any()) {
+                if ((clinicMgrRole = ctx.Roles.FirstOrDefault(r => r.Name == "ClinicManager")) == null)
+                {
+                    clinicMgrRole = new IdentityRole() { Name = "ClinicManager", NormalizedName = "ClinicManager".ToUpper(), ConcurrencyStamp = Guid.NewGuid().ToString() };
+                    await roleStore.CreateAsync(clinicMgrRole);
+                }
+
+
+                if (ctx.Timeslots.Any())
+                {
+                    timeslots = ctx.Timeslots.ToList();
+                }
+                else
+                {
+                    timeslots = TimeslotHelper.GenerateDefaultTimeslots(TimeslotHelper.DEFAULT_START,
+                        TimeslotHelper.DEFAULT_END);
+                    await ctx.AddRangeAsync(timeslots);
+                    await ctx.SaveChangesAsync();
+                }
+
+                if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Practices.Any()) {
 
                     var ndTenancy = new Tenancy()
                     {
@@ -46,7 +65,8 @@ namespace HBKPlatform.Database.Helpers
                         ContactEmail = ".",
                         LicenceStatus = Enums.LicenceStatus.Active,
                         RegistrationDate = DateTime.UtcNow,
-                        OrgTagline = ""
+                        OrgTagline = "",
+                        Type = TenancyType.NdAdmin
                     };
                     
                     var t = new Tenancy()
@@ -55,7 +75,8 @@ namespace HBKPlatform.Database.Helpers
                         ContactEmail = "foo@bar.net",
                         LicenceStatus = Enums.LicenceStatus.Active,
                         RegistrationDate = DateTime.UtcNow,
-                        OrgTagline = "Timely treatment or your time back."
+                        OrgTagline = "Timely treatment or your time back.",
+                        Type = TenancyType.Practice
                     };
                     
                     var suEmail = "mjb+sudo1@nowdoctor.co.uk";
@@ -79,6 +100,7 @@ namespace HBKPlatform.Database.Helpers
                     await ctx.SaveChangesAsync();
                     
                     // Set tenancyId to demo tenancy to avoid FK violations on CREATE actions (see AppDbCtx).
+                    // CREATE PRACS on T1
                     tenancySrv.SetTenancyId(t.Id);
                     
                     var user1 = new User()
@@ -100,11 +122,12 @@ namespace HBKPlatform.Database.Helpers
                         Forename = "Emmett",
                         Surname = "Brown",
                         Title = Enums.Title.Dr,
-                        Bio = "inventor of the flux capacitor",
+                        ClientBio = "inventor of the flux capacitor",
                         Location = "hill valley",
                         DateOfBirth = new DateOnly(1932, 07, 08),
                         Img = new string("samples/brown.jpg"),
                         User = user1,
+                        GmcNumber = "foo",
                         Tenancy = t
                     };
                     
@@ -113,11 +136,12 @@ namespace HBKPlatform.Database.Helpers
                         Forename = "Another",
                         Surname = "Prac",
                         Title = Enums.Title.Dr,
-                        Bio = "layabout",
+                        ClientBio = "layabout",
                         Location = "the pub",
                         DateOfBirth = new DateOnly(1992, 07, 08),
                         Img = new string("samples/second.jpg"),
                         Tenancy = t,
+                        GmcNumber = "foo",
                         User =  new ()
                         {
                             Email = "another@hillvalley.com",
@@ -147,6 +171,13 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t
                     };
                     client1User.PasswordHash = passwordHasher.HashPassword(client1User, "toodamnloud");
+
+                    var setting = new Setting()
+                    {
+                        Key = "SelfBookingEnabled",
+                        Value = "True"
+                    };
+                    ctx.Add(setting);
                     
                     var client1 = new Client()
                     {
@@ -189,59 +220,31 @@ namespace HBKPlatform.Database.Helpers
                         Tenancy = t
                     };
                     
-                    var client3Email = "les@primus.com";
-                    var client3User = new User()
-                    {
-                        Email = client3Email,
-                        NormalizedEmail = client3Email.ToUpper(),
-                        UserName = client3Email,
-                        NormalizedUserName = client3Email.ToUpper(),
-                        EmailConfirmed = true,
-                        LockoutEnabled = true,
-                        PhoneNumber = "98989",
-                        PhoneNumberConfirmed = true,
-                        Tenancy = t
-                    };
-                    client3User.PasswordHash = passwordHasher.HashPassword(client1User, "johnthefisherman");
-                    
-                    var client3 = new Client()
-                    {
-                        Forename = "Les",
-                        Surname = "Claypool",
-                        Title = Enums.Title.Mr,
-                        Address = "Rancho Relaxo",
-                        DateOfBirth = new DateOnly(1968, 07, 08),
-                        Img = "samples/les.jpg",
-                        Telephone = "919191",
-                        User = client3User,
-                        Tenancy = t
-                    };
-                    
-                    var clinic = new Clinic()
+                    var practice = new Practice()
                     {
                         EmailAddress = "foo@bar.com",
-                        Description = "Hill Valley Clinic",
+                        Description = "Hill Valley Practice",
                         Telephone = "0898 333 201",
-                        Clients = new List<Client>() {client1, client2, client3},
+                        Clients = new List<Client>() {client1, client2},
                         Practitioners = new List<Practitioner>() {prac1, prac2},
                         Tenancy = t
                     };
 
-                    ctx.Add(clinic);
+                    ctx.Add(practice);
                     ctx.SaveChanges();
 
-                    clinic.LeadPractitioner = prac1;
-                    ctx.SaveChanges();
-
+                    practice.LeadPractitioner = prac1;
+                    
                     var clientPracs = new List<ClientPractitioner>()
                     {
                         new () {Client = client1, Practitioner = prac1, Tenancy = t},
                         new () {Client = client2, Practitioner = prac1, Tenancy = t},
-                        new () {Client = client3, Practitioner = prac2, Tenancy = t},
                     };
 
                     ctx.AddRange(clientPracs);
+                    ctx.SaveChanges();
 
+                    
                     var roles = new List<IdentityUserRole<string>>
                     {
                         new () { UserId = user1.Id, RoleId = pracRole.Id },
@@ -254,33 +257,32 @@ namespace HBKPlatform.Database.Helpers
                     ctx.AddRange(roles);
 
                     var conversation = new List<ClientMessage>();
-                    conversation.Add(new ClientMessage()
+                    conversation.Add(new ()
                     {
-                        ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Client,
+                        ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Client,
                         MessageBody = "lost the plutonium sorry", Tenancy = t
                     });
-                    conversation.Add(new ClientMessage()
+                    conversation.Add(new ()
                     {
-                        ClientId = client1.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
+                        ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "ah bollocks", Tenancy = t
                     });
-                    conversation.Add(new ClientMessage()
+                    conversation.Add(new ()
                     {
-                        ClientId = client2.Id, PractitionerId = prac1.Id, ClinicId = clinic.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
+                        ClientId = client2.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "don't steal that almanac you tool", Tenancy = t
                     });
                     ctx.AddRange(conversation);
 
                     var clientRecord1 = new ClientRecord()
                     {
-                        Clinic = clinic, Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
+                        Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
                         Title = "Bad news for the bowels", NoteBody = "bother shifting the goods", Practitioner = prac1, Tenancy = t
                     };
                     ctx.Add(clientRecord1);
 
                     var treatment1 = new Treatment()
                     {
-                        Clinic = clinic,
                         TreatmentRequestability = Enums.TreatmentRequestability.ClientAndPrac,
                         Title = "Checkup",
                         Description = "talk and pretend to do something",
@@ -290,7 +292,6 @@ namespace HBKPlatform.Database.Helpers
                     
                     var treatment2 = new Treatment()
                     {
-                        Clinic = clinic,
                         TreatmentRequestability = Enums.TreatmentRequestability.PracOnly,
                         Title = "Prac Only Test",
                         Description = "no book for client",
@@ -301,9 +302,6 @@ namespace HBKPlatform.Database.Helpers
                     ctx.Add(treatment1);
                     ctx.Add(treatment2);
 
-                    var timeslots = TimeslotHelper.GenerateDefaultTimeslots(t);
-                    
-                    ctx.AddRange(timeslots);
                     ctx.SaveChanges();
 
                     var appointments = new Appointment[] { 
@@ -347,8 +345,7 @@ namespace HBKPlatform.Database.Helpers
                     {
                         Key = "DbStartDate",
                         Value = "2024-01-01",
-                        Tenancy = t,
-                        Clinic = clinic
+                        Tenancy = t
                     };
                     ctx.Add(startDate);
 
@@ -389,6 +386,171 @@ namespace HBKPlatform.Database.Helpers
                     };
                     ctx.AddRange(ta);
                     ctx.SaveChanges();
+                    
+                    // Now add Clinic and rooms for rental
+                    
+                    var clinicTenancy = new Tenancy() {
+                        OrgName = "The Coachman",
+                        LicenceStatus = Enums.LicenceStatus.Active,
+                        Type = TenancyType.Clinic,
+                        ContactEmail = "coachm@btinternet.com"
+                    };
+                    await ctx.AddAsync(clinicTenancy);
+                    await ctx.SaveChangesAsync();
+                    tenancySrv.SetTenancyId(clinicTenancy.Id);
+                    
+                    var mgr1Email = "coach@btinternet.com";
+                    var managerUser = new User()
+                    {
+                        Email = mgr1Email,
+                        NormalizedEmail = mgr1Email.ToUpper(),
+                        UserName = mgr1Email,
+                        NormalizedUserName = mgr1Email.ToUpper(),
+                        EmailConfirmed = true,
+                        LockoutEnabled = true,
+                        PhoneNumber = "98989",
+                        PhoneNumberConfirmed = true,
+                        Tenancy = clinicTenancy,
+                        FullName = "mr. davey"
+                    };
+                    managerUser.PasswordHash = passwordHasher.HashPassword(client1User, "vip_pass_mode");
+                    await ctx.AddAsync(managerUser);
+                    await ctx.SaveChangesAsync();
+
+                    var mgrUser = new IdentityUserRole<string>()
+                    {
+                        UserId = managerUser.Id,
+                        RoleId = clinicMgrRole.Id
+                    };
+                    await ctx.AddAsync(mgrUser);
+                    var clinic1 = new Clinic()
+                    {
+                        EmailAddress = "coachm@btinternet.com",
+                        StreetAddress = "Broad Street\nMagherafelt",
+                        Telephone = "1690",
+                        ManagerUserId = managerUser.Id,
+                        Rooms = new List<Room>()
+                        {
+                            new() { Description = "Pool room", Title = "Pool Room", PricePerUse = 8.8},
+                            new() { Description = "Drinks and a jukebox", Title = "Front Bar", PricePerUse = 100.0},
+                            new() { Description = "bring coat", Title = "Beer garden", PricePerUse = 3.0}
+                        }
+                    };
+                    await ctx.AddAsync(clinic1);
+                    await ctx.SaveChangesAsync();
+                    
+                    
+                    // BEGIN T2 PRACTICE
+                    var t2 = new Tenancy()
+                    {
+                        OrgName = "Tom's Rhinoplasty",
+                        ContactEmail = "bastardo@primusville.com",
+                        LicenceStatus = Enums.LicenceStatus.Active,
+                        RegistrationDate = DateTime.UtcNow,
+                        OrgTagline = "never smelt better.",
+                        Type = TenancyType.Practice
+                    };
+                    
+                    await ctx.AddAsync(t2);
+                    await ctx.SaveChangesAsync();
+                    tenancySrv.SetTenancyId(t2.Id);
+                    
+                    var t2ClientEmail = "mrg@sphigh.com";
+                    var t2Client= new Client()
+                    {
+                        Forename = "herbert",
+                        Surname = "garrison",
+                        Title = Enums.Title.Mr,
+                        Address = "south park",
+                        DateOfBirth = new DateOnly(1962, 07, 08),
+                        Img = "samples/herbertg.jpg",
+                        Telephone = "28228282",
+                        Tenancy = t2,
+                        User =  new() {
+                            Email = t2ClientEmail,
+                            NormalizedEmail = t2ClientEmail.ToUpper(),
+                            UserName = t2ClientEmail,
+                            NormalizedUserName = t2ClientEmail.ToUpper(),
+                            EmailConfirmed = true,
+                            LockoutEnabled = true,
+                            PhoneNumber = "2828282",
+                            PhoneNumberConfirmed = true,
+                            Tenancy = t2
+                        }
+                    };
+                    t2Client.User.PasswordHash = passwordHasher.HashPassword(t2Client.User, "misterslave");
+                    
+                    var selfBookingT2 = new Setting()
+                    {
+                        Key = "SelfBookingEnabled",
+                        Value = "False"
+                    };
+                    ctx.Add(selfBookingT2);
+                    
+                    var client3Email = "les@primusville.com";
+                    var t2Prac = new Practitioner()
+                    {
+                        Forename = "Les",
+                        Surname = "Claypool",
+                        Title = Enums.Title.Mr,
+                        DateOfBirth = new DateOnly(1968, 07, 08),
+                        Img = "samples/les.jpg",
+                        Tenancy = t2,
+                        User = new() {
+                            Email = client3Email,
+                            NormalizedEmail = client3Email.ToUpper(),
+                            UserName = client3Email,
+                            NormalizedUserName = client3Email.ToUpper(),
+                            EmailConfirmed = true,
+                            LockoutEnabled = true,
+                            PhoneNumber = "98989",
+                            PhoneNumberConfirmed = true,
+                            Tenancy = t2
+                        }
+                    };
+                    t2Prac.User.PasswordHash = passwordHasher.HashPassword(t2Prac.User, "johnthefisherman");
+                    
+                    var t2practice = new Practice()
+                    {
+                        EmailAddress = "nose@jobs.com",
+                        Description = "Tom's Rhinoplasty",
+                        Telephone = "0898 333 201",
+                        Clients = new List<Client>() {t2Client},
+                        Practitioners = new List<Practitioner>() {t2Prac},
+                        Tenancy = t2
+                    };
+                    
+                    var t2treatment = new Treatment()
+                    {
+                        Title = "nose job",
+                        Description = "Never smelt better",
+                        Cost = 8.99,
+                        Tenancy = t2
+                    };
+                    
+                    ctx.Add(t2practice);
+                    ctx.Add(t2treatment);
+                    
+                    var t2ClientPracs = new List<ClientPractitioner>()
+                    {
+                        new () {Client = t2Client, Practitioner = t2Prac, Tenancy = t2},
+                    };
+
+                    await ctx.AddRangeAsync(t2ClientPracs);
+                    await ctx.SaveChangesAsync();
+
+                    t2practice.LeadPractitioner = t2Prac;
+
+                    var t2Roles = new List<IdentityUserRole<string>>
+                    {
+                        new () { UserId = t2Prac.User.Id, RoleId = pracRole.Id },
+                        new () { UserId = t2Client.User.Id, RoleId = clientRole.Id },
+                    };
+                    
+                    await ctx.AddRangeAsync(t2Roles);
+                    await ctx.SaveChangesAsync();
+                    
+                    // END T2
                 }
             }
         }

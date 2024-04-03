@@ -6,11 +6,11 @@ using HBKPlatform.Globals;
 namespace HBKPlatform.Models.DTO
 {
     [DebuggerDisplay("WeekNum={WeekNum} Day={Day} Time={Time} Desc={Description}")]
-    public class TimeslotDto
+    public class TimeslotDto: IComparable<TimeslotDto>
     {
         public int Id { get; set; }
         public string Description { get; set; }
-        public int ClinicId { get; set; }
+        public int PracticeId { get; set; }
         public Enums.Day Day { get; set; }
         public TimeOnly Time { get; set; }
         [Range(10,300)]
@@ -27,7 +27,7 @@ namespace HBKPlatform.Models.DTO
             {
                 Id = this.Id,
                 Description = this.Description,
-                ClinicId = this.ClinicId,
+                PracticeId = this.PracticeId,
                 Day = this.Day,
                 Time = this.Time,
                 Duration = this.Duration,
@@ -57,7 +57,40 @@ namespace HBKPlatform.Models.DTO
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
-            return x.Id == y.Id && x.Description == y.Description && x.ClinicId == y.ClinicId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+            return x.Id == y.Id && x.Description == y.Description && x.PracticeId == y.PracticeId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+        }
+
+        public int CompareTo(TimeslotDto? next)
+        {
+            if (next == null)
+            {
+                return 1;
+            }
+            else if (next.WeekNum < this.WeekNum)
+            {
+                return 1;
+            }
+            else if (next.WeekNum > this.WeekNum)
+            {
+                return -1;
+            }
+            else if (next.WeekNum == this.WeekNum && next.Day < this.Day)
+            {
+                return 1;
+            }
+            else if (next.WeekNum == this.WeekNum && next.Day > this.Day)
+            {
+                return -1;
+            }
+            else if (next.WeekNum == this.WeekNum && next.Day == this.Day && next.Time < this.Time)
+            {
+                return 1;
+            }
+            else if (next.WeekNum == this.WeekNum && next.Day == this.Day && next.Time > this.Time)
+            {
+                return -1;
+            }
+            return 0;
         }
 
         private sealed class TimeslotDtoEqualityComparer : IEqualityComparer<TimeslotDto>
@@ -68,12 +101,12 @@ namespace HBKPlatform.Models.DTO
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.Id == y.Id && x.Description == y.Description && x.ClinicId == y.ClinicId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+                return x.Id == y.Id && x.Description == y.Description && x.PracticeId == y.PracticeId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
             }
 
             public int GetHashCode(TimeslotDto obj)
             {
-                return HashCode.Combine(obj.Id, obj.Description, obj.ClinicId, (int)obj.Day, obj.Time, obj.Duration, obj.WeekNum);
+                return HashCode.Combine(obj.Id, obj.Description, obj.PracticeId, (int)obj.Day, obj.Time, obj.Duration, obj.WeekNum);
             }
         }
 

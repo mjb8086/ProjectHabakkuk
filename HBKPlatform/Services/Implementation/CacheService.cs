@@ -15,15 +15,15 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, ITenancyService _tenancy): ICacheService
+    public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, ITenancyService _tenancy, ILogger<CacheService> _logger): ICacheService
     {
         // Default policy: All values will be evicted after 1 day
         private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(1));
         private int TenancyId = _tenancy.TenancyId;
     
-        public string GetPracName(int pracId)
+        public string GetPractitionerName(int practitionerId)
         {
-            return GetPracDetailsLite(pracId).Name;
+            return GetPractitionerDetailsLite(practitionerId).Name;
         }
 
         public string GetClientName(int clientId)
@@ -32,37 +32,42 @@ namespace HBKPlatform.Services.Implementation
         }
 
         /// <summary>
-        /// Get the lead practitioner Id for a clinic
+        /// Get the lead practitioner Id for a practice
         /// </summary>
-        public int GetLeadPracId(int clinicId)
+        public int GetLeadPractitionerId(int practiceId)
         {
-            string key = $"LeadPrac-t{TenancyId}-c{clinicId}";
+            string key = $"LeadPractitioner-t{TenancyId}-p{practiceId}";
             if (_memoryCache.TryGetValue(key, out int pracId)) return pracId;
         
-            var clinic = _db.Clinics.FirstOrDefault(x => x.Id == clinicId);
-            if (clinic == null || !clinic.LeadPractitionerId.HasValue) 
-                throw new IdxNotFoundException($"No practitioner for clinicId {clinicId} exists");
-            _memoryCache.Set(key, clinic.LeadPractitionerId.Value, CacheEntryOptions);
-            return clinic.LeadPractitionerId.Value;
+            var practice = _db.Practices.FirstOrDefault(x => x.Id == practiceId);
+            if (practice == null || !practice.LeadPractitionerId.HasValue) 
+                throw new IdxNotFoundException($"No practitioner for practiceId {practiceId} exists");
+            _memoryCache.Set(key, practice.LeadPractitionerId.Value, CacheEntryOptions);
+            return practice.LeadPractitionerId.Value;
         }
 
-        public PracDetailsLite GetPracDetailsLite(int pracId)
+        /// <summary>
+        /// Warning: Cross-Tenancy
+        /// </summary>
+        public PractitionerDetailsLite GetPractitionerDetailsLite(int pracId)
         {
-            string key = $"Prac-t{TenancyId}-{pracId}";
-            if (_memoryCache.TryGetValue(key, out PracDetailsLite pracDetails)) return pracDetails;
+            string key = $"Practitioner-{pracId}";
+            if (_memoryCache.TryGetValue(key, out PractitionerDetailsLite? practitionerDetails)) 
+                return practitionerDetails ?? throw new IdxNotFoundException();
 
-            var prac = _db.Practitioners.FirstOrDefault(x => x.Id == pracId);
-            if (prac == null) throw new IdxNotFoundException($"No practitioner of id {pracId} exists");
+            var practitioner = _db.Practitioners.IgnoreQueryFilters().FirstOrDefault(x => x.Id == pracId);
+            if (practitioner == null) throw new IdxNotFoundException($"No practitioner of id {pracId} exists");
         
-            pracDetails = new PracDetailsLite()
-                { Id = prac.Id, Name = $"{prac.Forename} {prac.Surname}", ClinicId = prac.ClinicId };
-            _memoryCache.Set(key, pracDetails, CacheEntryOptions);
-            return pracDetails;
+            practitionerDetails = new PractitionerDetailsLite()
+                { Id = practitioner.Id, Name = $"{practitioner.Forename} {practitioner.Surname}", PracticeId = practitioner.PracticeId };
+            _memoryCache.Set(key, practitionerDetails, CacheEntryOptions);
+            return practitionerDetails;
         }
     
-        public void ClearPracDetails(int pracId)
+        public void ClearPractitionerDetails(int practitionerId)
         {
-            _memoryCache.Remove($"Prac-t{TenancyId}-{pracId}");
+            _logger.LogDebug($"Clearing practitionerId {practitionerId} details from cache.");
+            _memoryCache.Remove($"Practitioner-t{TenancyId}-{practitionerId}");
         }
     
         public ClientDetailsLite GetClientDetailsLite(int clientId)
@@ -74,41 +79,45 @@ namespace HBKPlatform.Services.Implementation
             if (client == null) throw new IdxNotFoundException($"No client of id {clientId} exists");
         
             clientDetails = new ClientDetailsLite()
-                { Id = client.Id, Name = $"{client.Forename} {client.Surname}", ClinicId = client.ClinicId };
+                { Id = client.Id, Name = $"{client.Forename} {client.Surname}", PracticeId = client.PracticeId };
             _memoryCache.Set(key, clientDetails, CacheEntryOptions);
             return clientDetails;
         }
     
         public void ClearClientDetails(int clientId)
         {
+            _logger.LogDebug($"Clearing clientId {clientId} details from cache.");
             _memoryCache.Remove($"Client-t{TenancyId}-{clientId}");
         }
 
-        public async Task<List<PracDetailsLite>> GetClinicPracDetailsLite()
+        public async Task<Dictionary<int, PractitionerDetailsLite>> GetPracticePractitionerDetailsLite()
         {
-            string key = $"Pracs-t{TenancyId}";
-            if (_memoryCache.TryGetValue(key, out List<PracDetailsLite>? pracDetails)) return pracDetails;
+            string key = $"Practitioners-t{TenancyId}";
+            if (_memoryCache.TryGetValue(key, out Dictionary<int, PractitionerDetailsLite>? practitionerDetails)) 
+                return practitionerDetails ?? throw new IdxNotFoundException();
         
-            pracDetails = await _db.Practitioners.Select(x => new PracDetailsLite()
-                { Id = x.Id, Name = $"{x.Title} {x.Forename} {x.Surname}", ClinicId = x.ClinicId }).ToListAsync();
-            _memoryCache.Set(key,  pracDetails, CacheEntryOptions);
-            return pracDetails;
+            practitionerDetails = await _db.Practitioners.Select(x => new PractitionerDetailsLite()
+                { Id = x.Id, Name = $"{x.Title} {x.Forename} {x.Surname}", PracticeId = x.PracticeId }).ToDictionaryAsync(x => x.Id);
+            _memoryCache.Set(key,  practitionerDetails, CacheEntryOptions);
+            return practitionerDetails;
         }
 
-        public async Task<List<ClientDetailsLite>> GetClinicClientDetailsLite()
+        public async Task<List<ClientDetailsLite>> GetPracticeClientDetailsLite()
         {
-            string key = $"ClinicClients-t{TenancyId}";
-            if (_memoryCache.TryGetValue(key, out List<ClientDetailsLite>? clientDetails)) return clientDetails;
+            string key = $"PracticeClients-t{TenancyId}";
+            if (_memoryCache.TryGetValue(key, out List<ClientDetailsLite>? clientDetails)) 
+                return clientDetails ?? throw new IdxNotFoundException();
         
             clientDetails = await _db.Clients.Select(x => new ClientDetailsLite()
-                { Id = x.Id, Name = $"{x.Forename} {x.Surname}", ClinicId = x.ClinicId }).ToListAsync();
+                { Id = x.Id, Name = $"{x.Forename} {x.Surname}", PracticeId = x.PracticeId }).ToListAsync();
             _memoryCache.Set(key,  clientDetails, CacheEntryOptions);
             return clientDetails;
         }
     
-        public void ClearClinicClientDetails()
+        public void ClearPracticeClientDetails()
         {
-            _memoryCache.Remove($"ClinicClients-t{TenancyId}");
+            _logger.LogDebug($"Clearing Practice client details from cache.");
+            _memoryCache.Remove($"PracticeClients-t{TenancyId}");
         }
 
         public async Task<Dictionary<string, SettingDto>> GetAllTenancySettings()
@@ -119,7 +128,7 @@ namespace HBKPlatform.Services.Implementation
                 return tenancySettings ?? new Dictionary<string, SettingDto>();
             }
         
-            // Ensure duplicate keys may not be created per-Clinic in Settings Repo!!!
+            // Ensure duplicate keys may not be created per-Practice in Settings Repo!!!
             tenancySettings = await _db.Settings.Select(x => new SettingDto()
             {
                 Id = x.Id,
@@ -133,6 +142,7 @@ namespace HBKPlatform.Services.Implementation
     
         public void ClearSettings()
         {
+            _logger.LogDebug($"Clearing settings from cache.");
             _memoryCache.Remove($"Settings-t{TenancyId}");
         }
 
@@ -160,7 +170,33 @@ namespace HBKPlatform.Services.Implementation
 
         public void ClearTreatments()
         {
+            _logger.LogDebug($"Clearing treatments from cache.");
             _memoryCache.Remove($"Treatments-t{TenancyId}");
+        }
+
+        /// <summary>
+        /// Warning: Cross-Tenancy
+        /// </summary>
+        public RoomDto GetRoom(int roomId)
+        {
+            string key = $"Room-r{roomId}";
+            if (_memoryCache.TryGetValue(key, out RoomDto? room))
+            {
+                return room ?? new RoomDto();
+            }
+            
+            room = _db.Rooms.IgnoreQueryFilters().Select(x => new RoomDto() { Id = x.Id, Title = x.Title, Description = x.Description, ClinicId = x.ClinicId }).FirstOrDefault(x => x.Id == roomId);
+            if (room == null) 
+                throw new IdxNotFoundException($"No room of roomId {roomId} exists");
+        
+            _memoryCache.Set(key,  room, CacheEntryOptions);
+            return room;
+        }
+        
+        public void ClearRoom(int roomId)
+        {
+            _logger.LogDebug($"Clearing room Id {roomId} from cache.");
+            _memoryCache.Remove($"Room-r{roomId}");
         }
 
         public void ClearAll()
@@ -170,8 +206,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 concreteMemoryCache.Clear();
             } 
+            _logger.LogWarning("All memory cache contents were cleared.");
         }
-
-
     }
 }

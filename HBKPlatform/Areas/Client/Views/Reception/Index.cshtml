@@ -1,7 +1,7 @@
-@model HBKPlatform.Models.ClientClinicData
+@model HBKPlatform.Models.ClientPracticeData
 
 @{
-    ViewBag.Title = "Clinic Reception";
+    ViewBag.Title = "Practice Reception";
     ViewBag.CurrentNav = "Reception";
     Layout = "_Client";
 }
@@ -9,4 +9,7 @@
 <h2>Welcome to Reception.</h2>
 <h3>Quick actions:</h3>
 <p><a asp-area="Client" asp-controller="Messaging" asp-action="Conversation" asp-route-pracId="@Model.PracId">Messaging with @Model.MyPracName</a> (@Model.NumUnreadMessages unread)</p>
-<p><a asp-area="Client" asp-controller="Appointment" asp-action="Booking">Book another appointment.</a></p>
+@if (!Model.SelfBookingEnabled)
+{
+    <p><a asp-area="Client" asp-controller="Appointment" asp-action="Booking">Book another appointment.</a></p>
+}

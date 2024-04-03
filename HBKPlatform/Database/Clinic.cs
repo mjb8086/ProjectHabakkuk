@@ -1,28 +1,24 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using HBKPlatform.Globals;
 
-namespace HBKPlatform.Database
+namespace HBKPlatform.Database;
+
+/// <summary>
+/// HBKPlatform clinic entity
+/// A Clinic owns rooms available for Practitioners to rent
+/// 
+/// Author: Mark Brown
+/// Authored: 18/03/2024
+/// 
+/// © 2024 NowDoctor Ltd.
+/// </summary>
+public class Clinic : HbkBaseEntity
 {
-    /// <summary>
-    /// Clinic entity. Store details for each customer clinic to be displayed on its homepage
-    /// as well as some of our business data like the licence status. Analogous to a tenant.
-    /// </summary>
-    public class Clinic : HbkBaseEntity
-    {
-        // Columns
-        public string Description { get; set; }
-        [DataType(DataType.MultilineText)]
-        public string? StreetAddress { get; set; }
-        public string Telephone { get; set; }
-        [DataType(DataType.EmailAddress)] 
-        public string EmailAddress { get; set; }
-    
-        public int? LeadPractitionerId { get; set; }
-    
-        // EF Navigations
-        public Practitioner LeadPractitioner { get; set; }
-        public virtual ICollection<Practitioner> Practitioners { get; set; }
-        public virtual ICollection<Client> Clients { get; set; }
-    }
+    [DataType(DataType.MultilineText)]
+    public string? StreetAddress { get; set; }
+    public string Telephone { get; set; }
+    [DataType(DataType.EmailAddress)] 
+    public string EmailAddress { get; set; }
+    public string ManagerUserId { get; set; }
+    public virtual User ManagerUser { get; set; }
+    public ICollection<Room> Rooms { get; set; }
 }

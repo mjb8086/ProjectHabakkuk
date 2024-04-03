@@ -27,7 +27,7 @@ namespace HBKPlatform.Repository.Implementation
             }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException("Could not find timeslot Id");
         }
 
-        public async Task<List<TimeslotDto>> GetClinicTimeslots()
+        public async Task<List<TimeslotDto>> GetPracticeTimeslots()
         {
             return await _db.Timeslots.OrderBy(x => x.Day).ThenBy(x => x.Time).Select(x => new TimeslotDto()
             {

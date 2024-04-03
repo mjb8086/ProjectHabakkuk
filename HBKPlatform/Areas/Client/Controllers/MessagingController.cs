@@ -20,7 +20,7 @@ namespace HBKPlatform.Areas.Client.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var leadId = _cache.GetLeadPracId(_userService.GetClaimFromCookie("ClinicId"));
+            var leadId = _cache.GetLeadPractitionerId(_userService.GetClaimFromCookie("PracticeId"));
             return RedirectToRoute(new { controller = "Messaging", action = "Conversation", PracId = leadId });
         }
 

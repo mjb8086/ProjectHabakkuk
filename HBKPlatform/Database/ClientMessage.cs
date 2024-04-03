@@ -9,7 +9,6 @@ namespace HBKPlatform.Database
           public int? PreviousMessageId { get; set; }
           public int PractitionerId { get; set; }
           public int ClientId { get; set; }
-          public int ClinicId { get; set; }
 
           [DataType(DataType.MultilineText)]
           public string MessageBody { get; set; }
@@ -20,7 +19,7 @@ namespace HBKPlatform.Database
 
           // EF Navigations
           public ClientMessage PreviousMessage { get; set; }
-          private Clinic Clinic { get; set; }
+          private Practice Practice { get; set; }
           private Practitioner Practitioner { get; set; }
           private Client Client { get; set; }
      }

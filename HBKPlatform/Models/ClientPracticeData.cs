@@ -1,9 +1,10 @@
 namespace HBKPlatform.Models
 {
-    public class ClientClinicData
+    public class ClientPracticeData
     {
         public int PracId { get; set; }
         public string MyPracName { get; set; }
         public int NumUnreadMessages { get; set; }
+        public bool SelfBookingEnabled { get; set; }
     }
 }

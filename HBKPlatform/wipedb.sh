@@ -3,18 +3,22 @@
 psql -U devlogin -d HBKPlatform << EOF
 
 delete from client_messages;
-delete from clinic_homepages;
 delete from client_records;
-delete from timeslot_availabilities;
+delete from timeslot_availability;
 delete from timeslots;
 delete from clients;
 delete from clinics;
+delete from practices;
 delete from practitioners;
 delete from user_roles;
 delete from users;
 delete from user_claims;
 delete from appointments;
 delete from tenancies;
+delete from attributes;
+delete from room_attributes;
+delete from rooms;
+delete from room_reservations;
 
 EOF
 

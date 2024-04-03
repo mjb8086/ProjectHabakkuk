@@ -30,25 +30,25 @@ namespace HBKPlatform.Areas.MyND.Controllers
     
         public async Task<IActionResult> SetWeekAvailability(int weekNum)
         {
-            return View(await _availabilityMgmt.GetAvailabilityModelForWeek(weekNum));
+            return View(await _availabilityMgmt.GetPractitionerModelForWeek(weekNum));
         }
     
         public async Task<IActionResult> SetIndefAvailability()
         {
-            return View(await _availabilityMgmt.GetAvailabilityModelForIndef());
+            return View(await _availabilityMgmt.GetPractitionerModelForIndef());
         }
 
         [HttpPost]
         public async Task<IActionResult> DoSetAvailability(int? weekNum, [FromBody] UpdatedAvailability model)
         {
-            if (!ModelState.IsValid) throw new Exception("Model bad");
+            if (!ModelState.IsValid) throw new MissingFieldException("Missing data");
             if (weekNum.HasValue)
             {
-                await _availabilityMgmt.UpdateAvailabilityForWeek(weekNum.Value, model);
+                await _availabilityMgmt.UpdatePractitionerForWeek(weekNum.Value, model);
             }
             else
             {
-                await _availabilityMgmt.UpdateAvailabilityForIndef(model);
+                await _availabilityMgmt.UpdatePractitionerForIndef(model);
             }
             return Ok();
         }
@@ -57,11 +57,11 @@ namespace HBKPlatform.Areas.MyND.Controllers
         {
             if (weekNum.HasValue)
             {
-                await _availabilityMgmt.RevertAvailabilityForWeek(weekNum.Value);
+                await _availabilityMgmt.RevertPractitionerForWeek(weekNum.Value);
             }
             else
             {
-                await _availabilityMgmt.RevertAvailabilityForIndef();
+                await _availabilityMgmt.ClearPractitonerForIndef();
             }
 
             return Ok();
@@ -112,15 +112,15 @@ namespace HBKPlatform.Areas.MyND.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> BookingConfirm([FromForm] PracBookingFormModel appointment)
+        public async Task<IActionResult> BookingConfirm([FromForm] PractitionerBookingFormModel appointment)
         {
             if (!ModelState.IsValid) throw new Exception("Model bad");
             return View(await _bookingService.GetBookingConfirmModel(appointment));
         }
     
-        public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum, int clientId)
+        public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId)
         {
-            return View(await _bookingService.DoBookingPractitioner(treatmentId, timeslotId, weekNum, clientId));
+            return View(await _bookingService.DoBookingPractitioner(treatmentId, timeslotId, weekNum, clientId, roomResId));
         }
 
         public async Task<IActionResult> CancelBooking(int appointmentId)

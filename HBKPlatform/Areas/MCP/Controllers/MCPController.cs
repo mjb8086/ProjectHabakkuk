@@ -1,3 +1,4 @@
+using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,10 +13,10 @@ namespace HBKPlatform.Areas.MCP.Controllers
     /// © 2023 NowDoctor Ltd.
     /// </summary>
     [Area("MCP"), Authorize(Roles="SuperAdmin")]
-    public class MCPController : Controller
+    public class MCPController(IMcpService _mcpSrv) : Controller
     {
         [Route("mcp")]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             return View();
         }
@@ -23,7 +24,7 @@ namespace HBKPlatform.Areas.MCP.Controllers
         [Route("mcp/status")]
         public async Task<IActionResult> Status()
         {
-            return View();
+            return View(await _mcpSrv.GetStatsView());
         }
 
     }

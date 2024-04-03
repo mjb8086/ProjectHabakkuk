@@ -14,11 +14,11 @@ namespace HBKPlatform.Areas.MyND.Controllers
     /// © 2023 NowDoctor Ltd.
     /// </summary>
     [Area("MyND"), Authorize(Roles="Practitioner")]
-    public class ReceptionController(IClinicService _clinicService): Controller
+    public class ReceptionController(IPracticeService practiceService): Controller
     {
         public async Task<IActionResult> Index()
         {
-            return View(await _clinicService.GetReceptionModel());
+            return View(await practiceService.GetPractitionerReceptionModel());
         }
     }
 }

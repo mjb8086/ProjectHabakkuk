@@ -2,21 +2,29 @@ using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Globals
 {
-    public struct DefaultSettings
+    public static class DefaultSettings
     {
         public const int DEFAULT_PASSWORD_LENGTH = 14;
         public const bool LOCKOUT_ON_FAILURE = true;
         public const int LOCKOUT_MAX_ATTEMPTS = 5;
         public const int AVAILABILITY_ADVANCE_WEEKS = 52;
 
-        public const string LOG_ROOT_PROD = "/var/log/";
-        public const string LOG_ROOT_LOCAL = "./log/";
-        
         public static readonly Dictionary<string, SettingDto> DefaultSetting = new()
         {
             { "DbStartDate", new SettingDto() { Value = "2024-01-01" }},
-            { "BookingAdvanceWeeks", new SettingDto() { Value = "2" }}
+            { "BookingAdvanceWeeks", new SettingDto() { Value = "2" }},
+            { "SelfBookingEnabled", new SettingDto() { Value = "Yes" }},
         };
+
+        /// <summary>
+        /// Check whether a new setting key is valid. Uses the default setting dictionary to ensure that every key
+        /// will have a default.
+        /// </summary>
+        public static bool IsSettingKeyValid(string key)
+        {
+            return DefaultSetting.ContainsKey(key);
+        }
+        
     }
 
     public struct Consts

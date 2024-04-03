@@ -1,4 +1,5 @@
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +24,32 @@ namespace HBKPlatform.Repository.Implementation
                 Value = x.Value,
                 Value2 = x.Value2
             }).ToListAsync();
+        }
+
+        public async Task Update(SettingDto setting)
+        {
+            var dbSetting = await _db.Settings.FirstOrDefaultAsync(x => x.Key == setting.Key) ??
+                            throw new IdxNotFoundException($"Setting key {setting.Key} not found in DB");
+            dbSetting.Value = setting.Value;
+            dbSetting.Value2 = setting.Value2;
+            await _db.SaveChangesAsync();
+        }
+        
+        public async Task Create(SettingDto setting)
+        {
+            if (_db.Settings.Any(x => x.Key == setting.Key))
+            {
+                throw new DuplicateKeyException("Duplicate settings keys are not permitted.");
+            }
+            
+            await _db.AddAsync(new Setting()
+            {
+                Key = setting.Key,
+                Value = setting.Value,
+                Value2 = setting.Value2
+            });
+            
+            await _db.SaveChangesAsync();
         }
     
     }

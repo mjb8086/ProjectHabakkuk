@@ -4,6 +4,7 @@ namespace HBKPlatform.Models
 {
     public class AvailabilityModel
     {
+        public int? RoomId { get; set; }
         public string WeekStr { get; set; }
         public int WeekNum { get; set; }
         public Dictionary<Enums.Day, List<AvailabilityLite>> DailyTimeslotLookup { get; set; }

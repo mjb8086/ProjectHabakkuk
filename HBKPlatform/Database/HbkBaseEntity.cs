@@ -10,7 +10,6 @@ namespace HBKPlatform.Database
         public int Id { get; set; } 
         public int TenancyId { get; set; }
         [DataType(DataType.DateTime)]
-        
         public DateTime DateCreated { get; set; }
         [DataType(DataType.DateTime)]
         public DateTime? DateModified { get; set; }

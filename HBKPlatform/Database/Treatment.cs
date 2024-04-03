@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database
@@ -15,7 +13,6 @@ namespace HBKPlatform.Database
     /// </summary>
     public class Treatment : HbkBaseEntity
     {
-        public int ClinicId { get; set; }
         public Enums.TreatmentRequestability TreatmentRequestability { get; set; }
         public double Cost { get; set; }
         public string Title { get; set; }
@@ -23,6 +20,5 @@ namespace HBKPlatform.Database
         public string? Img { get; set; }
     
         // EF Navigations
-        public virtual Clinic Clinic { get; set; }
     }
 }

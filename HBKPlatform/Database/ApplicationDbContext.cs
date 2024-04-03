@@ -33,16 +33,19 @@ namespace HBKPlatform.Database
         public DbSet<Client> Clients { get; set; } = default!;
         public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
         public DbSet<ClientRecord> ClientRecords { get; set; } = default!;
-        public DbSet<Clinic> Clinics { get; set; } = default!;
-        public DbSet<ClinicHomepage> ClinicHomepages { get; set; } = default!;
+        public DbSet<Practice> Practices { get; set; } = default!;
         public DbSet<Practitioner> Practitioners { get; set; } = default!;
         public DbSet<Tenancy> Tenancies { get; set; } = default!;
         public DbSet<Timeslot> Timeslots { get; set; } = default!;
-        public DbSet<TimeslotAvailability> TimeslotAvailabilities { get; set; } = default!;
+        public DbSet<TimeslotAvailability> TimeslotAvailability { get; set; } = default!;
         public DbSet<Treatment> Treatments { get; set; } = default!;
         public DbSet<Setting> Settings { get; set; } = default!;
         public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
-    
+        public DbSet<Room> Rooms { get; set; } = default!;
+        public DbSet<Attribute> Attributes { get; set; } = default!;
+        public DbSet<RoomAttribute> RoomAttributes { get; set; } = default!;
+        public DbSet<Clinic> Clinics { get; set; } = default!;
+        public DbSet<RoomReservation> RoomReservations { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,17 +56,17 @@ namespace HBKPlatform.Database
             modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
         
             // Manual relationships
-            // Configure one-to-many relationship between Clinic and Practitioner
+            // Configure one-to-many relationship between Practice and Practitioner
             modelBuilder.Entity<Practitioner>()
-                .HasOne(p => p.Clinic)
+                .HasOne(p => p.Practice)
                 .WithMany(c => c.Practitioners)
-                .HasForeignKey(p => p.ClinicId);
+                .HasForeignKey(p => p.PracticeId);
 
-            // Configure one-to-one relationship between Clinic and LeadPractitioner
-            modelBuilder.Entity<Clinic>()
+            // Configure one-to-one relationship between Practice and LeadPractitioner
+            modelBuilder.Entity<Practice>()
                 .HasOne(c => c.LeadPractitioner)
                 .WithOne()
-                .HasForeignKey<Clinic>(c => c.LeadPractitionerId);
+                .HasForeignKey<Practice>(c => c.LeadPractitionerId);
 
             // Ensure inherited entities are flattened into one table.
             modelBuilder.Entity<HbkBaseEntity>().UseTpcMappingStrategy();
@@ -89,19 +92,18 @@ namespace HBKPlatform.Database
         }
 
         /// <summary>
-        /// Set snake case on other entities.
+        /// Set snake case on all entities.
         /// </summary>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            // Configure logging for database commands
-//        optionsBuilder.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug)));
             optionsBuilder.UseSnakeCaseNamingConvention();
         }
 
         /// <summary>
         /// Automatically update DateModified for all entities that inherit from BaseEntity.
+        /// Set user ID and tenancy ID on create/update actions.
         /// </summary>
-        void UpdateEntries()
+        void ProcessEntities()
         {
             ChangeTracker.DetectChanges();
 
@@ -137,14 +139,13 @@ namespace HBKPlatform.Database
 
         public override int SaveChanges()
         {
-            UpdateEntries();
+            ProcessEntities();
             return base.SaveChanges();
         }
     
-    
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            UpdateEntries();
+            ProcessEntities();
             return base.SaveChangesAsync(cancellationToken);
         }
     }

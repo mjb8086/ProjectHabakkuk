@@ -4,6 +4,7 @@ using HBKPlatform.Models.DTO;
 using HBKPlatform.Repository;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace HBK.Test
@@ -24,8 +25,8 @@ namespace HBK.Test
         const int DEFAULT_DURATION = 60;
         const string DB_START_DATE = "2024-01-01";
         const int FAKE_TREATMENT_ID = 1;
-        const int FAKE_CLINIC_ID = 2;
-        const int FAKE_PRAC_ID = 3;
+        const int FAKE_PRACTICE_ID = 2;
+        const int FAKE_PRACTITIONER_ID = 3;
         
         readonly Dictionary<int, TreatmentDto> FAKE_TREATMENTS = new ()
         {
@@ -74,30 +75,33 @@ namespace HBK.Test
             var mockAvaRepo = new Mock<IAvailabilityRepository>();
             var mockApptRepo = new Mock<IAppointmentRepository>();
             
-            mockTimeslotRepo.Setup(x => x.GetClinicTimeslots()).ReturnsAsync(timeslotList);
+            mockTimeslotRepo.Setup(x => x.GetPracticeTimeslots()).ReturnsAsync(timeslotList);
             mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate")).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
             mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = advanceWeeks});
             mockDateTimeHelper.Setup(x => x.Now).Returns(now);
-            mockUserService.Setup(x => x.GetClaimFromCookie("ClinicId")).Returns(FAKE_CLINIC_ID);
-            mockCacheService.Setup(x => x.GetLeadPracId(FAKE_CLINIC_ID)).Returns(FAKE_PRAC_ID);
+            mockUserService.Setup(x => x.GetClaimFromCookie("PracticeId")).Returns(FAKE_PRACTICE_ID);
+            mockCacheService.Setup(x => x.GetLeadPractitionerId(FAKE_PRACTICE_ID)).Returns(FAKE_PRACTITIONER_ID);
             mockCacheService.Setup(x => x.GetTreatments()).ReturnsAsync(FAKE_TREATMENTS);
             if (weekNums != null)
             {
-                mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, weekNums))
+                mockAvaRepo.Setup(x => x.GetPractitionerLookupForWeeks(FAKE_PRACTITIONER_ID, weekNums))
                     .ReturnsAsync(new List<TimeslotAvailabilityDto>());
             }
             else
             {
-                mockAvaRepo.Setup(x => x.GetAvailabilityLookupForWeeks(FAKE_PRAC_ID, It.IsAny<int[]>()))
+                mockAvaRepo.Setup(x => x.GetPractitionerLookupForWeeks(FAKE_PRACTITIONER_ID, It.IsAny<int[]>()))
                     .ReturnsAsync(new List<TimeslotAvailabilityDto>());
             }
             // Return empty availability when not specified - a missing availability value for any week is reckoned as available
-            mockAvaRepo.Setup(x => x.GetAvailabilityLookupForIndef(FAKE_PRAC_ID))
+            mockAvaRepo.Setup(x => x.GetPractitionerLookupForIndef(FAKE_PRACTITIONER_ID))
                 .ReturnsAsync(indefAvailability);
-            mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRAC_ID, mockDateTimeHelper.Object.Now))
+            mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now))
                 .ReturnsAsync(appointments);
 
-            return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object);
+            // TODO: Need to setup the timeslot service
+            return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, 
+                mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object, 
+                new Mock<IRoomReservationService>().Object, new Mock<ITimeslotService>().Object, new Mock<ILogger<BookingService>>().Object);
         }
         
         //////////////////////////////////////////////////////////////////////////////// 
@@ -190,7 +194,7 @@ namespace HBK.Test
             // NB: AppointmentRepo includes Timeslot data in select, thus the appointment's timeslot must be instantiated
             var appointments = new List<AppointmentDto>()
             {
-                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == TS_ID), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == TS_ID), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
             };
             
             // Instantiate booking service
@@ -223,9 +227,9 @@ namespace HBK.Test
             // NB: AppointmentRepo includes Timeslot data in select, thus the appointment's timeslot must be instantiated
             var appointments = new List<AppointmentDto>()
             {
-                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 21), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
-                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 41), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
-                new () { PractitionerId = FAKE_PRAC_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 30), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 21), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 41), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.Id == 30), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
             };
             
             // Instantiate booking service

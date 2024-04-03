@@ -1,0 +1,17 @@
+@model HBKPlatform.Models.View.MyND.RoomReservation.ConfirmReservation;
+@{
+    ViewBag.Title = "Reservation wizard: Confirm";
+    Layout = "_MyND";
+    ViewBag.CurrentNav = "Reservation|RoomReservation";
+}
+@await Html.PartialAsync("_RoomReservationsPartial")
+
+<h1>Confirm your reservation.</h1>
+<p>You have chosen @Model.RoomDetails at @Model.ProspectiveDateTime.</p>
+
+<p>
+    <a style="margin-right: 5px" asp-area="MyND" asp-controller="RoomReservation" asp-action="DoMakeReservation" asp-route-roomId="@Model.RoomId" asp-route-weekNum="@Model.WeekNum" asp-route-timeslotId="@Model.TimeslotId">Confirm</a>
+    <a asp-area="MyND" asp-controller="RoomReservation" asp-action="MyReservations">Cancel</a>
+</p>
+
+<p>If you confirm, a request will be sent to the clinic who will either approve or deny the request.</p>

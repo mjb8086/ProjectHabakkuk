@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Repository.Implementation
 {
-    public class UserRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, IHttpContextAccessor _ctx) : IUserRepository
+    public class UserRepository(ApplicationDbContext _db, IPasswordHasher<User> passwordHasher, IHttpContextAccessor _ctx, ILogger<UserRepository> _logger) : IUserRepository
     {
         /// <summary>
         /// Reset password for the tenancy User Id. Or, any user if actioned by a Super Admin.
@@ -35,6 +35,7 @@ namespace HBKPlatform.Repository.Implementation
         /// </summary>
         public async Task ToggleLockout(string userId)
         {
+            // Are we a super admin or a customer user?
             IQueryable<User> userQuery = _ctx.HttpContext != null && _ctx.HttpContext.User.IsInRole("SuperAdmin") ?
                 _db.Users.IgnoreQueryFilters() : _db.Users;
         
@@ -65,7 +66,64 @@ namespace HBKPlatform.Repository.Implementation
             return await _db.Users.IgnoreQueryFilters().AnyAsync(x =>
                 x.Email != null && x.Email.ToLower() == newEmail || x.UserName != null && x.UserName.ToLower() == newEmail);
         }
-    
+        
+        // TODO: Use cache if this becomes a regular op. Currently only used in messaging service
+        public async Task<bool> VerifyClientPractitionerMembership(int clientId, int practitionerId)
+        {
+            var client = await _db.Clients.FirstAsync(x => x.Id == clientId);
+            var prac = await _db.Practitioners.FirstAsync(x => x.Id == practitionerId);
+            return client.PracticeId == prac.PracticeId && client.TenancyId == prac.TenancyId;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////
+        // BEGIN LOGIN METHODS - no tenancy ID filtering. Do not use except on login!
+        ////////////////////////////////////////////////////////////////////////////////
+        public async Task<UserDto> GetAndUpdateLoginUser(string userId)
+        {
+            var user = new UserDto();
+            var client = await _db.Clients.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId);    // TODO: Put these in repositories
+            Practitioner? prac;
+            User? dbUser;
+            Clinic? clinic;
+
+            if (client != null)
+            {
+                user.ClientId = client.Id;
+                user.PracticeId = client.PracticeId;
+                user.TenancyId = client.TenancyId;
+                client.User.LastLogin = DateTime.UtcNow;
+                client.User.LoginCount++;
+            }
+            else if ((prac = await _db.Practitioners.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId)) != null)
+            {
+                user.PractitionerId = prac.Id;
+                user.PracticeId = prac.PracticeId;
+                user.TenancyId = prac.TenancyId;
+                prac.User.LastLogin = DateTime.UtcNow;
+                prac.User.LoginCount++;
+            }
+            else if ((clinic = await _db.Clinics.Include("ManagerUser").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.ManagerUserId == userId)) != null)
+            {
+                user.TenancyId = clinic.TenancyId;
+                user.ClinicId = clinic.Id;
+                clinic.ManagerUser.LastLogin = DateTime.UtcNow;
+                clinic.ManagerUser.LoginCount++;
+            }
+            else if((dbUser = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == userId)) != null) // user has neither client or prac entity, get tenancyId from user entity
+            {
+                user.TenancyId = dbUser.TenancyId;
+                dbUser.LastLogin = DateTime.UtcNow;
+                dbUser.LoginCount++;
+                _logger.LogWarning($"Plain user with no associated Client, Practitioner or Clinic login: {userId}");
+            }
+
+            await _db.SaveChangesAsync();
+            return user;
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////
+        // END LOGIN METHODS 
+        ////////////////////////////////////////////////////////////////////////////////
     
     }
 }

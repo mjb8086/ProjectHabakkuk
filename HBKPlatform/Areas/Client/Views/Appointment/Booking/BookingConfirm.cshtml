@@ -7,7 +7,7 @@
 
 <h1>Booking wizard.</h1>
 <h2>Confirm booking?</h2>
-<p>You are booking @Model.TreatmentTitle on @Model.BookingDate with @Model.PracctitionerName.</p>
+<p>You are booking @Model.TreatmentTitle on @Model.BookingDate with @Model.PractitionerName.</p>
 <p><a asp-area="Client" asp-controller="Appointment" asp-action="BookingConfirmed" asp-route-treatmentId="@Model.TreatmentId" asp-route-timeslotId="@Model.TimeslotId" asp-route-weekNum="@Model.WeekNum">Confirm Booking</a></p>
 <p><a asp-area="Client" asp-controller="Appointment" asp-action="TimeslotSelect" asp-route-treatmentId="@Model.TreatmentId">Choose a different time.</a></p>
 <p><a asp-area="Client" asp-controller="Appointment" asp-action="Booking">Choose a different treatment.</a></p>

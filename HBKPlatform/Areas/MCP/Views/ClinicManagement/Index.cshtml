@@ -1,12 +1,12 @@
-
 @{
     ViewData["Title"] = "MCP Clinic Management";
     ViewBag.CurrentNav = "ClinicManagement";
     Layout = "_McpShared";
 }
 <h1>Clinic Management</h1>
+<p>A "Clinic" is any organisation offering rooms for rental by Practitioners.</p>
 <ol>
-    <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="RegisterClinic">Register a new clinic.</a></li>
+    <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="RegisterClinic">Register a new Clinic.</a></li>
     <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="ListClinics">View, delete or modify existing clinics.</a></li>
     <li><a asp-area="MCP" asp-controller="ClinicManagement" asp-action="PasswordReset">User Lockout & Password reset.</a></li>
 </ol>

@@ -16,7 +16,7 @@ namespace HBKPlatform.Services.Implementation
      /// © 2023 NowDoctor Ltd.
      /// </summary>
      public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, IClientMessageRepository _clientMessageRepository, 
-          IClinicService _clinicService, ICacheService _cache) : IClientMessagingService
+          IPracticeService practiceService, ICacheService _cache) : IClientMessagingService
      {
           public async Task SendMessage(string messageBody, int recipientId)
           {
@@ -42,10 +42,10 @@ namespace HBKPlatform.Services.Implementation
                     throw new MissingFieldException("Message data is incomplete.");
                }
 
-               // Check that the users are part of the same clinic
-               if (!(await _clinicService.VerifyClientAndPracClinicMembership(clientId, pracId)))
+               // Check that the users are part of the same practice
+               if (!(await practiceService.VerifyClientPractitionerMembership(clientId, pracId)))
                {
-                    throw new InvalidUserOperationException("Client and practitioner are not members of the same clinic.");
+                    throw new InvalidUserOperationException("Client and practitioner are not members of the same practice.");
                }
 
                // if that's okay, clean it and then save it.
@@ -68,7 +68,7 @@ namespace HBKPlatform.Services.Implementation
                
                     model.PractitionerId = pracId;
                     model.CurrentConverser = Enums.MessageOrigin.Client;
-                    model.Recipient = _cache.GetPracName(pracId);
+                    model.Recipient = _cache.GetPractitionerName(pracId);
                     model.Sender = clientDetailsLite.Name;
                     await _clientMessageRepository.UpdateReadReceiptsClient(clientId, pracId);
                     return model;
@@ -84,7 +84,7 @@ namespace HBKPlatform.Services.Implementation
                // TODO: Security and access checks - ensure the client belongs to this prac
                if (pracIdClaim != null && int.TryParse(pracIdClaim.Value, out int pracId))
                {
-                    var pracDetailsLite = _cache.GetPracDetailsLite(pracId);
+                    var pracDetailsLite = _cache.GetPractitionerDetailsLite(pracId);
                     var model = await _clientMessageRepository.GetConversation(pracId, clientId, max);
                     model.ClientId = clientId;
                     model.CurrentConverser = Enums.MessageOrigin.Practitioner;

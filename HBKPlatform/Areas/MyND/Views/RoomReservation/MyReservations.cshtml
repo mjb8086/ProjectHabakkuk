@@ -1,0 +1,57 @@
+@model HBKPlatform.Models.View.MyND.RoomReservation.MyReservations
+@{
+    Layout = "_MyND";
+    ViewBag.CurrentNav = "Reservation|RoomReservationOverview";
+}
+@await Html.PartialAsync("_RoomReservationsPartial")
+
+<h1>My Reservations</h1>
+<h2>You currently hold the following treatment room reservations:</h2>
+
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Actions</td></tr></thead>
+        @foreach (var reservation in Model.Approved)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td><a asp-area="MyNd" asp-controller="RoomReservation" asp-action="CancelReservation" asp-route-reservationId="@reservation.Id">Cancel</a></td> </tr>
+        }
+    </table>
+</div>
+
+<div>
+    <a asp-area="MyND" asp-controller="RoomReservation" asp-action="MakeAReservation">Book Another</a>
+</div>
+
+<h2>Awaiting clinic approval</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>Actions</td></tr></thead>
+        @foreach (var reservation in Model.Requested)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td><a asp-area="MyNd" asp-controller="RoomReservation" asp-action="CancelReservation" asp-route-reservationId="@reservation.Id">Cancel</a></td> </tr>
+        }
+    </table>
+</div>
+
+<h2>Denied :(</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td></tr></thead>
+        @foreach (var reservation in Model.Denied)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> </tr>
+        }
+    </table>
+</div>
+
+<h2>Cancellations</h2>
+<div class="table1OuterWrap">
+    <table class="table1">
+        <thead class="table1Item"><tr class="table1Item"><td>Room Name</td> <td>When</td> <td>By Whom</td></tr></thead>
+        @foreach (var reservation in Model.Cancelled)
+        {
+            <tr class="table1Item"><td class="">@reservation.RoomTitle</td> <td>@reservation.When</td> <td>@reservation.Status</td> </tr>
+        }
+    </table>
+</div>
+

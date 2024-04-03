@@ -5,13 +5,15 @@ namespace HBKPlatform.Models.View.MCP
 {
     public class UserAccountFunctions
     {
+        public List<SelectListItem> Practices { get; set; }
         public List<SelectListItem> Clinics { get; set; }
     }
 
     public class UacRequest
     {
-        public int ClinicId { get; set; }
-        public int PractitionerId { get; set; }
+        public int? PractitionerId { get; set; }
+        public int? ClinicId { get; set; }
+        public int? ClientId { get; set; }
         public UacAction Action { get; set; }
     }
 
@@ -21,9 +23,10 @@ namespace HBKPlatform.Models.View.MCP
         PasswordReset = 1,
         ToggleLockout = 2
     }
+    
 
-    public struct ClinicPracs
+    public struct UacUserSelect
     {
-        public Dictionary<int, PracDetailsUac> Pracs { get; set; }
+        public Dictionary<int, UserDetailsUac> Users { get; set; }
     }
 }

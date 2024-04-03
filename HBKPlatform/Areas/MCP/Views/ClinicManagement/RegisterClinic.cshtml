@@ -3,20 +3,15 @@
 @{
     ViewData["Title"] = "MCP Clinic Management - Register a new clinic";
     ViewBag.CurrentNav = "ClinicManagement";
-    ViewBag.Css = "admin-clinicmgmt.css";
+    ViewBag.Css = "mcp-practicemgmt.css";
     Layout = "_McpShared";
 }
-<h1>New clinic</h1>
+<h1>New Clinic</h1>
 <div id="uacWrapper">
 <form id="treatmentDetails" asp-area="MCP" asp-controller="ClinicManagement" asp-action="DoRegisterClinic" method="post"> 
     <fieldset>
         <legend for="orgName" class="form-textfield">Organisation Name</legend>
-        <input type="text" id="orgName" asp-for="OrgName" value="" placeholder="Pearce & Pearce" >
-    </fieldset>
-
-    <fieldset>
-        <legend for="orgTagline" class="form-textfield">Organisation Tagline</legend>
-        <input type="text" id="orgTagline" asp-for="OrgTagline" value="" placeholder="Merges and Executions" >
+        <input type="text" id="orgName" asp-for="OrgName" value="" placeholder="Odyssey Arena">
     </fieldset>
 
     <fieldset>
@@ -28,50 +23,44 @@
     
     <fieldset>
         <legend for="orgEmail" class="form-textfield">Organisation Email</legend>
-        <input type="text" id="orgEmail" asp-for="Email" value="" placeholder="billg@microsoft.com" >
+        <input type="text" id="orgEmail" asp-for="OrgEmail" value="" placeholder="big@dome.com" >
     </fieldset>
 
     <fieldset>
         <legend for="telephone" class="form-textfield">Telephone</legend>
-        <input type="text" name="telephone" id="telephone" value=""/>
+        <input type="text" name="telephone" id="telephone" value="" placeholder="999" asp-for="Telephone"/>
     </fieldset>
   
     <fieldset>
       <legend for="address" class="form-textfield">Address</legend>
-      <textarea name="streetAddress" id="address">
-
+      <textarea name="streetAddress" id="address" asp-for="StreetAddress">
       </textarea> 
     </fieldset>
 
-    <h3>Lead Practitioner Details</h3>
+    <h3>Clinic Manager Details</h3>
     <fieldset>
-        <legend for="pracTitle" class="form-textfield">Title</legend>
-        <select id="pracTitle" asp-for="LeadPracTitle" asp-items="Html.GetEnumSelectList<Enums.Title>()">
+        <legend for="managerTitle" class="form-textfield">Title</legend>
+        <select id="managerTitle" asp-for="LeadManagerTitle" asp-items="Html.GetEnumSelectList<Enums.Title>()">
         </select> 
     </fieldset>
     
     <fieldset>
-        <legend for="pracForename" class="form-textfield">Forename</legend>
-        <input type="text" id="pracForename" asp-for="LeadPracForename" placeholder="Patrick">
+        <legend for="managerForename" class="form-textfield">Forename</legend>
+        <input type="text" id="managerForename" asp-for="LeadManagerForename" placeholder="George">
     </fieldset>
     
     <fieldset>
-        <legend for="pracSurname" class="form-textfield">Surname</legend>
-        <input type="text" id="pracSurname" asp-for="LeadPracSurname" placeholder="Bateman" >
+        <legend for="managerSurname" class="form-textfield">Surname</legend>
+        <input type="text" id="managerSurname" asp-for="LeadManagerSurname" placeholder="Best" >
     </fieldset>
     
     <fieldset>
-        <legend for="dateOfBirth" class="form-textfield">Date of birth</legend>
-        <input asp-for="LeadPracDOB" id="dateOfBirth" value="1970-01-01" type="date"/>
+        <legend for="managerEmail" class="form-textfield">Email</legend>
+        <input type="text" id="managerEmail" asp-for="LeadManagerEmail" placeholder="georgie@fsmail.net" >
     </fieldset>
     
     <fieldset>
-        <legend for="pracEmail" class="form-textfield">Email</legend>
-        <input type="text" id="pracEmail" asp-for="LeadPracEmail" placeholder="bateman@pandp.com" >
-    </fieldset>
-    
-    <fieldset>
-        <input type="submit" id="btnSave" value="Register clinic" />
+        <input type="submit" id="btnSave" value="Register Clinic" />
     </fieldset>
 </form>
 </div>

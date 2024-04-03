@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HBKPlatform.Database;
+using HBKPlatform.Exceptions;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Repository;
@@ -16,9 +17,9 @@ namespace HBKPlatform.Services.Implementation
     /// 
     /// © 2023 NowDoctor Ltd.
     /// </summary>
-    public class UserService(ApplicationDbContext _db, IHttpContextAccessor _httpContext, IUserRepository _userRepo, ILogger<UserService> _logger) : IUserService
+    public class UserService(IHttpContextAccessor _httpContext, IUserRepository _userRepo, IMcpRepository _mcpRepo, 
+        ILogger<UserService> _logger) : IUserService
     {
-        // TODO: Refactor these into repositories.
         
         /// <summary>
         /// use this to set the user's associated prac Id or client Id, also update last sign in time
@@ -26,51 +27,33 @@ namespace HBKPlatform.Services.Implementation
         /// </summary>
         public async Task<UserDto> GetLoginUserDto(string userId)
         {
-            var user = new UserDto();
-            var client = await _db.Clients.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId);    // TODO: Put these in repositories
-            Practitioner? prac;
-            User? dbUser;
-
-            if (client != null)
-            {
-                user.ClientId = client.Id;
-                user.ClinicId = client.ClinicId;
-                user.TenancyId = client.TenancyId;
-                client.User.LastLogin = DateTime.UtcNow;
-                client.User.LoginCount++;
-            }
-            else if ((prac = await _db.Practitioners.Include("User").IgnoreQueryFilters().FirstOrDefaultAsync(x => x.UserId == userId)) != null)
-            {
-                user.PractitionerId = prac.Id;
-                user.ClinicId = prac.ClinicId;
-                user.TenancyId = prac.TenancyId;
-                prac.User.LastLogin = DateTime.UtcNow;
-                prac.User.LoginCount++;
-            }
-            else if((dbUser = await _db.Users.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == userId)) != null) // user has neither client or prac entity, get tenancyId from user entity
-            {
-                user.TenancyId = dbUser.TenancyId;
-                dbUser.LastLogin = DateTime.UtcNow;
-                dbUser.LoginCount++;
-            }
-
-            await _db.SaveChangesAsync();
-            return user;
+            return await _userRepo.GetAndUpdateLoginUser(userId);
         }
     
-        private async Task<string> GetPracUserId(int pracId)
-        {
-            var client = await _db.Practitioners.IgnoreQueryFilters().FirstOrDefaultAsync(x => x.Id == pracId);
-            if (client == null || string.IsNullOrWhiteSpace(client.UserId))
-            {
-                throw new MissingMemberException("UserID is null");
-            }
-            return client.UserId;
-        }
     
         public async Task DoUacAction(UacRequest model)
         {
-            var userId = await GetPracUserId(model.PractitionerId);
+            string userId;
+            
+            // For which type of user?
+            if (model.PractitionerId.HasValue)
+            {
+                userId = await _mcpRepo.GetPracUserId(model.PractitionerId.Value);
+            }
+            else if (model.ClinicId.HasValue)
+            {
+                userId = await _mcpRepo.GetLeadManagerUserId(model.ClinicId.Value) ?? 
+                         throw new InvalidUserOperationException("Clinic manager Id is missing on the clinic");
+            }
+            else if (model.ClientId.HasValue)
+            {
+                userId = await _mcpRepo.GetClientUserId(model.ClientId.Value);
+            }
+            else
+            {
+                throw new InvalidUserOperationException("No entity Id value supplied.");
+            }
+            
             switch (model.Action)
             {
                 case UacAction.PasswordReset:

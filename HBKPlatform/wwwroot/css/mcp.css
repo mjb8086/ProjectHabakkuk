@@ -19,7 +19,7 @@ form#uac select {
 
 input[type="submit"]
 {
-    width: 80px;
+    width: 100px;
     height: 30px;
     float: right;
 }

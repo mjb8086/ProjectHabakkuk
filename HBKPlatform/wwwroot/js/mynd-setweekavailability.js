@@ -71,6 +71,9 @@ $(document).ready(function () {
             success: function (data) {
                 Globals.HBKFlasher("Successfully updated availability.");
                 $('#changesMade').hide();
+            },
+            error: function () {
+                Globals.HBKFlasher("ERROR", "error");
             }
         });
     });
@@ -83,6 +86,9 @@ $(document).ready(function () {
                 Globals.HBKFlasher("Successfully reverted availability. All time periods are now available for this week.");
                 revertAll();
                 $('#changesMade').hide();
+            },
+            error: function () {
+                Globals.HBKFlasher("ERROR", "error");
             }
         });
     });

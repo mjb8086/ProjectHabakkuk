@@ -1,9 +1,4 @@
 using HBKPlatform.Database;
-using HBKPlatform.Globals;
-using HBKPlatform.Models.DTO;
-using HBKPlatform.Models.View.MCP;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 
 namespace HBKPlatform.Repository.Implementation
 {

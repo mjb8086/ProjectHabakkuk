@@ -20,14 +20,17 @@ namespace HBKPlatform.Database
         [Required]
         public Enums.Title Title { get; set; }
         public string? Location { get; set; }
-        public string? Bio { get; set; }
+        public string? ClientBio { get; set; }
+        public string? ClinicBio { get; set; }
+        public string? GmcNumber { get; set; }
+        public string? Credentials { get; set; }
         [DataType(DataType.Date)]
         public DateOnly DateOfBirth { get; set; }
         public string? Img { get; set; }
         public Enums.Sex Sex { get; set; }
 
-        public int ClinicId { get; set; }
-        public Clinic Clinic { get; set; }
+        public int PracticeId { get; set; }
+        public Practice Practice { get; set; }
         public string? UserId { get; set; }
         public User User { get; set; }
         

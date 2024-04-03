@@ -43,7 +43,7 @@ try
         .AddDefaultUI()
         .AddDefaultTokenProviders();
 
-    // To ensure custom claims (ClinicId, PracId, etc) are added to new identity when principal is refreshed.
+    // To ensure custom claims (PracticeId, PracId, etc) are added to new identity when principal is refreshed.
     builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
     // Scoped - created once per HTTP request. Use for database because there may be multiple calls in a web service.
@@ -60,6 +60,8 @@ try
     builder.Services.AddScoped<IUserRepository, UserRepository>();
     builder.Services.AddScoped<ITenancyService, TenancyService>();
     builder.Services.AddScoped<IMcpRepository, McpRepository>();
+    builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+    builder.Services.AddScoped<IRoomReservationRepository, RoomReservationRepository>();
 
     builder.Services.AddScoped<TenancyMiddleware>();
     builder.Services.AddScoped<CentralScrutinizerMiddleware>();
@@ -71,7 +73,7 @@ try
 
     // Transient - created each time it is required. Use on web services, because they will typically serve one action
     // to the controller.
-    builder.Services.AddTransient<IClinicService, ClinicService>();
+    builder.Services.AddTransient<IPracticeService, PracticeService>();
     builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
     builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
     builder.Services.AddTransient<ITreatmentService, TreatmentService>();
@@ -80,31 +82,22 @@ try
     builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
     builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
     builder.Services.AddTransient<IMcpService, McpService>();
+    builder.Services.AddTransient<IRoomService, RoomService>(); // yes, we come with room service. 100% satisfaction guarantee
+    builder.Services.AddTransient<IRoomReservationService, RoomReservationService>();
+    builder.Services.AddTransient<ITimeslotService, TimeslotService>();
 
     // Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
     builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
     builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
-    if (builder.Environment.IsDevelopment()) {
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("HbkContext") ??
-                    throw new InvalidOperationException("Connection string is invalid.") );
-                options.EnableSensitiveDataLogging();
-            }
-        );
-    }
-    else
-    {
-        builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("HbkContext") ??
-                    throw new InvalidOperationException("Connection string is invalid.") );
-            }
-        );
-    }
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(
+                builder.Configuration.GetConnectionString("HbkContext") ??
+                throw new InvalidOperationException("Connection string is invalid.") );
+            if (builder.Environment.IsDevelopment()) { options.EnableSensitiveDataLogging(); }
+        }
+    );
 
     // Routing config - enable lowercase URLs
     builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -112,7 +105,7 @@ try
     // Add services to the container.
     builder.Services.AddControllersWithViews();
     
-    // Add Hangfire services.
+    // Add Hangfire services. This facilitates background tasks.
     builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
         .UseSimpleAssemblyNameTypeSerializer()

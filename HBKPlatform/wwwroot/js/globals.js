@@ -1,9 +1,9 @@
 const Globals = {
     BaseUrl : "https://localhost:7251",
     TreatmentRequestability : {ClientAndPrac : 2, PracOnly : 1, None : 0},
-    HBKFlasher: function (message) {
+    HBKFlasher: function (message, status) {
         // Create flasher, flash it.
-        $("body").prepend($(`<div id=\"hbkFlasher\"><div id=\"hbkFlasherMessage\">${message}</div></div>`));
+        $("body").prepend($(`<div id=\"hbkFlasher\" class=\"${status}\"><div id=\"hbkFlasherMessage\">${message}</div></div>`));
         const me = $("#hbkFlasher");
         me.fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
 
