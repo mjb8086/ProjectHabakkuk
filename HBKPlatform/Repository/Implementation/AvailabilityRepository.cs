@@ -136,22 +136,22 @@ namespace HBKPlatform.Repository.Implementation
             await _db.TimeslotAvailability.Include("Timeslot").Where(x => x.IsIndefinite && x.RoomId == pracId).ExecuteDeleteAsync();
         }
 
-        public async Task<bool> IsRoomAvailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId)
+        public async Task<bool> IsRoomUnavailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId)
         {
             // Any per-week availability?
             var isPerWeekUnavailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
                 x.TimeslotId == timeslotId && x.WeekNum == weekNum && x.RoomId == roomId &&
-                x.Entity == Enums.AvailabilityEntity.Room && x.Availability != Enums.TimeslotAvailability.Unavailable).AnyAsync();
+                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Unavailable).AnyAsync();
             
-            if (isPerWeekUnavailable) return false;
+            if (isPerWeekUnavailable) return true;
 
             // If not, check Indef. If any Indef exists and is unavailable, return false. Else true.
              var isIndefUnavailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
                 x.TimeslotId == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
                 x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Unavailable).AnyAsync();
              
-             if (isIndefUnavailable) return false;
-             return true;
+             if (isIndefUnavailable) return true;
+             return false;
         }
         
         public async Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeksAnyTenancy(int roomId, int[] weekNums)
@@ -163,7 +163,7 @@ namespace HBKPlatform.Repository.Implementation
         
         public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndefAnyTenancy(int roomId)
         {
-            return await _db.TimeslotAvailability.Include("Timeslot")
+            return await _db.TimeslotAvailability.Include("Timeslot").IgnoreQueryFilters()
                 .Where(x => x.IsIndefinite && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
                 .ToDictionaryAsync(x => x.TimeslotId, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotId});
         }

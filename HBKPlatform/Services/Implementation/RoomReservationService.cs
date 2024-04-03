@@ -80,9 +80,6 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
 
     public async Task<TimeslotSelect> GetTimeslotSelectView(int roomId)
     {
-        var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
-        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        var bookingAdvance = int.Parse((await _config.GetSettingOrDefault("BookingAdvanceWeeks")).Value);
         var room = _cache.GetRoom(roomId);
         
         // Get availability for the weeks ahead
@@ -215,7 +212,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         }
         
         // finally check the room availability
-        if (await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomId, weekNum, timeslotId))
+        if (await _avaRepo.IsRoomUnavailableForWeekAnyTenancy(roomId, weekNum, timeslotId))
         {
             throw new TimeslotUnavailableException("The room is not available at this time.");
         }
@@ -250,7 +247,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             throw new DoubleBookingException("An appointment already exists in the room on this date and time. Cannot continue.");
         }
         // finally check the room availability
-        if (await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.TimeslotId))
+        if (await _avaRepo.IsRoomUnavailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.TimeslotId))
         {
             throw new TimeslotUnavailableException("The room is not available at this time.");
         }
@@ -264,7 +261,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             var occupiedTimeslots = await _appointmentRepo.GetFutureOccupiedTimeslotsForRoomAnyTenancy(roomId, _dateTime.Now);
             // populate lookups for IsAvailable check
             _weeklyAvaLookup = await _avaRepo.GetRoomLookupForWeeksAnyTenancy(roomId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
-            _indefAvaLookup = await _avaRepo.GetRoomLookupForIndef(roomId);
+            _indefAvaLookup = await _avaRepo.GetRoomLookupForIndefAnyTenancy(roomId);
         
             // If the ts is unavailable, return true. Fixme: may be inefficient?
             return new SortedSet<TimeslotDto>(timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.Id)));
