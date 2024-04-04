@@ -8,17 +8,24 @@ td.ava-ts {
     background-color: #9a9a9a;
 }
 
-td.ava-ts.available {
-   background-color: #00c600; 
-}
-
-td.ava-ts.indefinite {
-    background-color: #f4907e;
-}
-
+/* For now this covers *both* i.e. when undef is unavailable or unset */
 td.ava-ts.unavailable {
     background-color: #c0402a;
 }
+
+td.ava-ts.indefiniteAvailable {
+    background-color: #a5da7b;
+}
+
+td.ava-ts.indefiniteUnavailable {
+/*    background-color: #f4907e;*/
+}
+
+td.ava-ts.available {
+    background-color: #00c600;
+}
+
+
 
 td.dayCell {
     cursor: pointer;

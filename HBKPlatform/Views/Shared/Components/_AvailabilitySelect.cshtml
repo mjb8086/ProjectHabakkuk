@@ -8,7 +8,7 @@
             <td class="dayCell">@day.ToString()</td>
             @foreach (var al in Model.DailyTimeslotLookup[day])
             {
-                <td data-available="@al.IsAvailable.ToString().ToLower()" data-tsId="@al.TimeslotId" class="ava-ts @(al.IsAvailable ? "available" : "unavailable") @(al.IsIndefinite ? "indefinite" : "")" data-isIndef="@(al.IsIndefinite.ToString().ToLower())">@al.Description</td>
+                <td data-available="@al.IsAvailable.ToString().ToLower()" data-tsId="@al.TimeslotId" class="ava-ts @(al.IsAvailable ? "available" : "unavailable") @(al.IsIndefiniteAvailable ? "indefiniteAvailable" : "")" data-isIndef="@(al.IsIndefiniteAvailable.ToString().ToLower())">@al.Description</td>
             }
         </tr>
     }

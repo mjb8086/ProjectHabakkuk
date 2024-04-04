@@ -136,22 +136,24 @@ namespace HBKPlatform.Repository.Implementation
             await _db.TimeslotAvailability.Include("Timeslot").Where(x => x.IsIndefinite && x.RoomId == pracId).ExecuteDeleteAsync();
         }
 
+        /// <summary>
+        /// For a room to be 'unavailable', it must either have an explicit Timeslot Availability of Unavailable, or
+        /// there is no availability record in the Db.
+        /// This method checks the DB for any 'available' availability on the timeslot, if there is, it will return false.
+        /// </summary>
         public async Task<bool> IsRoomUnavailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId)
         {
             // Any per-week availability?
-            var isPerWeekUnavailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
+            var isPerWeekAvailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
                 x.TimeslotId == timeslotId && x.WeekNum == weekNum && x.RoomId == roomId &&
-                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Unavailable).AnyAsync();
+                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
             
-            if (isPerWeekUnavailable) return true;
-
-            // If not, check Indef. If any Indef exists and is unavailable, return false. Else true.
-             var isIndefUnavailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
+            // If not, check Indef. If any Indef exists and is available, return false. Else true.
+             var isIndefAvailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
                 x.TimeslotId == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
-                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Unavailable).AnyAsync();
+                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
              
-             if (isIndefUnavailable) return true;
-             return false;
+             return !(isPerWeekAvailable || isIndefAvailable);
         }
         
         public async Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeksAnyTenancy(int roomId, int[] weekNums)

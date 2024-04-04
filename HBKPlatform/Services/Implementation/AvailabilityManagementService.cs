@@ -224,7 +224,8 @@ namespace HBKPlatform.Services.Implementation
         //////////////////////////////////////////////////////////////////////////////// 
         
         /// <summary>
-        /// Build availability dictionary from timeslots. Used both per-week and for all weeks.
+        /// Build availability dictionary from timeslots. Used both per-week and for all weeks. Used in the Availability
+        /// Management View.
         /// </summary>
         private Dictionary<Enums.Day, List<AvailabilityLite>> BuildAvaLiteDict(List<TimeslotDto> allTimeslots)
         {
@@ -237,7 +238,7 @@ namespace HBKPlatform.Services.Implementation
                 dailyTimeslotLookup[day] = thisDayTs.Select(x => new AvailabilityLite()
                 {
                     // IsAvailable depends on CurrentAvailability being populated.
-                    Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.Id), TimeslotId = x.Id, IsIndefinite = IsIndefiniteUnavailable(x.Id)
+                    Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.Id), TimeslotId = x.Id, IsIndefiniteAvailable = IsIndefiniteAvailable(x.Id)
                 }).ToList();
             }
 
@@ -246,35 +247,35 @@ namespace HBKPlatform.Services.Implementation
 
         /// <summary>
         ///  Determine whether the db TimeslotAvailability enum resolves to true or false.
-        /// If no value is set, we assume true.
+        ///  A TS is unavailable if explicitly set as unavailable or there is no entry in the DB (HBK-36)
+        /// Previously, no data was assumed as available
         /// </summary>
         private bool IsAvailable(int tsId)
         {
             var avaDto = _currentAvailability.FirstOrDefault(x => x.TimeslotId == tsId);
             if (avaDto == null)
             {
-                return true;
+                return false;
             }
         
             switch (avaDto.Availability)
             {
                 case Enums.TimeslotAvailability.Available: return true;
-                case Enums.TimeslotAvailability.Unavailable: return false;
-                default: return true;
+                case Enums.TimeslotAvailability.Unavailable: default: return false;
             }
         }
     
         /// <summary>
-        /// Return TRUE if there is a matching indefinite availability for the timeslotId, and it is unavailable
+        /// Return TRUE if there is a matching indefinite availability for the timeslotId, and it is available
         /// </summary>
-        private bool IsIndefiniteUnavailable(int tsId)
+        private bool IsIndefiniteAvailable(int tsId)
         {
             if (!_indefiniteAvailability.TryGetValue(tsId, out var avaDto))
             {
                 return false;
             }
 
-            return avaDto.IsIndefinite && avaDto.Availability == Enums.TimeslotAvailability.Unavailable;
+            return avaDto.IsIndefinite && avaDto.Availability == Enums.TimeslotAvailability.Available;
         }
     
     }

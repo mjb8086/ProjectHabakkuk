@@ -117,17 +117,19 @@ namespace HBKPlatform.Services.Implementation
         {
             // first check definite (weekly) timeslots
             TimeslotAvailabilityDto? weekAva;
+            // If the weekly exists, check whether it is available and return the value as a boolean.
+            // if weekly exists with a value of unavailable, this will return a False. Weekly takes precedence.
             if ((weekAva = _weeklyAvaLookup.FirstOrDefault(y => y.WeekNum == weekNum && y.TimeslotId == tsId)) != null)
             {
                 return weekAva.Availability == Enums.TimeslotAvailability.Available;
             }
-            // then indefinite
+            // if weekly is not defined, do the same check for indefinite
             if (_indefAvaLookup.TryGetValue(tsId, out var ava))
             {
                 return ava.Availability == Enums.TimeslotAvailability.Available;
             }
-            // else we know it is available
-            return true;
+            // else we know it is unavailable
+            return false;
         }
     
 
@@ -287,7 +289,7 @@ namespace HBKPlatform.Services.Implementation
             }
         
             // all clear? then create the booking
-            // TODO: Consider a means of making this resilient - may involve consolidating more to the one repository
+            // TODO: Make this resilient - may involve consolidating more to the repository
             try
             {
                 appt.ClientId = clientId;
@@ -295,12 +297,12 @@ namespace HBKPlatform.Services.Implementation
                 appt.TreatmentId = treatmentId;
                 appt.WeekNum = weekNum;
                 appt.TimeslotId = timeslotId;
-                await _appointmentRepo.CreateAppointment(appt);
                 
-                if (roomResId.HasValue)
+                if (roomResId.HasValue && roomResId > 0)
                 {
                     await _roomRes.ConfirmRoomBookingPractitioner(roomResId.Value);
                 }
+                await _appointmentRepo.CreateAppointment(appt);
             }
             catch (Exception e)
             {

@@ -284,8 +284,8 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             {
                 return ava.Availability == Enums.TimeslotAvailability.Available;
             }
-            // else we know it is available
-            return true;
+            // else we know it is unavailable
+            return false;
         }
     
 }

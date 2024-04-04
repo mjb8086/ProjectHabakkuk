@@ -11,10 +11,10 @@ $(document).ready(function () {
     // Functions
     function revertAll()
     {
-        allTs.removeClass("unavailable");
-        if(isIndefView) allTs.removeClass("indefinite");
-        allTs.addClass("available");
-        allTs.attr("data-available", "true");
+        allTs.removeClass("available");
+        if(isIndefView) allTs.removeClass("indefiniteAvailable");
+        allTs.addClass("unavailable");
+        allTs.attr("data-available", "false");
     }
     
     function toggleIndefinite(self, isUnavailable)
