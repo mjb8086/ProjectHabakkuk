@@ -65,7 +65,8 @@ namespace HBK.Test
 
         // Save the repetition...
         public BookingService GetMockedBookingService(List<TimeslotDto> timeslotList, string advanceWeeks, DateTime now, 
-            List<AppointmentDto> appointments, Dictionary<int, TimeslotAvailabilityDto> indefAvailability, int[]? weekNums = null)
+            List<AppointmentDto> appointments, Dictionary<int, TimeslotAvailabilityDto> indefAvailability, 
+            List<TimeslotAvailabilityDto> weeklyAvailability, int[]? weekNums = null)
         {
             var mockTimeslotRepo = new Mock<ITimeslotRepository>();
             var mockConfigService = new Mock<IConfigurationService>();
@@ -74,6 +75,7 @@ namespace HBK.Test
             var mockCacheService = new Mock<ICacheService>();
             var mockAvaRepo = new Mock<IAvailabilityRepository>();
             var mockApptRepo = new Mock<IAppointmentRepository>();
+            var mockTimeslotService = new Mock<ITimeslotService>();
             
             mockTimeslotRepo.Setup(x => x.GetPracticeTimeslots()).ReturnsAsync(timeslotList);
             mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate")).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
@@ -82,26 +84,48 @@ namespace HBK.Test
             mockUserService.Setup(x => x.GetClaimFromCookie("PracticeId")).Returns(FAKE_PRACTICE_ID);
             mockCacheService.Setup(x => x.GetLeadPractitionerId(FAKE_PRACTICE_ID)).Returns(FAKE_PRACTITIONER_ID);
             mockCacheService.Setup(x => x.GetTreatments()).ReturnsAsync(FAKE_TREATMENTS);
+            
             if (weekNums != null)
             {
                 mockAvaRepo.Setup(x => x.GetPractitionerLookupForWeeks(FAKE_PRACTITIONER_ID, weekNums))
-                    .ReturnsAsync(new List<TimeslotAvailabilityDto>());
+                    .ReturnsAsync(weeklyAvailability);
             }
             else
             {
                 mockAvaRepo.Setup(x => x.GetPractitionerLookupForWeeks(FAKE_PRACTITIONER_ID, It.IsAny<int[]>()))
-                    .ReturnsAsync(new List<TimeslotAvailabilityDto>());
+                    .ReturnsAsync(weeklyAvailability);
             }
             // Return empty availability when not specified - a missing availability value for any week is reckoned as available
             mockAvaRepo.Setup(x => x.GetPractitionerLookupForIndef(FAKE_PRACTITIONER_ID))
                 .ReturnsAsync(indefAvailability);
             mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now))
                 .ReturnsAsync(appointments);
+            
+            mockTimeslotService.Setup(x => x.GetPopulatedFutureTimeslots()).ReturnsAsync(TimeslotHelper.GetPopulatedFutureTimeslots(now, timeslotList, DB_START_DATE, Int32.Parse(advanceWeeks)));
 
-            // TODO: Need to setup the timeslot service
             return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, 
                 mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object, 
-                new Mock<IRoomReservationService>().Object, new Mock<ITimeslotService>().Object, new Mock<ILogger<BookingService>>().Object);
+                new Mock<IRoomReservationService>().Object, mockTimeslotService.Object, new Mock<ILogger<BookingService>>().Object);
+        }
+
+        // Set everything as available when we don't care to test availability, i.e. just testing timeslots in isolaiton
+        // Setting indef to all available and weekly as an empty list will make all TSes available
+        private List<TimeslotAvailabilityDto>  GetAvailabilityLookup_AllAvailable(List<TimeslotDto> tsList, bool isIndefinite)
+        {
+            var ava = new List<TimeslotAvailabilityDto>(tsList.Count);
+            if (isIndefinite)
+            {
+                foreach (var ts in tsList)
+                {
+                    ava.Add(new TimeslotAvailabilityDto() { Availability = Enums.TimeslotAvailability.Available, TimeslotId = ts.Id, IsIndefinite = true, WeekNum = -1});
+                }
+            }
+
+            foreach (var ts in tsList)
+            {
+                 ava.Add(new TimeslotAvailabilityDto() { Availability = Enums.TimeslotAvailability.Available, TimeslotId = ts.Id, IsIndefinite = false, WeekNum = ts.WeekNum});
+            }
+            return ava.DistinctBy(x => x.TimeslotId).ToList();
         }
         
         //////////////////////////////////////////////////////////////////////////////// 
@@ -125,7 +149,7 @@ namespace HBK.Test
             var timeslotList = GenerateTimeslots(12, 15, DEFAULT_DURATION);
             
             // Instantiate booking service
-            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, new List<AppointmentDto>(), new Dictionary<int, TimeslotAvailabilityDto>(), weekNums);
+            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, new List<AppointmentDto>(), GetAvailabilityLookup_AllAvailable(timeslotList, true).ToDictionary(x => x.TimeslotId), new List<TimeslotAvailabilityDto>(), weekNums);
             
             // Act
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
@@ -161,7 +185,7 @@ namespace HBK.Test
             var timeslotList = GenerateTimeslots(09, 18, 30);
             
             // Instantiate booking service
-            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, new List<AppointmentDto>(), new Dictionary<int, TimeslotAvailabilityDto>(), null);
+            var bookingService = GetMockedBookingService(timeslotList, advanceWeeks, now, new List<AppointmentDto>(), GetAvailabilityLookup_AllAvailable(timeslotList, true).ToDictionary(x => x.TimeslotId), new List<TimeslotAvailabilityDto>(),null);
             
             // Act
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
@@ -169,7 +193,7 @@ namespace HBK.Test
             // Assert
             // number of Timeslots as expected?
             var actualTsCount = timeslots.Count; 
-            Assert.Equal(expectedTsCount, actualTsCount);
+            Assert.Equal(expectedTsCount, actualTsCount); // Note - currently broken, will require populated availability. Consider a method to make every Ts available, and other times make only some available
 
             // Weeknums as expected?
             var actualWeekNums = timeslots.Select(x => x.WeekNum).Distinct().ToArray();
@@ -199,8 +223,8 @@ namespace HBK.Test
             
             // Instantiate booking service
             // weekNum is 5 on the 2nd of Feb 
-            var bookingService = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , appointments, new Dictionary<int, TimeslotAvailabilityDto>());
-            var bookingServiceNoAppts = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , new List<AppointmentDto>(), new Dictionary<int, TimeslotAvailabilityDto>());
+            var bookingService = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , appointments, GetAvailabilityLookup_AllAvailable(timeslotList, true).ToDictionary(x => x.TimeslotId), new List<TimeslotAvailabilityDto>());
+            var bookingServiceNoAppts = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , new List<AppointmentDto>(), GetAvailabilityLookup_AllAvailable(timeslotList, true).ToDictionary(x => x.TimeslotId), new List<TimeslotAvailabilityDto>());
             
             // Act
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
@@ -234,7 +258,7 @@ namespace HBK.Test
             
             // Instantiate booking service
             // weekNum is 5 on the 2nd of Feb 
-            var bookingService = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , appointments, new Dictionary<int, TimeslotAvailabilityDto>());
+            var bookingService = GetMockedBookingService(timeslotList, "2", new DateTime(2024,01,29, 15,30, 00) , appointments, GetAvailabilityLookup_AllAvailable(timeslotList, true).ToDictionary(x => x.TimeslotId), new List<TimeslotAvailabilityDto>());
             
             // Act
             var timeslots = (await bookingService.GetAvailableTimeslotsClientView(FAKE_TREATMENT_ID)).AvailableTimeslots;
@@ -268,5 +292,6 @@ namespace HBK.Test
         
         // Ensure that per-week availability applies and only to the specified week
 
+         // TODO: Room booking as well.
     }
 }

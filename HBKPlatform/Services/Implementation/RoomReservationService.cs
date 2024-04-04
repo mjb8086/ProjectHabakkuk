@@ -212,7 +212,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         }
         
         // finally check the room availability
-        if (await _avaRepo.IsRoomUnavailableForWeekAnyTenancy(roomId, weekNum, timeslotId))
+        if (!await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomId, weekNum, timeslotId))
         {
             throw new TimeslotUnavailableException("The room is not available at this time.");
         }
@@ -247,7 +247,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             throw new DoubleBookingException("An appointment already exists in the room on this date and time. Cannot continue.");
         }
         // finally check the room availability
-        if (await _avaRepo.IsRoomUnavailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.TimeslotId))
+        if (!await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.TimeslotId))
         {
             throw new TimeslotUnavailableException("The room is not available at this time.");
         }
@@ -284,8 +284,8 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             {
                 return ava.Availability == Enums.TimeslotAvailability.Available;
             }
-            // else we know it is available
-            return true;
+            // else we know it is unavailable
+            return false;
         }
     
 }
