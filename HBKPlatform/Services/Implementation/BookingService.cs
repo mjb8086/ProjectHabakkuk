@@ -271,7 +271,7 @@ namespace HBKPlatform.Services.Implementation
             // first check for no clashes
             if (await ClashCheck(timeslotId, pracId, weekNum))
             {
-                throw new DoubleBookingException("Another appointment has already been booked into the timeslot.");
+                throw new DoubleBookingException("Cannot create a booking for this time. This is due either to another appointment currently booked on the same timeslot, or the timeslot is set to unavailable.");
             }
         
             if (roomResId.HasValue && roomResId.Value > 0)

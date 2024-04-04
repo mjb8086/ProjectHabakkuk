@@ -137,23 +137,22 @@ namespace HBKPlatform.Repository.Implementation
         }
 
         /// <summary>
-        /// For a room to be 'unavailable', it must either have an explicit Timeslot Availability of Unavailable, or
-        /// there is no availability record in the Db.
-        /// This method checks the DB for any 'available' availability on the timeslot, if there is, it will return false.
+        /// For a room to be 'available', it must either have an explicit Timeslot Availability of Available, 
+        /// This method checks the DB on the timeslot's weekly and indefinite availability, if there is, it will return true.
+        /// Precedence is given to Per-week.
         /// </summary>
-        public async Task<bool> IsRoomUnavailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId)
+        public async Task<bool> IsRoomAvailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId)
         {
             // Any per-week availability?
             var isPerWeekAvailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
                 x.TimeslotId == timeslotId && x.WeekNum == weekNum && x.RoomId == roomId &&
                 x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
+            if (isPerWeekAvailable) return true;
             
-            // If not, check Indef. If any Indef exists and is available, return false. Else true.
-             var isIndefAvailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
+            // If not, check Indef. 
+             return await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
                 x.TimeslotId == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
                 x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
-             
-             return !(isPerWeekAvailable || isIndefAvailable);
         }
         
         public async Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeksAnyTenancy(int roomId, int[] weekNums)
