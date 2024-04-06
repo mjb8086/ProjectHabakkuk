@@ -16,6 +16,7 @@ using HBKPlatform.Repository;
 using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
+using Microsoft.AspNetCore.HttpOverrides;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -128,19 +129,29 @@ try
     // END builder, create the webapp instance...
     var app = builder.Build();
     
-    // Seed DB with sample data and admin user if necessary.
+    // Autodeploy and Seed DB with sample data and admin user if necessary.
     using (var scope = app.Services.CreateScope())
     {
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        db.Database.Migrate();
         var services = scope.ServiceProvider;
         await SeedNFeed.Initialise(services, new PasswordHasher<User>());
     }
 
-    app.UseHttpsRedirection();
     app.UseStaticFiles();
     app.UseSerilogRequestLogging();
     app.UseRouting();
 
     // Register middleware
+    if (builder.Environment.IsDevelopment())
+    {
+        // Use header forwarding to Nginx when in production.
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
+    }
+
     app.UseMiddleware<TenancyMiddleware>();
     app.UseMiddleware<CentralScrutinizerMiddleware>();
 
@@ -166,7 +177,8 @@ try
         app.UseExceptionHandler("/Home/Error");
         // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
         app.UseHsts();
-        builder.WebHost.UseUrls("http://*:80", "https://*.443");
+        app.UseHttpsRedirection();
+        builder.WebHost.UseUrls("http://*:5000");
     }
     
     Log.Information("HBKPlatform startup complete.");

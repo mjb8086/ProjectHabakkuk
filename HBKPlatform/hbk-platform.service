@@ -3,7 +3,7 @@ Description=HBK Platform 1.0
 
 [Service]
 WorkingDirectory=/var/www/hbk-platform
-ExecStart=/usr/bin/dotnet /var/www/hbk-platform/hbk_main.dll
+ExecStart=/usr/bin/dotnet /var/www/hbk-platform/HBKPlatform.dll
 Restart=always
 # Restart service after 10 seconds if the dotnet service crashes:
 RestartSec=10
