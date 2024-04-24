@@ -17,6 +17,8 @@ using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Vite.AspNetCore;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -163,13 +165,19 @@ try
     app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
     app.MapRazorPages();
+    
+    builder.Services.AddViteServices();
+    builder.Services.AddViteManifest();
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
     {
         app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
+        // Debug page to list all routes, currently broken.
         app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
             string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
+        
+        builder.Services.AddViteDevMiddleware();
     }
     else // configure production
     {

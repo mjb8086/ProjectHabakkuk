@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "start": "echo Starting the development server && vite",
     "build": "vite build",
     "preview": "vite preview"
   },

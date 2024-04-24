@@ -20,5 +20,11 @@ namespace HBKPlatform.Areas.MyND.Controllers
         {
             return View(await practiceService.GetPractitionerReceptionModel());
         }
+        
+        [Route("/mynd/newui")]
+        public async Task<IActionResult> NewUI()
+        {
+            return View();
+        }
     }
 }
