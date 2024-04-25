@@ -9,12 +9,12 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NowDoctor - MyND</title>
-    <environment include="Development">
-        <script type="module" src="http://localhost:5173/@@vite/client"></script>
-        <script type="module" src="~/ui/mynd.js"></script>
+    <environment names="Development">
+        <script type="module" src="~/dist/@@vite/client"></script>
+        <script type="module" src="~/dist/js/mynd.js"></script>
     </environment>
   </head>
   <body>
-    <div id="myndAppRoot"></div>
+    <div id="app"></div>
   </body>
 </html>

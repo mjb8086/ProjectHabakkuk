@@ -6,7 +6,26 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base: '/dist/',
+  root: 'src',
+  build: {
+    outDir: '../../wwwroot/dist',
+    assetsDir: '',
+    emptyOutDir: true,
+    manifest: true,
+    rollupOptions: {
+      input: {
+        mynd: './src/mynd.js',
+        client: './src/client.js'
+      }
+    },
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+    hmr: {
+      clientPort: 5173
+    }
+  },
   plugins: [
     vue(),
     VueDevTools(),

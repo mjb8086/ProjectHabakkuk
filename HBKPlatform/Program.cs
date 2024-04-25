@@ -181,6 +181,7 @@ try
         builder.WebHost.UseUrls("http://*:5000");
     }
     
+    
     Log.Information("HBKPlatform startup complete.");
 
     app.Run();
