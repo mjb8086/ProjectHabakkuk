@@ -17,6 +17,8 @@ using HBKPlatform.Repository.Implementation;
 using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Rewrite;
+using Vite.AspNetCore;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -105,6 +107,7 @@ try
 
     // Add services to the container.
     builder.Services.AddControllersWithViews();
+    builder.Services.AddViteServices();
     
     // Add Hangfire services. This facilitates background tasks.
     builder.Services.AddHangfire(configuration => configuration
@@ -157,12 +160,16 @@ try
 
     app.UseAuthorization();
 
-    app.MapControllerRoute(name: "MCP", pattern: "{area:exists}/{controller=MCP}/{action=Index}/{id?}");
+    // Include mappings to pass all SPA routes to the right endpoints.
     app.MapControllerRoute(name: "MyND", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "Client", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
-
     app.MapRazorPages();
+
+    var options = new RewriteOptions()
+        .AddRewrite("^/mynd/newui/.*", "/mynd/newui/", skipRemainingRules: true)
+        .AddRewrite("^/clinic/newui/.*", "/clinic/newui/", skipRemainingRules: true);
+    app.UseRewriter(options);
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
@@ -170,6 +177,8 @@ try
         app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
         app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
             string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
+        
+        app.UseViteDevelopmentServer(true);
     }
     else // configure production
     {

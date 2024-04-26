@@ -1,12 +1,32 @@
 import './assets/main.css'
 
 import { createApp } from 'vue'
+import Consts from './lib/common/consts.js'
 import App from './App.vue'
-import router from './router'
 import 'vite/modulepreload-polyfill'
+import {createRouter, createWebHistory} from "vue-router";
+import HomeView from "@/views/HomeView.vue";
 
-const app = createApp(App)
+const app = createApp(App);
 
-app.use(router)
+app.use( createRouter({
+        history: createWebHistory(Consts.MYND_BASE_URL),
+        routes: [
+            {
+                path: '/',
+                name: 'home',
+                component: HomeView
+            },
+            {
+                path: '/about',
+                name: 'about',
+                // route level code-splitting
+                // this generates a separate chunk (About.[hash].js) for this route
+                // which is lazy-loaded when the route is visited.
+                component: () => import('./views/AboutView.vue')
+            }
+        ]
+    })
+);
 
-app.mount('#app')
+app.mount('#app');

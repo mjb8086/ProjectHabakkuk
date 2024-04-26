@@ -1,3 +1,4 @@
+@addTagHelper *, Vite.AspNetCore
 @{
     ViewBag.Title = "MyND";
   // does not inherit from old _Layout or _MyND
@@ -10,9 +11,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NowDoctor - MyND</title>
     <environment names="Development">
-        <script type="module" src="~/dist/@@vite/client"></script>
-        <script type="module" src="~/dist/js/mynd.js"></script>
+<!--      <script type="module" src="~/dist/@@vite/client"></script>
+      <script type="module" src="~/dist/js/mynd.js"></script> -->
     </environment>
+    <link rel="stylesheet" vite-href="~/mynd.js" asp-append-version="true" />
+    <script type="module" vite-src="~/mynd.js" asp-append-version="true"></script>
   </head>
   <body>
     <div id="app"></div>
