@@ -164,12 +164,11 @@ try
     app.MapControllerRoute(name: "MyND", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "Client", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
-    // Two alternatives, neither are in use because neither seem to do anything.
-/*    app.MapControllerRoute(
-        name: "MyNDSpa",
-        pattern: "/mynd/reception/newui/{*url}",
-        defaults: new {area="MyND", controller = "Reception", action = "NewUI"}
-    );*/
+    // Rewrite the SPA routes
+    app.MapControllerRoute( name: "MyNDSpa", pattern: "/mynd/ui/{*url}", 
+        defaults: new {area="MyND", controller = "Ui", action = "Index"} );
+    app.MapControllerRoute( name: "ClientSpa", pattern: "/client/ui/{*url}", 
+        defaults: new {area="Client", controller = "Ui", action = "Index"} );
     app.MapRazorPages();
 
     /*

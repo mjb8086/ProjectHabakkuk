@@ -7,11 +7,10 @@
 ******************************/
 
 using System.Diagnostics;
-using System.Text.Encodings.Web;
 using HBKPlatform.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace HBKPlatform.Areas.MyND.Controllers
+namespace HBKPlatform.Controllers
 {
     /// <summary>
     /// HBKPlatform Home Controller.

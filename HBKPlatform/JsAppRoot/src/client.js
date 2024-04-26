@@ -11,15 +11,15 @@ import './assets/main.css';
 
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import App from './App.vue';
+import ClientMain from './ClientMain.vue';
 import Consts from './lib/common/consts.js'
 import 'vite/modulepreload-polyfill';
 import HomeView from "@/views/HomeView.vue";
 
-const app = createApp(App);
+const client = createApp(ClientMain);
 
 // Set routing.
-app.use( createRouter({
+client.use( createRouter({
         history: createWebHistory(Consts.CLIENT_BASE_URL),
         routes: [
             {
@@ -37,5 +37,6 @@ app.use( createRouter({
         ]
     })
 );
-    
-app.mount('#app');
+
+// Inject it into the template that was served by Asp.Net
+client.mount('#app');

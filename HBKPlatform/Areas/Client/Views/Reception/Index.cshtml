@@ -7,6 +7,11 @@
 }
 
 <h2>Welcome to Reception.</h2>
+
+<div class="action-section" style="max-width: 800px; background-color: #c4d3ff">
+    <a asp-area="Client" asp-controller="Ui" asp-action="Index">Launch New UI</a>
+</div>
+
 <h3>Quick actions:</h3>
 <p><a asp-area="Client" asp-controller="Messaging" asp-action="Conversation" asp-route-pracId="@Model.PracId">Messaging with @Model.MyPracName</a> (@Model.NumUnreadMessages unread)</p>
 @if (!Model.SelfBookingEnabled)

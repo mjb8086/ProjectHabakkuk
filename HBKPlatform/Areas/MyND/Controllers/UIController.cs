@@ -5,20 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 namespace HBKPlatform.Areas.MyND.Controllers
 {
     /// <summary>
-    /// HBKPlatform MyND Reception Controller.
-    /// Default landing page and other related views.
+    /// HBKPlatform MyND New UI Controller.
+    /// Boot up the SPA and also ensure it receives the routes that match this index.
+    /// The things we do to tick the boxes imposed by modern web app dev, eh?
     /// 
     /// Author: Mark Brown
-    /// Authored: 13/12/2023
+    /// Authored: 26/04/2024
     /// 
-    /// © 2023 NowDoctor Ltd.
+    /// © 2024 NowDoctor Ltd.
     /// </summary>
     [Area("MyND"), Authorize(Roles="Practitioner")]
-    public class ReceptionController(IPracticeService practiceService): Controller
+    public class UIController(): Controller
     {
         public async Task<IActionResult> Index()
         {
-            return View(await practiceService.GetPractitionerReceptionModel());
+            return View();
         }
     }
 }
