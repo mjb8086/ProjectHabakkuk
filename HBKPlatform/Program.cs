@@ -164,12 +164,20 @@ try
     app.MapControllerRoute(name: "MyND", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "Client", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
+    // Two alternatives, neither are in use because neither seem to do anything.
+/*    app.MapControllerRoute(
+        name: "MyNDSpa",
+        pattern: "/mynd/reception/newui/{*url}",
+        defaults: new {area="MyND", controller = "Reception", action = "NewUI"}
+    );*/
     app.MapRazorPages();
 
+    /*
     var options = new RewriteOptions()
-        .AddRewrite("^/mynd/newui/.*", "/mynd/newui/", skipRemainingRules: true)
+        .AddRewrite("^/mynd/reception/newui/.*", "/mynd/reception/newui/", skipRemainingRules: true)
         .AddRewrite("^/clinic/newui/.*", "/clinic/newui/", skipRemainingRules: true);
     app.UseRewriter(options);
+*/
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
