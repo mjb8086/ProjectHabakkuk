@@ -157,6 +157,7 @@ try
 
     app.UseMiddleware<TenancyMiddleware>();
     app.UseMiddleware<CentralScrutinizerMiddleware>();
+    
 
     app.UseAuthorization();
 
@@ -176,11 +177,12 @@ try
         .AddRewrite("^/mynd/reception/newui/.*", "/mynd/reception/newui/", skipRemainingRules: true)
         .AddRewrite("^/clinic/newui/.*", "/clinic/newui/", skipRemainingRules: true);
     app.UseRewriter(options);
-*/
+    */
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
     {
+        // Use dev error screen with a more detailed message.
         app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
         app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
             string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
