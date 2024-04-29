@@ -5,6 +5,11 @@ import ToolingIcon from './icons/IconTooling.vue'
 import EcosystemIcon from './icons/IconEcosystem.vue'
 import CommunityIcon from './icons/IconCommunity.vue'
 import SupportIcon from './icons/IconSupport.vue'
+import Button from "primevue/button";
+
+function foo2u() {
+  console.log('fooooo cliucked');
+}
 </script>
 
 <template>
@@ -39,6 +44,7 @@ import SupportIcon from './icons/IconSupport.vue'
     <br />
 
     More instructions are available in <code>README.md</code>.
+    <Button label="Watson and Click" icon="pi pi-check" severity="help" @click="foo2u" />
   </WelcomeItem>
 
   <WelcomeItem>

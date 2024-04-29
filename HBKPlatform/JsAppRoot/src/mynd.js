@@ -9,15 +9,18 @@
  */
 import './assets/main.css';
 
-import { createApp } from 'vue';
-import Consts from './lib/common/consts.js';
-import MyNDMain from './MyNDMain.vue';
 import 'vite/modulepreload-polyfill';
+import { createApp } from 'vue';
 import {createRouter, createWebHistory} from "vue-router";
+import PrimeVue from 'primevue/config';
+
+import Consts from './lib/common/consts.js';
 import HomeView from "@/views/HomeView.vue";
+import MyNDMain from './MyNDMain.vue';
 
 const myNd = createApp(MyNDMain);
 
+myNd.use(PrimeVue);
 myNd.use( createRouter({
         history: createWebHistory(Consts.MYND_BASE_URL),
         routes: [
