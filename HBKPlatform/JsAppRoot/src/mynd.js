@@ -18,9 +18,12 @@ import Consts from './lib/common/consts.js';
 import HomeView from "@/views/HomeView.vue";
 import MyNDMain from './MyNDMain.vue';
 
+// Import global style including PrimeVue/Poseidon
+import '@/assets/styles.scss';
+
 const myNd = createApp(MyNDMain);
 
-myNd.use(PrimeVue, {});
+myNd.use(PrimeVue, { ripple: true });
 myNd.use( createRouter({
         history: createWebHistory(Consts.MYND_BASE_URL),
         routes: [
