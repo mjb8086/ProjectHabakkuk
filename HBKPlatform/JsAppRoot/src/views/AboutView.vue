@@ -1,6 +1,8 @@
 <template>
   <div class="about">
     <h1>This is an about page</h1>
+    <p>This is testing the public root.</p>
+    <p><img src="/ZA-WAURDO.jpg"/></p>
   </div>
 </template>
 

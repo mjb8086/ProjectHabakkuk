@@ -20,7 +20,7 @@ import MyNDMain from './MyNDMain.vue';
 
 const myNd = createApp(MyNDMain);
 
-myNd.use(PrimeVue);
+myNd.use(PrimeVue, {});
 myNd.use( createRouter({
         history: createWebHistory(Consts.MYND_BASE_URL),
         routes: [
