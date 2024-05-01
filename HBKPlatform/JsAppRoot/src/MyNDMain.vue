@@ -1,15 +1,16 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { RouterLink, RouterView } from 'vue-router';
+import HelloWorld from './mynd/components/HelloWorld.vue';
 </script>
 
 <template>
+  <h1>HEADER</h1>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <img alt="Vue logo" class="logo" src="@/common/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
       <h1>MyND View</h1>
-      <HelloWorld msg="You did it! The boys are back in town... :D" />
+      <HelloWorld msg="somewhat functional, but varus, where are my fonts??" />
 
       <nav>
         <RouterLink to="/">Home</RouterLink>

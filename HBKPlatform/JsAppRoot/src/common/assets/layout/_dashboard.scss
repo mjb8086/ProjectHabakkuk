@@ -1,0 +1,72 @@
+#order-tabs-container {
+    .order-tab {
+        h3 {
+            color: #949aa6;
+        }
+
+        background-color: color-mix(
+            in srgb,
+            var(--content-alt-bg-color) 30%,
+            transparent
+        );
+
+        &:hover {
+            background-color: color-mix(
+                in srgb,
+                var(--content-alt-bg-color) 50%,
+                transparent
+            );
+
+            h3 {
+                color: rgba(#2f8ee5, 0.6);
+            }
+        }
+
+        &.order-tab-active {
+            background-color: color-mix(
+                in srgb,
+                var(--content-alt-bg-color) 70%,
+                transparent
+            );
+            h3 {
+                color: #2f8ee5;
+            }
+        }
+    }
+}
+
+#traffic-tabs-container {
+    .traffic-tab {
+        background-color: var(--content-alt-bg-color);
+
+        &.traffic-tab-active {
+            background-color: var(--primary-600);
+        }
+    }
+}
+
+.overview-card {
+    .header-button {
+        background-color: rgba(148, 154, 166, 0.1);
+    }
+    .tooltip-wrapper {
+        position: relative;
+        span {
+            font-size: 12px;
+            min-width: 6px;
+            position: absolute;
+            padding: 1px;
+            border-radius: 2px;
+            background-color: var(--content-alt-bg-color);
+            top: -22px;
+            left: -4px;
+            display: none;
+            z-index: 2;
+        }
+        &:hover {
+            span {
+                display: block;
+            }
+        }
+    }
+}

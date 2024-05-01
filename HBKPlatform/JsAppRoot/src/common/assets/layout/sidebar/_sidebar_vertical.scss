@@ -1,0 +1,179 @@
+.layout-sidebar {
+    position: fixed;
+    height: calc(100% - 4rem);
+    margin-top: 4rem;
+    top: 0;
+    left: 0;
+    width: 18rem;
+    background: var(--menu-bg);
+    display: flex;
+    flex-direction: column;
+
+    .layout-menu-container {
+        overflow: auto;
+        flex: 1;
+        padding-bottom: 2rem;
+        background-color: var(--menu-bg);
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    .layout-menu {
+        margin: 0;
+        padding: 0 0 0 1.25rem;
+        list-style-type: none;
+
+        > li {
+            margin-bottom: 2.25rem;
+
+            &:first-child {
+                margin-top: 2rem;
+            }
+        }
+
+        .layout-root-menuitem {
+            > div {
+                margin-bottom: 0.5rem;
+                font-size: 12px;
+
+                &.layout-menuitem-root-text {
+                    color: var(--root-menuitem-text-color);
+                    font-size: 0.857rem;
+                    font-weight: 600;
+                    text-transform: uppercase;
+    
+                    > .layout-menuitem-root-icon {
+                        display: none;
+                    }
+                }
+            }
+
+            > a {
+                display: none;
+            }
+
+            ul {
+                li {
+                    overflow: hidden;
+                    border-bottom-left-radius: 8px;
+                    border-top-left-radius: 8px;
+                }
+            }
+
+            li {
+                margin-top: 0.5rem;
+            }
+        }
+
+        a {
+            user-select: none;
+        }
+
+        li.active-menuitem {
+            > a {
+                color: var(--active-menuitem-text-color);
+                background-color: var(--active-menuitem-bg);
+
+                .layout-menuitem-icon {
+                    color: var(--active-menuitem-text-color);
+                }
+
+                .layout-submenu-toggler {
+                    transform: rotate(-180deg);
+                }
+            }
+            > ul {
+                max-height: 1000px;
+                transition: max-height 1s ease-in-out;
+            }
+
+            &:has(.active-menuitem) {
+                li.active-menuitem {
+                    background-color: var(--active-menuitem-bg);
+
+                    > a {
+                        background-color: var(--menuitem-hover-bg);
+                    }
+                    
+                    .active-route {
+                        background-color: var(--menuitem-hover-bg);
+                    }
+                }
+            }
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+
+            a {
+                display: flex;
+                align-items: center;
+                position: relative;
+                outline: 0 none;
+                color: var(--menuitem-text-color);
+                cursor: pointer;
+                padding: 0.5rem 1rem;
+                transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
+
+                .layout-menuitem-icon {
+                    margin-right: 0.5rem;
+                    color: var(--menuitem-text-color);
+                }
+
+                .layout-submenu-toggler {
+                    font-size: 75%;
+                    margin-left: auto;
+                    transition: transform var(--transition-duration);
+                }
+
+                &:hover {
+                    background-color: var(--menuitem-hover-bg);
+                }
+            }
+
+            ul {
+                overflow: hidden;
+                border-radius: var(--border-radius);
+                max-height: 0;
+                transition: max-height 0.45s cubic-bezier(0.86, 0, 0.07, 1);
+
+                li {
+                    a {
+                        padding-left: 1.5rem;
+                    }
+
+                    li {
+                        a {
+                            padding-left: 2rem;
+                        }
+
+                        li {
+                            a {
+                                padding-left: 2.5rem;
+                            }
+
+                            li {
+                                a {
+                                    padding-left: 3rem;
+                                }
+
+                                li {
+                                    a {
+                                        padding-left: 3.5rem;
+                                    }
+
+                                    li {
+                                        a {
+                                            padding-left: 4rem;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

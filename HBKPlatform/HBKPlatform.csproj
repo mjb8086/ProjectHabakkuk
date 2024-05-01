@@ -35,12 +35,7 @@
     <Folder Include="HBK.Test\" />
     <Folder Include="JsAppRoot\src\client\" />
     <Folder Include="JsAppRoot\src\clinic\" />
-    <Folder Include="JsAppRoot\src\common\components\" />
-    <Folder Include="JsAppRoot\src\common\lib\" />
     <Folder Include="JsAppRoot\src\common\views\" />
-    <Folder Include="JsAppRoot\src\components\common\" />
-    <Folder Include="JsAppRoot\src\mynd\" />
-    <Folder Include="JsAppRoot\src\router\" />
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>

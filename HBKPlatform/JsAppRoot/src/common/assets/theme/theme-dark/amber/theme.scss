@@ -1,0 +1,10 @@
+$primaryLightColor: #F2CE8D;
+$primaryColor:#E5B56E;
+$primaryDarkColor: #D49341;
+$primaryDarkerColor: #B6742F;
+$primaryTextColor: #363E47;
+
+@import '../_variables';
+@import '../../theme-base/_components';
+@import '../_extensions';
+@import '../../extensions/_fullcalendar';

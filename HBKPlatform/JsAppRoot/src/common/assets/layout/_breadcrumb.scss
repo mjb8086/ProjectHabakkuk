@@ -1,0 +1,42 @@
+.layout-breadcrumb-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 2rem;
+    
+    .layout-breadcrumb {
+        ol {
+            display: flex;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            gap: .5rem;
+            flex-wrap: wrap;
+            color: var(--text-color-secondary);
+
+            li {
+                display: flex;
+                align-items: center;
+                font-size: 12px;
+                text-transform: uppercase;
+
+                span {
+                    font-size: .875rem;
+                    font-weight: 500;
+                    color: var(--text-color-secondary);
+                }
+            }
+        }
+    }
+    
+    .layout-breadcrumb-buttons {
+        display: flex;
+        align-items: center;
+        gap: .25rem;
+
+        button {
+            flex-shrink: 0;
+        }
+    }
+}

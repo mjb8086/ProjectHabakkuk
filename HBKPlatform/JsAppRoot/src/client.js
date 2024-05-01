@@ -7,14 +7,14 @@
  *  Configure and start the client UI here after login hands it off to Vue.Js
  *  © 2024 NowDoctor Ltd
  */
-import './assets/main.css';
+import '@/common/assets/main.css';
 
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import ClientMain from './ClientMain.vue';
-import Consts from './lib/common/consts.js'
+import Consts from '@/common/lib/consts.js'
 import 'vite/modulepreload-polyfill';
-import HomeView from "@/views/HomeView.vue";
+import HomeView from "@/mynd/views/HomeView.vue";
 
 const client = createApp(ClientMain);
 
