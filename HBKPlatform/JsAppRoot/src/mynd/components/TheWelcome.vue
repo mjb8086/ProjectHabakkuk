@@ -9,8 +9,7 @@ function foo2u() {
 
 <template>
   <WelcomeItem>
-    <template #icon>
-    </template>
+    <h2>Welcome to the New UI! This is Reception...</h2>
     <template #heading>Documentation</template>
 
     Vue’s

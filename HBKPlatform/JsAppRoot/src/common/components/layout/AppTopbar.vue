@@ -1,5 +1,6 @@
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
+import { useLayout } from '@/common/components/layout/layout.js';
+import Consts from '@/common/lib/consts.js';
 
 const { layoutConfig, isMobile, onMenuToggle, onRightPanelToggle } = useLayout();
 
@@ -16,7 +17,7 @@ const onMenuButtonClick = () => {
             </a>
             <router-link to="/">
                 <div class="layout-topbar-logo" id="logolink" style="cursor: pointer; outline: none">
-                    <img id="app-logo" alt="poseidon-layout" :src="'/layout/images/logo-' + (layoutConfig.topbarTheme.value === 'light' ? 'poseidon' : 'poseidon-dark') + '.png'" />
+                  <img id="app-logo" alt="poseidon-layout" :src="`/layout/images/${Consts.APP_LOGO}`" />
                 </div>
             </router-link>
             <a class="lg:hidden" v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'scalein', leaveToClass: 'hidden', leaveActiveClass: 'fadeout', hideOnOutsideClick: true }">
@@ -28,8 +29,8 @@ const onMenuButtonClick = () => {
                         <div class="flex gap-3 p-3 bg-primary-600">
                             <img src="/layout/images/avatar-profile.png" alt="demo" />
                             <div class="flex flex-column cursor-pointer">
-                                <span class="font-semibold text-white">Peter Taylor</span>
-                                <span class="text-xs font-normal text-white">Webmaster</span>
+                                <span class="font-semibold text-white">NAME HERE???</span>
+                                <span class="text-xs font-normal text-white">ROLE HERE</span>
                             </div>
                         </div>
                     </li>
@@ -158,7 +159,6 @@ const onMenuButtonClick = () => {
                                 </li>
                                 <li>
                                     <a class="cursor-pointer flex align-items-center px-3 py-2 gap-3 hover:text-primary">
-                                        <img src="/demo/images/dashboard/leader-1.png" class="w-2rem h-2rem" />
                                         <div>
                                             <h6 class="m-0 font-semibold">Hey! I sent the sales report</h6>
                                             <span class="text-sm text-700">Dusana Semenov</span>
@@ -167,7 +167,6 @@ const onMenuButtonClick = () => {
                                 </li>
                                 <li>
                                     <a class="cursor-pointer flex align-items-center px-3 py-2 gap-3 hover:text-primary">
-                                        <img src="/demo/images/dashboard/leader-2.png" class="w-2rem h-2rem" />
                                         <div>
                                             <h6 class="m-0 font-semibold">OK. Let’s meet at 15 pm...</h6>
                                             <span class="text-sm text-700">Edward Lindgren</span>
@@ -176,7 +175,6 @@ const onMenuButtonClick = () => {
                                 </li>
                                 <li>
                                     <a class="cursor-pointer flex align-items-center px-3 py-2 gap-3 hover:text-primary">
-                                        <img src="/demo/images/dashboard/leader-3.png" class="w-2rem h-2rem" />
                                         <div>
                                             <h6 class="m-0 font-semibold">Presentation is ready</h6>
                                             <span class="text-sm text-700">Noell Blue</span>
@@ -185,7 +183,6 @@ const onMenuButtonClick = () => {
                                 </li>
                                 <li>
                                     <a class="cursor-pointer flex align-items-center px-3 py-2 gap-3 hover:text-primary">
-                                        <img src="/demo/images/dashboard/leader-4.png" class="w-2rem h-2rem" />
                                         <div>
                                             <h6 class="m-0 font-semibold">Faulty delivery on #959</h6>
                                             <span class="text-sm text-700">Gvozden Boskovsky</span>
@@ -244,8 +241,8 @@ const onMenuButtonClick = () => {
                             <div class="flex gap-2">
                                 <img src="/layout/images/avatar-profile.png" alt="demo" />
                                 <div class="flex flex-column">
-                                    <span class="font-semibold">Peter Taylor</span>
-                                    <span class="text-sm">Webmaster</span>
+                                    <span class="font-semibold">Name Here??</span>
+                                    <span class="text-sm">wangmeister</span>
                                 </div>
                             </div>
                         </a>
@@ -255,8 +252,8 @@ const onMenuButtonClick = () => {
                                     <div class="flex gap-3 p-3 bg-primary-600">
                                         <img src="/layout/images/avatar-profile.png" alt="demo" />
                                         <div class="flex flex-column cursor-pointer">
-                                            <span class="font-semibold text-white">Peter Taylor</span>
-                                            <span class="text-xs font-normal text-white">Webmaster</span>
+                                            <span class="font-semibold text-white">Name HERE</span>
+                                            <span class="text-xs font-normal text-white">wangmeister</span>
                                         </div>
                                     </div>
                                 </li>

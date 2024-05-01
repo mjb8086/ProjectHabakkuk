@@ -23,6 +23,9 @@ import '@/common/assets/theme/theme-light/denim/theme.css'; // other options exi
 //import '@/common/assets/main.css'; // vue default style - remove when appropriate
 import '@/common/assets/styles.scss';
 
+// Assign Logo to be used by common AppTopbar
+Consts.APP_LOGO = Consts.LOGO_MYND;
+
 const myNd = createApp(MyNDMain);
 
 myNd.use(PrimeVue, { ripple: true });
