@@ -27,13 +27,13 @@ const model = ref([
             {
                 label: 'Availability Management',
                 icon: 'pi pi-fw pi-calendar-clock',
-                to: '/appointments/availability',
+                to: '/appointments/availability-management',
                 colour: '#b9f6c2'
             },
             {
                 label: 'Treatment Management',
                 icon: 'pi pi-fw pi-money-bill',
-                to: '/appointments/treatments',
+                to: '/appointments/treatment-management',
                 colour: '#7973f6'
             }]
     },
@@ -44,13 +44,13 @@ const model = ref([
         {
           label: 'My Reservations',
           icon: 'pi pi-fw pi-warehouse',
-          to: '/room-reservation/overview',
+          to: '/reservations/my-reservations',
           colour: '#b0fbba'
         },
         {
           label: 'Make A Reservation',
           icon: 'pi pi-fw pi-ticket',
-          to: '/room-reservation/make',
+          to: '/reservations/make',
           colour: '#bab0fb'
         }]
     },
@@ -101,7 +101,7 @@ const model = ref([
         {
           label: 'My Personal Details',
           icon: 'pi pi-fw pi-user',
-          to: '/configuration/personal',
+          to: '/configuration/personal-details',
           colour: '#d2a7fd'
         },
         {

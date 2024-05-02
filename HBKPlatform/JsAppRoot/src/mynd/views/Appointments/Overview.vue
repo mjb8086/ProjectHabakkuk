@@ -1,9 +1,6 @@
 <template>
   <div class="about">
-    <h1>This is a sample page showing useful info.</h1>
-      <div>
-        Id is this {{ $route.params.id }}
-      </div>
+    <h1>Appointment Overview</h1>
   </div>
 </template>
 
