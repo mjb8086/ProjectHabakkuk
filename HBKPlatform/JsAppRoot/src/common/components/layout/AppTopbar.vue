@@ -1,5 +1,6 @@
 <script setup>
 import { useLayout } from '@/common/components/layout/layout.js';
+import { CurrentUserData } from '@/common/lib/globals.js';
 import Consts from '@/common/lib/consts.js';
 
 const { layoutConfig, isMobile, onMenuToggle, onRightPanelToggle } = useLayout();
@@ -7,6 +8,8 @@ const { layoutConfig, isMobile, onMenuToggle, onRightPanelToggle } = useLayout()
 const onMenuButtonClick = () => {
     onMenuToggle();
 };
+
+
 </script>
 
 <template>
@@ -239,10 +242,10 @@ const onMenuButtonClick = () => {
                     <li class="layout-topbar-profile">
                         <a v-if="!isMobile" class="p-ripple" v-ripple v-styleclass="{ selector: '@next', enterFromClass: 'hidden', enterActiveClass: 'scalein', leaveToClass: 'hidden', leaveActiveClass: 'fadeout', hideOnOutsideClick: true }">
                             <div class="flex gap-2">
-                                <img src="/layout/images/avatar-profile.png" alt="demo" />
+                                <img :src="CurrentUserData.profilePicUrl" alt="demo" />
                                 <div class="flex flex-column">
-                                    <span class="font-semibold">Name Here??</span>
-                                    <span class="text-sm">wangmeister</span>
+                                    <span class="font-semibold">{{CurrentUserData.fullUserName}}</span>
+                                    <span class="text-sm">{{CurrentUserData.roleName}}</span>
                                 </div>
                             </div>
                         </a>
@@ -253,7 +256,7 @@ const onMenuButtonClick = () => {
                                         <img src="/layout/images/avatar-profile.png" alt="demo" />
                                         <div class="flex flex-column cursor-pointer">
                                             <span class="font-semibold text-white">Name HERE</span>
-                                            <span class="text-xs font-normal text-white">wangmeister</span>
+                                            <span class="text-xs font-normal text-white">big boss</span>
                                         </div>
                                     </div>
                                 </li>

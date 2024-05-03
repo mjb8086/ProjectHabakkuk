@@ -1,10 +1,10 @@
 using System.Security.Claims;
-using HBKPlatform.Database;
 using HBKPlatform.Exceptions;
+using HBKPlatform.Globals;
+using HBKPlatform.Models.API.Common;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View.MCP;
 using HBKPlatform.Repository;
-using Microsoft.EntityFrameworkCore;
 
 namespace HBKPlatform.Services.Implementation
 {
@@ -18,7 +18,7 @@ namespace HBKPlatform.Services.Implementation
     /// © 2023 NowDoctor Ltd.
     /// </summary>
     public class UserService(IHttpContextAccessor _httpContext, IUserRepository _userRepo, IMcpRepository _mcpRepo, 
-        ILogger<UserService> _logger) : IUserService
+        ILogger<UserService> _logger, ICacheService _cache) : IUserService
     {
         
         /// <summary>
@@ -80,6 +80,38 @@ namespace HBKPlatform.Services.Implementation
             }
             _logger.LogWarning($"User {_httpContext.HttpContext?.User.FindFirstValue(ClaimTypes.NameIdentifier)} attempted to retrieve missing claim: {claim}");
             return -1;
+        }
+
+        public async Task<UserData> GetCurrentUserData()
+        {
+            // determine user type
+            var claims = _httpContext.HttpContext?.User.Claims.ToArray() ?? 
+                         throw new InvalidUserOperationException("User must be logged in to retrieve a claim.");
+
+            var userData = new UserData();
+            foreach (var claim in claims)
+            {
+                if (string.IsNullOrWhiteSpace(claim.Value)) continue;
+                switch (claim.Type)
+                {
+                    case "PractitionerId":
+                        var pracData = _cache.GetPractitionerDetailsLite(Int32.Parse(claim.Value));
+                        userData.FullUserName = pracData.Name;
+                        userData.RoleName = "Practitioner";
+                        userData.ProfilePicUrl = string.IsNullOrWhiteSpace(pracData.Img) ? DefaultSettings.DEFAULT_PIC_URL : pracData.Img;
+                        break;
+                    case "ClientId":
+                        var clientData = _cache.GetClientDetailsLite(Int32.Parse(claim.Value));
+                        userData.FullUserName = clientData.Name;
+                        userData.RoleName = "Client";
+                        userData.ProfilePicUrl = string.IsNullOrWhiteSpace(clientData.Img) ? DefaultSettings.DEFAULT_PIC_URL : clientData.Img;
+                        break;
+                    default: continue;
+                    // TODO: Handle others
+                }
+            }
+            
+            return userData;
         }
     
     }

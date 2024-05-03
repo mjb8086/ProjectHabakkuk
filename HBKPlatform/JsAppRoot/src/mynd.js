@@ -14,6 +14,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import PrimeVue from 'primevue/config';
 
 import Consts from '@/common/lib/consts.js';
+import {CurrentUserData} from '@/common/lib/globals.js';
 import ReceptionView from "@/mynd/views/ReceptionView.vue";
 import MyNDMain from '@/MyNDMain.vue';
 
@@ -22,9 +23,13 @@ import '@/common/assets/theme/theme-light/denim/theme.css'; // other options exi
 // Import global style including PrimeVue/Poseidon
 //import '@/common/assets/main.css'; // vue default style - remove when appropriate
 import '@/common/assets/styles.scss';
+import {getCurrentUserData} from "@/common/lib/api/user.js";
 
 // Assign Logo to be used by common AppTopbar
 Consts.APP_LOGO = Consts.LOGO_MYND;
+
+// Fetch current user data
+CurrentUserData.value = await getCurrentUserData();
 
 const myNd = createApp(MyNDMain);
 

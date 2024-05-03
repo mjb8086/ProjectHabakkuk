@@ -157,20 +157,22 @@ try
 
     app.UseMiddleware<TenancyMiddleware>();
     app.UseMiddleware<CentralScrutinizerMiddleware>();
-    
 
     app.UseAuthorization();
 
+    // Configure the HTTP request pipeline.
     // Include mappings to pass all SPA routes to the right endpoints.
     app.MapControllerRoute(name: "MyND", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
     app.MapControllerRoute(name: "Client", pattern: "{area:exists}/{controller=Reception}/{action=Index}/{id?}");
-    app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
     // Rewrite the SPA routes
     app.MapControllerRoute( name: "MyNDSpa", pattern: "/mynd/ui/{*url}", 
         defaults: new {area="MyND", controller = "Ui", action = "Index"} );
     app.MapControllerRoute( name: "ClientSpa", pattern: "/client/ui/{*url}", 
         defaults: new {area="Client", controller = "Ui", action = "Index"} );
+    
+    app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
     app.MapRazorPages();
+    app.MapControllers(); // will fill in routes as declared in decorators - use these for the API
 
     /*
     var options = new RewriteOptions()
@@ -179,11 +181,11 @@ try
     app.UseRewriter(options);
     */
 
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment()) // configure for dev environment, enable all routes listing 
+    if (app.Environment.IsDevelopment()) // configure for dev environment
     {
         // Use dev error screen with a more detailed message.
         app.UseStatusCodePagesWithReExecute("/Home/ErrorDev", "?statusCode={0}");
+        // enable all routes listing 
         app.MapGet("/debug/routes", (IEnumerable<EndpointDataSource> endpointSources) =>
             string.Join("\n", endpointSources.SelectMany(source => source.Endpoints)).ToLower());
         
@@ -198,7 +200,6 @@ try
         app.UseHttpsRedirection();
         builder.WebHost.UseUrls("http://*:5000");
     }
-    
     
     Log.Information("HBKPlatform startup complete.");
 

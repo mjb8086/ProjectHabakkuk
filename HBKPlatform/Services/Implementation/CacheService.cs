@@ -8,7 +8,9 @@ namespace HBKPlatform.Services.Implementation
 {
     /// <summary>
     /// HBKPlatform Cache service.
+    /// 
     /// Fast lookups for oft'needed data
+    /// it will be correct, inshallah
     /// 
     /// Author: Mark Brown
     /// Authored: 04/01/2024
@@ -17,7 +19,7 @@ namespace HBKPlatform.Services.Implementation
     /// </summary>
     public class CacheService(ApplicationDbContext _db, IMemoryCache _memoryCache, ITenancyService _tenancy, ILogger<CacheService> _logger): ICacheService
     {
-        // Default policy: All values will be evicted after 1 day
+        // Default policy: All values will be evicted after 1 day. Pay up or get out. That's just life in the city.
         private static readonly MemoryCacheEntryOptions CacheEntryOptions = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromDays(1));
         private int TenancyId = _tenancy.TenancyId;
     
@@ -59,7 +61,8 @@ namespace HBKPlatform.Services.Implementation
             if (practitioner == null) throw new IdxNotFoundException($"No practitioner of id {pracId} exists");
         
             practitionerDetails = new PractitionerDetailsLite()
-                { Id = practitioner.Id, Name = $"{practitioner.Forename} {practitioner.Surname}", PracticeId = practitioner.PracticeId };
+                { Id = practitioner.Id, Name = $"{practitioner.Forename} {practitioner.Surname}", 
+                    PracticeId = practitioner.PracticeId, Img = practitioner.Img};
             _memoryCache.Set(key, practitionerDetails, CacheEntryOptions);
             return practitionerDetails;
         }
@@ -79,7 +82,10 @@ namespace HBKPlatform.Services.Implementation
             if (client == null) throw new IdxNotFoundException($"No client of id {clientId} exists");
         
             clientDetails = new ClientDetailsLite()
-                { Id = client.Id, Name = $"{client.Forename} {client.Surname}", PracticeId = client.PracticeId };
+            {
+                Id = client.Id, Name = $"{client.Forename} {client.Surname}", PracticeId = client.PracticeId,
+                Img = client.Img
+            };
             _memoryCache.Set(key, clientDetails, CacheEntryOptions);
             return clientDetails;
         }

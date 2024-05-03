@@ -7,6 +7,7 @@ namespace HBKPlatform.Models.DTO
         public string Name { get; set; }
         public int Id { get; set; }
         public int PracticeId { get; set; }
+        public string? Img { get; set; }
     }
 
     public class PractitionerDetailsLite
@@ -14,6 +15,7 @@ namespace HBKPlatform.Models.DTO
         public string Name { get; set; }
         public int Id { get; set; }
         public int PracticeId { get; set; }
+        public string? Img { get; set; }
     }
 
     public class UserDetailsUac : PractitionerDetailsLite

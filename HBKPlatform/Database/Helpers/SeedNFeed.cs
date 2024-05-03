@@ -125,7 +125,7 @@ namespace HBKPlatform.Database.Helpers
                         ClientBio = "inventor of the flux capacitor",
                         Location = "hill valley",
                         DateOfBirth = new DateOnly(1932, 07, 08),
-                        Img = new string("samples/brown.jpg"),
+                        Img = new string("/samples/brown.jpg"),
                         User = user1,
                         GmcNumber = "foo",
                         Tenancy = t
@@ -139,7 +139,7 @@ namespace HBKPlatform.Database.Helpers
                         ClientBio = "layabout",
                         Location = "the pub",
                         DateOfBirth = new DateOnly(1992, 07, 08),
-                        Img = new string("samples/second.jpg"),
+                        Img = new string("/samples/second.jpg"),
                         Tenancy = t,
                         GmcNumber = "foo",
                         User =  new ()
@@ -186,7 +186,7 @@ namespace HBKPlatform.Database.Helpers
                         Title = Enums.Title.Mr,
                         Address = "a garage",
                         DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = new string("samples/marty.jpg"),
+                        Img = new string("/samples/marty.jpg"),
                         Telephone = "999",
                         User = client1User,
                         Tenancy = t
@@ -214,7 +214,7 @@ namespace HBKPlatform.Database.Helpers
                         Title = Enums.Title.Mr,
                         Address = "A big house somewhere",
                         DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = "samples/biff.jpg",
+                        Img = "/samples/biff.jpg",
                         Telephone = "299",
                         User = client2User,
                         Tenancy = t
@@ -463,7 +463,7 @@ namespace HBKPlatform.Database.Helpers
                         Title = Enums.Title.Mr,
                         Address = "south park",
                         DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = "samples/herbertg.jpg",
+                        Img = "/samples/herbertg.jpg",
                         Telephone = "28228282",
                         Tenancy = t2,
                         User =  new() {
@@ -494,7 +494,7 @@ namespace HBKPlatform.Database.Helpers
                         Surname = "Claypool",
                         Title = Enums.Title.Mr,
                         DateOfBirth = new DateOnly(1968, 07, 08),
-                        Img = "samples/les.jpg",
+                        Img = "/samples/les.jpg",
                         Tenancy = t2,
                         User = new() {
                             Email = client3Email,
