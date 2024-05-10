@@ -8,7 +8,7 @@ namespace HBKPlatform.Areas.Clinic.Controllers;
 
 /// <summary>
 /// HBKPlatform Clinic Reservation Controller.
-/// Accept or reject practitioner reservations through this cont.
+/// Accept or reject practitioner reservations through this controller.
 /// 
 /// Author: Mark Brown
 /// Authored: 20/03/2024
@@ -33,7 +33,7 @@ public class ReservationController(IRoomReservationService _roomRes): Controller
     public async Task<IActionResult> DenyReservation(int reservationId)
     {
         await _roomRes.DenyReservation(reservationId);
-        TempData["Message"] = $"Reservation request has been DENIED.";
+        TempData["Message"] = $"Reservation request has been denied.";
         return RedirectToRoute(new { area = "Clinic", controller = "Reservation", action = "Index" });
     }
     

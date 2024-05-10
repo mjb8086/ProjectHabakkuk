@@ -24,11 +24,14 @@ namespace HBKPlatform.Models.DTO
         public DateTimeOffset? LockoutEnd { get; set; }
     }
 
-    public struct ClientRecordLite
+    public class ClientRecordLite
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public DateTime Date { get; set; }
+        public string DisplayDate { get; set; }
+        public int ClientId { get; set; }
+        public string ClientName { get; set; }
         public Enums.RecordVisibility Visibility { get; set; }
         public bool IsPriority { get; set; }
     }

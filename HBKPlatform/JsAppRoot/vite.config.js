@@ -4,6 +4,10 @@ import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import VueDevTools from 'vite-plugin-vue-devtools';
 
+// The following enable auto-import of Vite components:
+import Components from 'unplugin-vue-components/vite';
+import {PrimeVueResolver} from 'unplugin-vue-components/resolvers';
+
 // https://vitejs.dev/config/
 export default defineConfig (({ command, mode, isSsrBuild, isPreview }) => {
     const commonConfig = {
@@ -29,6 +33,10 @@ export default defineConfig (({ command, mode, isSsrBuild, isPreview }) => {
       plugins: [
         vue(),
         VueDevTools(),
+        Components({
+          resolvers: [
+            PrimeVueResolver()
+          ]})
       ],
       resolve: {
         alias: {

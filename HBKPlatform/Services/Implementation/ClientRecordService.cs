@@ -1,3 +1,4 @@
+using HBKPlatform.Helpers;
 using HBKPlatform.Models.DTO;
 using HBKPlatform.Models.View;
 using HBKPlatform.Models.View.MyND;
@@ -31,6 +32,17 @@ namespace HBKPlatform.Services.Implementation
                 ClientId = clientId,
                 ClientRecordList = await _recordRepo.GetClientRecordsLite(clientId)
             };
+        }
+
+        public async Task<List<ClientRecordLite>> GetPopulatedLiteRecords(bool isPriority)
+        {
+            var liteRecords = await _recordRepo.GetRecordsLite(isPriority);
+            foreach (var record in liteRecords)
+            {
+                record.ClientName = _cache.GetClientName(record.ClientId);
+                record.DisplayDate = DateTimeHelper.GetFriendlyDateTimeString(record.Date);
+            }
+            return liteRecords;
         }
 
         public async Task<FullClientRecordDto> GetClientRecord(int? recordId, int? clientId)

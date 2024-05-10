@@ -80,15 +80,17 @@ namespace HBKPlatform.Repository.Implementation
         /// Get upcoming appointments for the practitionerId.
         /// TODO: Return only timeslots for booking clash checking
         /// </summary>
-        public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now)
+        public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now, bool liveOnly)
         {
             var query = _db.Appointments.Include("Timeslot");
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+
+            if (liveOnly) query = query.Where(x => x.Status == Enums.AppointmentStatus.Live);
         
             return await query 
-                .Where(x => x.PractitionerId == pracId && x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+                .Where(x => x.PractitionerId == pracId && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {

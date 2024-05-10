@@ -14,7 +14,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import ClientMain from './ClientMain.vue';
 import Consts from '@/common/lib/consts.js'
 import 'vite/modulepreload-polyfill';
-import HomeView from "@/mynd/views/HomeView.vue";
 
 const client = createApp(ClientMain);
 
@@ -25,14 +24,14 @@ client.use( createRouter({
             {
                 path: '/',
                 name: 'home',
-                component: HomeView
+//                component: HomeView
             },
             {
                 path: '/about',
                 name: 'about',
                 // route level code-splitting - this generates a separate chunk (About.[hash].js) for this route
                 // which is lazy-loaded when the route is visited.
-                component: () => import('/views/AboutView.vue')
+//                component: () => import('/views/AboutView.vue')
             }
         ]
     })

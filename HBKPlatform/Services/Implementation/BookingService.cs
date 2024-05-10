@@ -153,9 +153,9 @@ namespace HBKPlatform.Services.Implementation
             return appointments;
         }
     
-        public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId, Enums.AppointmentStatus? status = null)
+        public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId, bool liveOnly)
         {
-            var appointments = await _appointmentRepo.GetAppointmentsForPractitioner(pracId, status);
+            var appointments = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, liveOnly);
             var treatments = await _cacheService.GetTreatments();
             var dbStartDate = await _config.GetSettingOrDefault("DbStartDate");
         
@@ -181,7 +181,7 @@ namespace HBKPlatform.Services.Implementation
             var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
-            var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"));
+            var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"), false);
             return new UpcomingAppointmentsView()
             {
                 UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))).ToList(),

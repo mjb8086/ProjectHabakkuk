@@ -1,4 +1,5 @@
 using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
 using HBKPlatform.Models.API.MyND;
 using HBKPlatform.Repository;
 
@@ -14,7 +15,7 @@ namespace HBKPlatform.Services.Implementation;
 /// </summary>
 
 public class ReceptionService(IBookingService _bookingService, IUserService _userService, IConfigurationService _config, 
-    IAppointmentRepository _appointmentRepo, IRecordRepository _recordRepo, IClientRepository _clientRepo) : IReceptionService
+    IAppointmentRepository _appointmentRepo, IClientRecordService _recordService, IClientRepository _clientRepo, IRoomReservationService _roomResService) : IReceptionService
 {
     public async Task<ReceptionSummaryData> GetReceptionSummaryData()
     {
@@ -22,7 +23,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var now = DateTime.UtcNow;
         
-        var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId);
+        var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId, false);
         var model = new ReceptionSummaryData()
         {
             UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live).ToList(),
@@ -30,7 +31,8 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
                 appts.Where(x => x.Status is Enums.AppointmentStatus.CancelledByClient or Enums.AppointmentStatus.
                     CancelledByPractitioner).ToList(),
             NumAppointmentsCompleted = await _appointmentRepo.GetNumberOfCompletedAppointments(pracId, dbStartDate, now),
-            PriorityItems = await _recordRepo.GetClientRecordsLite(pracId, true),
+            PriorityItems = await _recordService.GetPopulatedLiteRecords(true),
+            RoomReservations = await _roomResService.GetHeldReservationsPractitioner(),
             NumClientsRegistered = _clientRepo.GetClientCount()
         };
         
