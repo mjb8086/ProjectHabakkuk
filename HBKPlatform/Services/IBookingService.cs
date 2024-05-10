@@ -9,7 +9,7 @@ namespace HBKPlatform.Services
     {
         public Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId);
         public Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId);
-        public Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId);
+        public Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId, Enums.AppointmentStatus? status = null);
         public Task<UpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView();
         public Task<ClientUpcomingAppointmentsView> GetClientUpcomingAppointmentsView();
         public Task<BookingConfirm> GetBookingConfirmModel(PractitionerBookingFormModel model);

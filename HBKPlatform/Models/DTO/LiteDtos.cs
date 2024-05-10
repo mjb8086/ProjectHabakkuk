@@ -86,5 +86,16 @@ namespace HBKPlatform.Models.DTO
         public string Name { get; set; }
         public int Id { get; set; }
     }
+
+    public class AppointmentLite
+    {
+        public string DateString { get; set; }
+        public string TimeString { get; set; }
+        public string ClientName { get; set; }
+        public string PractitionerName { get; set; }
+        public string TreatmentTitle { get; set; }
+        public string? RoomDetails { get; set; }
+        public Enums.AppointmentStatus Status { get; set; }
+    }
     
 }

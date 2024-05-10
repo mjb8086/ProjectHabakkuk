@@ -19,7 +19,7 @@ namespace HBKPlatform.Globals
 
         /// <summary>
         /// Check whether a new setting key is valid. Uses the default setting dictionary to ensure that every key
-        /// will have a default.
+        /// will map to a default.
         /// </summary>
         public static bool IsSettingKeyValid(string key)
         {

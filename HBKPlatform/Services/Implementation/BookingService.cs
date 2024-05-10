@@ -153,9 +153,9 @@ namespace HBKPlatform.Services.Implementation
             return appointments;
         }
     
-        public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId)
+        public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId, Enums.AppointmentStatus? status = null)
         {
-            var appointments = await _appointmentRepo.GetAppointmentsForPractitioner(pracId);
+            var appointments = await _appointmentRepo.GetAppointmentsForPractitioner(pracId, status);
             var treatments = await _cacheService.GetTreatments();
             var dbStartDate = await _config.GetSettingOrDefault("DbStartDate");
         
@@ -173,6 +173,7 @@ namespace HBKPlatform.Services.Implementation
             return appointments;
         }
 
+        // TO DEPRECATE
         public async Task<UpcomingAppointmentsView> GetMyNDUpcomingAppointmentsView()
         {
             var now = DateTime.UtcNow;
@@ -189,6 +190,7 @@ namespace HBKPlatform.Services.Implementation
             };
         }
     
+        // TO DEPRECATE
         public async Task<ClientUpcomingAppointmentsView> GetClientUpcomingAppointmentsView()
         {
             return new ClientUpcomingAppointmentsView()

@@ -22,9 +22,11 @@ namespace HBKPlatform.Repository.Implementation
                 .AsNoTracking().FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Record Id {recordId} not found.");
         }
 
-        public async Task<List<ClientRecordLite>> GetClientRecordsLite(int clientId)
+        public async Task<List<ClientRecordLite>> GetClientRecordsLite(int clientId, bool priorityOnly)
         {
-            return await _db.ClientRecords.Where(x => x.ClientId == clientId).Select(x => new ClientRecordLite()
+            IQueryable<ClientRecord> query = _db.ClientRecords;
+            if (priorityOnly) query = query.Where(x => x.IsPriority);
+            return await query.Where(x => x.ClientId == clientId).Select(x => new ClientRecordLite()
             {
                 Id = x.Id, Date = x.DateCreated, Title = x.Title, Visibility = x.RecordVisibility, IsPriority = x.IsPriority
             }).ToListAsync();

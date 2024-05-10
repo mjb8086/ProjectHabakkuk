@@ -20,7 +20,7 @@ const client = createApp(ClientMain);
 
 // Set routing.
 client.use( createRouter({
-        history: createWebHistory(Consts.CLIENT_BASE_URL),
+        history: createWebHistory(Consts.CLIENT_BASE_PATH),
         routes: [
             {
                 path: '/',

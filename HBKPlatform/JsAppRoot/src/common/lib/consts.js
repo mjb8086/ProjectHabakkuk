@@ -1,7 +1,7 @@
 const Consts = {
-    // The baseURLs need to match the routes in Program.cs
-    CLIENT_BASE_URL : '/client/ui',
-    MYND_BASE_URL : '/mynd/ui',
+    // The basePaths need to match the routes in Program.cs
+    CLIENT_BASE_PATH : '/client/ui',
+    MYND_BASE_PATH : '/mynd/ui',
     // App logos
     LOGO_MYND: 'MyNDLogo1.png',
     LOGO_CLINIC: 'NDClinicLogo1.png',
@@ -10,3 +10,4 @@ const Consts = {
 };
 
 export default Consts;
+export const API_BASE = import.meta.env.VITE_API_BASE;

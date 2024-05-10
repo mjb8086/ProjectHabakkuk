@@ -5,11 +5,10 @@ import Consts from '@/common/lib/consts.js';
 
 const { layoutConfig, isMobile, onMenuToggle, onRightPanelToggle } = useLayout();
 
+console.log(' base url: ' + import.meta.env.BASE_URL);
 const onMenuButtonClick = () => {
     onMenuToggle();
 };
-
-
 </script>
 
 <template>

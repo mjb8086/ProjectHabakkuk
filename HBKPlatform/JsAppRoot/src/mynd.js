@@ -37,7 +37,7 @@ myNd.use(PrimeVue, { ripple: true });
 
 // Routing. Don't forget to append the new routes to MyNDMenu if appropriate.
 myNd.use( createRouter({
-        history: createWebHistory(Consts.MYND_BASE_URL),
+        history: createWebHistory(Consts.MYND_BASE_PATH),
         routes: [
             // RECEPTION
             {
@@ -120,6 +120,8 @@ myNd.use( createRouter({
         ]
     })
 );
+
+console.log(import.meta.env.VITE_FOO)
 
 // Inject it into the template that was served by Asp.Net
 myNd.mount('#app');

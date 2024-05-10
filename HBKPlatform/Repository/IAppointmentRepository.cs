@@ -8,11 +8,14 @@ namespace HBKPlatform.Repository
         public Task CreateAppointment(AppointmentDto appointmentDto);
         public Task<AppointmentDto> GetAppointment(int appointmentId);
         public Task<List<AppointmentDto>> GetAppointmentsForClient(int clientId);
-        public Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId);
+        public Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId, Enums.AppointmentStatus? status = null);
         public Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now);
         public Task CancelAppointment(int appointmentId, string reason, Enums.AppointmentStatus actioner);
         public Task<bool> CheckForDoubleBookingsAnyTenant(int weekNum, int timeslotId, int roomId, int? currentRoomResId = null);
         public Task<List<TimeslotDto>> GetFutureOccupiedTimeslotsForRoomAnyTenancy(int roomId, DateTime now);
+        
+        // Statistical methods
+        public Task<int> GetNumberOfCompletedAppointments(int pracId, string dbStartDate, DateTime now);
 
     }
 }

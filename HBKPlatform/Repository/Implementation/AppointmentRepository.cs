@@ -56,9 +56,15 @@ namespace HBKPlatform.Repository.Implementation
                 }).AsNoTracking().ToListAsync();
         }
     
-        public async Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId)
+        /// <summary>
+        /// Get all appointments for the Practitioner, optionally filtered by status.
+        /// </summary>
+        public async Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId, Enums.AppointmentStatus? status)
         {
-            return await _db.Appointments.Include("Timeslot").Where(x => x.PractitionerId == pracId)
+            var query = _db.Appointments.Include("Timeslot");
+            if (status.HasValue) query = query.Where(x => x.Status == status.Value);
+            
+            return await query.Where(x => x.PractitionerId == pracId)
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {
@@ -69,18 +75,19 @@ namespace HBKPlatform.Repository.Implementation
                     }
                 }).AsNoTracking().ToListAsync();
         }
-    
+        
         /// <summary>
         /// Get upcoming appointments for the practitionerId.
         /// TODO: Return only timeslots for booking clash checking
         /// </summary>
         public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now)
         {
+            var query = _db.Appointments.Include("Timeslot");
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
-            return await _db.Appointments.Include("Timeslot")
+            return await query 
                 .Where(x => x.PractitionerId == pracId && x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
@@ -130,7 +137,8 @@ namespace HBKPlatform.Repository.Implementation
         }
         
         /// <summary>
-        /// Get future and occupied timeslots for the roomId.
+        /// Get future and occupied timeslots for the roomId. Ignores query filters because rooms and other bookings will belong to
+        /// other tenancies.
         /// </summary>
         public async Task<List<TimeslotDto>> GetFutureOccupiedTimeslotsForRoomAnyTenancy(int roomId, DateTime now)
         {
@@ -146,6 +154,23 @@ namespace HBKPlatform.Repository.Implementation
                     Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
                 }).AsNoTracking().ToListAsync();
         }
+        
+        
+        /// <summary>
+        /// Statistics: Get the count of past appointments that have been completed by the Practitioner.
+        /// </summary>
+        public async Task<int> GetNumberOfCompletedAppointments(int pracId, string dbStartDate, DateTime now)
+        {
+            var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+            
+            return await _db.Appointments.Include("Timeslot")
+                .Where(x => x.PractitionerId == pracId && x.Status == Enums.AppointmentStatus.Live &&
+                            (x.WeekNum < weekNum || x.WeekNum == weekNum && x.Timeslot.Day < today ||
+                             x.WeekNum == weekNum && x.Timeslot.Day == today &&
+                             x.Timeslot.Time < TimeOnly.FromDateTime(now))).CountAsync();
+        }
+        
 
     }
 }
