@@ -16,7 +16,7 @@ const model = ref([
                 label: 'Overview',
                 icon: 'pi pi-fw pi-calendar',
                 to: '/appointments/overview',
-                colour: '#ffbdbd'
+                colour: 'var(--teal-300)'
             },
             {
                 label: 'Booking',

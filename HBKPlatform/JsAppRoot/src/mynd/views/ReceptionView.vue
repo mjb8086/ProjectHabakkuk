@@ -1,7 +1,7 @@
 <script setup>
 import {ref} from 'vue';
 import {API_BASE} from "@/common/lib/consts.js";
-import AppointmentLiteItem from '@/common/components/controls/AppointmentLiteItem.vue';
+import AppointmentPanel from '@/common/components/AppointmentPanel.vue';
 
 const summaryData = ref({summaryData:{}});
 
@@ -14,25 +14,20 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
 <template>
   <main>
     <div class="flex justify-content-between flex-wrap">
-      <Card class="align-items-stretch">
+      <AppointmentPanel class="upcoming" v-bind:appointmentData="summaryData.upcomingAppointments">
         <template #title>
           Upcoming Appointments
         </template>
-        <template #content>
-          <ul v-for="appt in summaryData.upcomingAppointments" key="id">
-            <AppointmentLiteItem v-bind="appt"></AppointmentLiteItem>
-          </ul>
+        <template #bottom>
+          <span>with X more.</span> <span><router-link :to="{ name: 'appointments-overview' }" class="underline">Open Appointments.</router-link></span>
         </template>
-      </Card>
+      </AppointmentPanel>
 
-      <div class="col-12 md:col-12 xl:col-3">
-        <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
+      <AppointmentPanel class="cancellations" v-bind:appointmentData="summaryData.recentCancellations">
+        <template #title>
           Recent Cancellations
-          <ul v-for="appt in summaryData.recentCancellations" key="id">
-            <AppointmentLiteItem v-bind="appt"></AppointmentLiteItem>
-          </ul>
-        </div>
-      </div>
+        </template>
+      </AppointmentPanel>
 
       <div class="col-12 md:col-12 xl:col-3">
         <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
@@ -43,9 +38,9 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
       <div class="col-12 md:col-12 xl:col-3">
         <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
           Current Room Reservations
-          <ul v-for="res in summaryData.roomReservations" key="id">
+          <div v-for="res in summaryData.roomReservations" key="id">
             {{res.roomTitle}} - {{res.when}}
-          </ul>
+          </div>
         </div>
       </div>
 

@@ -7,3 +7,22 @@ $gutter: 1rem; //for primeflex grid system
 
 @import '@/common/assets/layout/layout.scss';
 
+/* Declare our colours */
+html {
+}
+
+/* QUICK GLOBAL STYLES */
+summary {
+  cursor: pointer;
+}
+
+/* globally disable a:visited */
+a, a:visited {
+  color: var(--blue-600);
+}
+a.underline {
+  text-decoration: underline !important;
+}
+a.underline:hover {
+  color: var(--blue-400);
+}

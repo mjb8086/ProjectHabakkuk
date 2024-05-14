@@ -1,6 +1,7 @@
 <template>
   <div class="about">
     <h1>Appointment Overview</h1>
+    <p>Calendar Here Soon</p>
   </div>
 </template>
 
