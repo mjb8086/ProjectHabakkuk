@@ -8,11 +8,11 @@ defineProps({
 
 <template>
   <div class="appointment-panel-root col-12 md:col-12 xl:col-3">
-    <div class="overview-card surface-card py-3 px-4 shadow-3 border-round-md h-full flex flex-column">
+    <div class="appointment-panel-inner surface-card py-3 px-4 shadow-3 border-round-md h-full flex flex-column">
       <h1 class="appointment-panel-title">
         <slot name="title" />
       </h1>
-      <div class="appointment-data">
+      <div class="appointment-data flex-grow-1">
         <slot>
           <div v-for="appt in appointmentData" key="id">
             <AppointmentLiteItem v-bind="appt"></AppointmentLiteItem>
@@ -28,22 +28,25 @@ defineProps({
 
 <style>
 div.appointment-panel-root {
-  min-height: 300px; 
+  height: 400px;
+}
+div.appointment-panel-inner {
 }
 div.appointment-data {
-  min-height: 200px;
+  overflow-y: scroll;
 }
 footer.appointment-data-footer {
+  height: 22px;
   border-top: 1px solid var(--surface-400);
   display: flex;
   justify-content: space-between;
 }
 
 h1.appointment-panel-title {
-  font-size: 1.2em;
+  font-size: 1.1em;
   border-bottom: 1px solid var(--surface-400);
   padding-bottom: 2px;
-  margin-bottom: 2px;
+  margin-bottom: 0px;
 }
 
 /* Custom options depending on appointment data category */

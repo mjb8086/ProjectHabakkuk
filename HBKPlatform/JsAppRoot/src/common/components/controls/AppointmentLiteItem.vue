@@ -13,21 +13,25 @@ defineProps({
   <details>
     <summary>
       <span class="date-time">{{dateString}}</span> at
-      <span class="date-time">{{timeString}}</span> -
-      <span class="client-name">{{clientName}}</span>
+      <span class="date-time">{{timeString}}</span>
+      <div class="client-name">{{clientName}}</div>
     </summary>
-    <span>{{treatmentTitle}}</span>
-    <div v-if="roomDetails">{{roomDetails}}</div>
+    <div class="item-body">
+      <span>{{treatmentTitle}}</span>
+      <div v-if="roomDetails">{{roomDetails}}</div>
+    </div>
   </details>
 </div>
 </template>
 
 <style scoped>
-div.appointment-lite-item {
-  max-width: 300px;
-  margin: 2px;
+div.item-body, div.client-name {
+  margin-left: 14px;
 }
-div.appointment-lite-item summary {
+div.appointment-lite-item {
+  margin: 2px 2px 6px 2px;
+}
+div.appointment-lite-item details[open] > summary {
   border-bottom: 1px solid var(--surface-200);
 }
 span.date-time {
