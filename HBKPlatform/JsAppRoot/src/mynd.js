@@ -120,8 +120,7 @@ myNd.use( createRouter({
         ]
     })
 );
-
-console.log(import.meta.env.VITE_FOO)
+console.log('HBKPlatform New UI booting in MyND mode.');
 
 // Inject it into the template that was served by Asp.Net
 myNd.mount('#app');

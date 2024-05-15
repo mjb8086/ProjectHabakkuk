@@ -17,7 +17,7 @@ namespace HBKPlatform.Services.Implementation;
 
 public class ReceptionService(IBookingService _bookingService, IUserService _userService, IConfigurationService _config, 
     IAppointmentRepository _appointmentRepo, IClientRecordService _recordService, IClientRepository _clientRepo, 
-    IRoomReservationService _roomResService, IAppointmentRepository _apptRepo) : IReceptionService
+    IRoomReservationService _roomResService) : IReceptionService
 {
     public async Task<ReceptionSummaryData> GetReceptionSummaryData()
     {

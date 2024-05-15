@@ -1,17 +1,19 @@
 <script setup>
+import DateUtils from '@/common/lib/dateutils.js';
+
 defineProps({
   dateTime: String,
   clientName: String,
   treatmentTitle: String,
   roomDetails: String
-})
+});
 </script>
 
 <template>
 <div class="appointment-lite-item">
   <details>
     <summary>
-      <span class="date-time">{{dateTime}}</span>
+      <span class="date-time">{{DateUtils.getFormattedDateTime(dateTime)}}</span>
       <div class="client-name">{{clientName}}</div>
     </summary>
     <div class="item-body">

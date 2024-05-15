@@ -17,3 +17,4 @@ import {ref} from "vue";
  */
 
 export const CurrentUserData = ref({fullUserName: '', roleName: '', profilePicUrl: ''});
+export const CurrentUserSettings = ref({dateFormat: '', timeFormat: ''});
