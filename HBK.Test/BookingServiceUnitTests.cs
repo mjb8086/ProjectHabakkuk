@@ -98,7 +98,7 @@ namespace HBK.Test
             // Return empty availability when not specified - a missing availability value for any week is reckoned as available
             mockAvaRepo.Setup(x => x.GetPractitionerLookupForIndef(FAKE_PRACTITIONER_ID))
                 .ReturnsAsync(indefAvailability);
-            mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now, true))
+            mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now, DB_START_DATE, true, null))
                 .ReturnsAsync(appointments);
             
             mockTimeslotService.Setup(x => x.GetPopulatedFutureTimeslots()).ReturnsAsync(TimeslotHelper.GetPopulatedFutureTimeslots(now, timeslotList, DB_START_DATE, Int32.Parse(advanceWeeks)));

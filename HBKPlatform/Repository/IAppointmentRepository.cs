@@ -1,3 +1,4 @@
+using HBKPlatform.Database;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 
@@ -9,8 +10,8 @@ namespace HBKPlatform.Repository
         public Task<AppointmentDto> GetAppointment(int appointmentId);
         public Task<List<AppointmentDto>> GetAppointmentsForClient(int clientId);
         public Task<List<AppointmentDto>> GetAppointmentsForPractitioner(int pracId, Enums.AppointmentStatus? status = null);
-        public Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now,
-            bool liveOnly = true);
+        public Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly = true, int? limit = null);
+//        public Task<int> GetFutureAppointmentCountForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly = true);
         public Task CancelAppointment(int appointmentId, string reason, Enums.AppointmentStatus actioner);
         public Task<bool> CheckForDoubleBookingsAnyTenant(int weekNum, int timeslotId, int roomId, int? currentRoomResId = null);
         public Task<List<TimeslotDto>> GetFutureOccupiedTimeslotsForRoomAnyTenancy(int roomId, DateTime now);

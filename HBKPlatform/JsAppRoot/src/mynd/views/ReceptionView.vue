@@ -19,13 +19,16 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
           Upcoming Appointments
         </template>
         <template #bottom>
-          <span>with X more.</span> <span><router-link :to="{ name: 'appointments-overview' }" class="underline">Open Appointments.</router-link></span>
+          <span v-if="summaryData.additionalUpcoming">with {{summaryData.additionalUpcoming}} more.</span> <span><router-link :to="{ name: 'appointments-overview' }" class="underline">Open Appointments.</router-link></span>
         </template>
       </AppointmentPanel>
 
       <AppointmentPanel class="cancellations" v-bind:appointmentData="summaryData.recentCancellations">
         <template #title>
           Recent Cancellations
+        </template>
+        <template #bottom>
+          <span v-if="summaryData.additionalCancellations">with {{summaryData.additionalCancellations}} more.</span>
         </template>
       </AppointmentPanel>
 

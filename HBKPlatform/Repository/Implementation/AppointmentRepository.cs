@@ -78,29 +78,45 @@ namespace HBKPlatform.Repository.Implementation
         
         /// <summary>
         /// Get upcoming appointments for the practitionerId.
-        /// TODO: Return only timeslots for booking clash checking
+        /// TODO: another method to Return only timeslots for booking clash checking
         /// </summary>
-        public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now, bool liveOnly)
+        public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly, int? limit)
         {
             var query = _db.Appointments.Include("Timeslot");
-            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-            var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
-            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
 
             if (liveOnly) query = query.Where(x => x.Status == Enums.AppointmentStatus.Live);
-        
+            if (limit.HasValue) query = query.Take(limit.Value);
+            
+            var currentWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+            
             return await query 
-                .Where(x => x.PractitionerId == pracId && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+                .Where(x => x.PractitionerId == pracId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
                 .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
-                        Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
+                        Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
                     }
                 }).AsNoTracking().ToListAsync();
         }
+
+        /*
+         // re-use this if we ever split the fetch above for performance reasons, only likely needed if the user has hundreds of appointments.
+        public async Task<int> GetFutureAppointmentCountForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly)
+        {
+            var query = _db.Appointments.Include("Timeslot");
+            if (liveOnly) query = query.Where(x => x.Status == Enums.AppointmentStatus.Live);
+            
+            var currentWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+            return await query 
+                .Where(x => x.PractitionerId == pracId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+                .CountAsync();
+        }
+        */
 
         public async Task CancelAppointment(int appointmentId, string reason, Enums.AppointmentStatus cancelActioner)
         {

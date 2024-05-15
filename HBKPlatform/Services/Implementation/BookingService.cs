@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
@@ -24,7 +25,7 @@ namespace HBKPlatform.Services.Implementation
     {
         private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
         private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
-    
+        public const int APPOINTMENTS_SELECT_LIMIT = 10;    // currently not used because we just do one fetch
     
         public async Task<TimeslotSelectView> GetAvailableTimeslotsClientView(int treatmentId)
         {
@@ -55,7 +56,8 @@ namespace HBKPlatform.Services.Implementation
         /// </summary>
         private async Task<List<TimeslotDto>> FilterOutUnsuitableTimeslots(SortedSet<TimeslotDto> timeslots, int pracId)
         {
-            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now);
+            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now, dbStartDate);
             // populate lookups for IsAvailable check
             _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeeks(pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
             _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
@@ -73,8 +75,9 @@ namespace HBKPlatform.Services.Implementation
         /// <returns>TRUE - timeslot clashes with another appointment, or is set to unavailable.</returns>
         private async Task<bool> ClashCheck(int timeslotId, int pracId, int weekNum)
         {
-            // TODO: Replace this with simple check like in Room double booking check
-            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow);
+            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+            // TODO: Replace this with simple query check like in Room double booking check
+            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, dbStartDate);
             _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeek(pracId, weekNum);
             _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
         
@@ -131,7 +134,6 @@ namespace HBKPlatform.Services.Implementation
             // else we know it is unavailable
             return false;
         }
-    
 
         public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForClient(int clientId)
         {
@@ -153,24 +155,28 @@ namespace HBKPlatform.Services.Implementation
             return appointments;
         }
     
-        public async Task<List<AppointmentDto>> GetUpcomingAppointmentsForPractitioner(int pracId, bool liveOnly)
+        public async Task<List<AppointmentLite>> GetUpcomingAppointmentsForPractitioner(int pracId, bool liveOnly, string? dbStartDate)
         {
-            var appointments = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, liveOnly);
+            dbStartDate ??= (await _config.GetSettingOrDefault("DbStartDate")).Value;
+            var appointments = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, dbStartDate, liveOnly);
             var treatments = await _cacheService.GetTreatments();
-            var dbStartDate = await _config.GetSettingOrDefault("DbStartDate");
-        
+
+            var appointmentsLite = new List<AppointmentLite>();
             foreach (var appointment in appointments)
             {
-                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
-                appointment.DateString = dateTime.ToShortDateString();
-                appointment.TimeString = dateTime.ToShortTimeString();
-                appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
-                appointment.ClientName = _cacheService.GetClientName(appointment.ClientId);
-                appointment.RoomDetails = appointment.RoomId.HasValue
+                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
+                appointmentsLite.Add(new AppointmentLite()
+                {
+                    DateTime = dateTime.ToString("s"),
+                    TreatmentTitle = treatments[appointment.TreatmentId].Title,
+                    ClientName = _cacheService.GetClientName(appointment.ClientId),
+                    Status = appointment.Status,
+                    RoomDetails = appointment.RoomId.HasValue
                     ? _cacheService.GetRoom(appointment.RoomId.Value).Title
-                    : null;
+                    : null
+                });
             }
-            return appointments;
+            return appointmentsLite;
         }
 
         // TO DEPRECATE
@@ -180,8 +186,21 @@ namespace HBKPlatform.Services.Implementation
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
+            var treatments = await _cacheService.GetTreatments();
         
-            var appts = await GetUpcomingAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"), false);
+            var appts = await _appointmentRepo.GetAppointmentsForPractitioner(_userService.GetClaimFromCookie("PractitionerId"));
+            
+            foreach (var appointment in appts)
+            {
+                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
+                appointment.DateString = dateTime.ToShortDateString();
+                appointment.TimeString = dateTime.ToShortTimeString();
+                appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
+                appointment.ClientName = _cacheService.GetClientName(appointment.ClientId);
+                appointment.RoomDetails = appointment.RoomId.HasValue
+                    ? _cacheService.GetRoom(appointment.RoomId.Value).Title
+                    : null;
+            }
             return new UpcomingAppointmentsView()
             {
                 UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now))).ToList(),

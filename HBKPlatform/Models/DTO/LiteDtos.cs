@@ -92,8 +92,7 @@ namespace HBKPlatform.Models.DTO
 
     public class AppointmentLite
     {
-        public string DateString { get; set; }
-        public string TimeString { get; set; }
+        public string DateTime { get; set; }
         public string ClientName { get; set; }
         public string PractitionerName { get; set; }
         public string TreatmentTitle { get; set; }

@@ -14,9 +14,10 @@ defineProps({
       </h1>
       <div class="appointment-data flex-grow-1">
         <slot>
-          <div v-for="appt in appointmentData" key="id">
+          <div v-if="appointmentData.length > 0" v-for="appt in appointmentData" key="id">
             <AppointmentLiteItem v-bind="appt"></AppointmentLiteItem>
           </div>
+          <p v-else>None yet.</p>
         </slot>
       </div>
       <footer class="appointment-data-footer text-sm">
