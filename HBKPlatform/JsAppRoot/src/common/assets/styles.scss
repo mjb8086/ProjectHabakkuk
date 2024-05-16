@@ -16,6 +16,12 @@ summary {
   cursor: pointer;
 }
 
+span.badge-sml {
+  min-width: 1.2rem;
+  height: 1.2rem;
+  line-height: 1.2rem;
+}
+
 /* globally disable a:visited */
 a, a:visited {
   color: var(--blue-600);

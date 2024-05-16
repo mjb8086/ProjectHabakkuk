@@ -2,6 +2,7 @@
 import {ref} from 'vue';
 import {API_BASE} from "@/common/lib/consts.js";
 import AppointmentPanel from '@/common/components/AppointmentPanel.vue';
+import UnreadMessagePanel from "@/mynd/components/Reception/UnreadMessagePanel.vue";
 
 const summaryData = ref({summaryData:{}});
 
@@ -32,14 +33,8 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
         </template>
       </AppointmentPanel>
 
-      <div class="col-12 md:col-12 xl:col-3">
-        <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
-          Unread Messages
-          <ul v-for="record in summaryData.unreadMessageDetails" key="id">
-            {{record.name}} {{record.unreadMessageCount}} {{record.clientId}}
-          </ul>
-        </div>
-      </div>
+      <UnreadMessagePanel v-bind:unreadMessageDetails="summaryData.unreadMessageDetails">
+      </UnreadMessagePanel>
 
       <div class="col-12 md:col-12 xl:col-3">
         <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">

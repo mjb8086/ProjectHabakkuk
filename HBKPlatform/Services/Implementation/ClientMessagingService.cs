@@ -103,7 +103,9 @@ namespace HBKPlatform.Services.Implementation
                // populate client names - todo, move to ui, one lookup???
                foreach (var unread in unreadDetails)
                {
-                    unread.Name = _cache.GetClientName(unread.ClientId);
+                    var client = _cache.GetClientDetailsLite(unread.ClientId);
+                    unread.Name = client.Name;
+                    unread.Img = client.Img;
                }
                return unreadDetails;
           }
