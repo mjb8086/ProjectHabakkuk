@@ -26,9 +26,4 @@ div.convo-entry {
   display: flex;
   align-items: center;
 }
-
-span.msg-count {
-  color: var(--red-500);
-}
-
 </style>

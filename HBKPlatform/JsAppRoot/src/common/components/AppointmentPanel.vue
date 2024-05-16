@@ -1,6 +1,6 @@
 <script setup>
 import GenericPanel from "./GenericPanel.vue";
-import AppointmentLiteItem from "@/common/components/controls/AppointmentLiteItem.vue";
+import AppointmentLiteItem from "@/common/components/Controls/AppointmentLiteItem.vue";
 
 defineProps({
   appointmentData: Array,

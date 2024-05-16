@@ -179,7 +179,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             {
                 Id = res.Id,
                 RoomTitle = _cache.GetRoom(res.RoomId).Title,
-                When = DateTimeHelper.GetFriendlyDateTimeString(
+                When = DateTimeHelper.GetIsoDateTimeString(
                     DateTimeHelper.FromTimeslot(dbStartDate, ts, res.WeekNum)),
                 Status = res.Status,
                 Whom = _cache.GetPractitionerName(res.PractitionerId)

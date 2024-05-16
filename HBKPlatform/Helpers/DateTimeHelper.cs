@@ -81,6 +81,11 @@ namespace HBKPlatform.Helpers
         {
             return dateTime.ToString("h:mm tt, dddd d MMMM yyyy");
         }
+        
+        public static string GetIsoDateTimeString(DateTime dateTime)
+        {
+            return dateTime.ToString("s");
+        }
 
         public static string GetDateRangeStringFromWeekNum(string dbStartDate, int weekNum)
         {

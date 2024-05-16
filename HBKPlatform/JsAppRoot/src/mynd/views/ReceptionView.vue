@@ -3,6 +3,9 @@ import {ref} from 'vue';
 import {API_BASE} from "@/common/lib/consts.js";
 import AppointmentPanel from '@/common/components/AppointmentPanel.vue';
 import UnreadMessagePanel from "@/mynd/components/Reception/UnreadMessagePanel.vue";
+import RoomReservationPanel from "@/mynd/components/Reception/RoomReservationPanel.vue";
+import PriorityItemPanel from "@/mynd/components/Reception/PriorityItemPanel.vue";
+import StatisticsPanel from "@/mynd/components/Reception/StatisticsPanel.vue";
 
 const summaryData = ref({summaryData:{}});
 
@@ -14,7 +17,7 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
 
 <template>
   <main>
-    <div class="flex justify-content-between flex-wrap">
+    <div class="flex  flex-wrap ">
       <AppointmentPanel class="upcoming" v-bind:appointmentData="summaryData.upcomingAppointments">
         <template #title>
           Upcoming Appointments
@@ -36,31 +39,13 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
       <UnreadMessagePanel v-bind:unreadMessageDetails="summaryData.unreadMessageDetails">
       </UnreadMessagePanel>
 
-      <div class="col-12 md:col-12 xl:col-3">
-        <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
-          Current Room Reservations
-          <div v-for="res in summaryData.roomReservations" key="id">
-            {{res.roomTitle}} - {{res.when}}
-          </div>
-        </div>
-      </div>
+      <RoomReservationPanel v-bind:currentReservations="summaryData.roomReservations">
+      </RoomReservationPanel>
 
-      <div class="col-12 md:col-12 xl:col-3">
-        <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
-          Priority Items
-          <ul v-for="record in summaryData.priorityItems" key="id">
-            {{record.title}} {{record.displayDate}} {{record.clientName}}
-          </ul>
-        </div>
-      </div>
+      <PriorityItemPanel v-bind:priorityItems="summaryData.priorityItems">
+      </PriorityItemPanel>
 
-      <div class="col-12 md:col-12 xl:col-3">
-        <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
-          Statistics
-          <div>Registered Clients: {{summaryData.numClientsRegistered}}</div>
-          <div>Completed Appointments: {{summaryData.numAppointmentsCompleted}}</div>
-        </div>
-      </div>
+      <StatisticsPanel v-bind="summaryData" />
     </div>
   </main>
 </template>

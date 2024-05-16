@@ -32,7 +32,7 @@ const model = ref([
             },
             {
                 label: 'Treatment Management',
-                icon: 'pi pi-fw pi-money-bill',
+                icon: 'pi pi-fw pi-receipt',
                 to: '/appointments/treatment-management',
                 colour: '#7973f6'
             }]
@@ -45,7 +45,7 @@ const model = ref([
           label: 'My Reservations',
           icon: 'pi pi-fw pi-warehouse',
           to: '/reservations/my-reservations',
-          colour: '#b0fbba'
+          colour: 'var(--green-300)',
         },
         {
           label: 'Make A Reservation',
