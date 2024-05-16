@@ -35,6 +35,9 @@ fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
       <div class="col-12 md:col-12 xl:col-3">
         <div class="overview-card surface-card py-3 px-4 shadow-1 border-round-md h-full">
           Unread Messages
+          <ul v-for="record in summaryData.unreadMessageDetails" key="id">
+            {{record.name}} {{record.unreadMessageCount}} {{record.clientId}}
+          </ul>
         </div>
       </div>
 

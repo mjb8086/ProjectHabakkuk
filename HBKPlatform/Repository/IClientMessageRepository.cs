@@ -1,5 +1,6 @@
 using HBKPlatform.Globals;
 using HBKPlatform.Models;
+using HBKPlatform.Models.DTO;
 
 namespace HBKPlatform.Repository
 {
@@ -14,6 +15,7 @@ namespace HBKPlatform.Repository
 
         public Task<int> GetUnreadMessagesAsClient(int pracId, int clientId);
         public Task<int> GetUnreadMessagesAsPractitioner(int pracId);
+        public Task<List<UnreadMessageDetailLite>> GetUnreadMessageDetailsAsPractitioner(int pracId);
         public Task UpdateReadReceiptsPractitioner(int clientId, int pracId);
         public Task UpdateReadReceiptsClient(int clientId, int pracId);
     }

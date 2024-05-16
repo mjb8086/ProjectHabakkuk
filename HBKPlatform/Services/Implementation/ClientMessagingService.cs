@@ -1,6 +1,7 @@
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Models;
+using HBKPlatform.Models.DTO;
 using HBKPlatform.Repository;
 using MissingFieldException = System.MissingFieldException;
 
@@ -8,7 +9,6 @@ namespace HBKPlatform.Services.Implementation
 {
      /// <summary>
      /// Client messaging service.
-     /// Middleware for controller and database functionality.
      /// 
      /// Author: Mark Brown
      /// Authored: 13/12/2023
@@ -16,7 +16,7 @@ namespace HBKPlatform.Services.Implementation
      /// © 2023 NowDoctor Ltd.
      /// </summary>
      public class ClientMessagingService(IHttpContextAccessor _httpContextAccessor, IClientMessageRepository _clientMessageRepository, 
-          IPracticeService practiceService, ICacheService _cache) : IClientMessagingService
+          IPracticeService practiceService, ICacheService _cache, IUserService _userService) : IClientMessagingService
      {
           public async Task SendMessage(string messageBody, int recipientId)
           {
@@ -94,6 +94,18 @@ namespace HBKPlatform.Services.Implementation
                     return model;
                }
                return null;
+          }
+
+          public async Task<List<UnreadMessageDetailLite>> GetUnreadMessageDetailsAsPractitioner(int? pracId)
+          {
+               pracId ??= _userService.GetClaimFromCookie("PractitionerId");
+               var unreadDetails = await _clientMessageRepository.GetUnreadMessageDetailsAsPractitioner(pracId.Value);
+               // populate client names - todo, move to ui, one lookup???
+               foreach (var unread in unreadDetails)
+               {
+                    unread.Name = _cache.GetClientName(unread.ClientId);
+               }
+               return unreadDetails;
           }
      }
 }

@@ -17,6 +17,8 @@ namespace HBKPlatform.Repository.Implementation
     /// </summary>
     public class ClientMessageRepository(ApplicationDbContext _db) : IClientMessageRepository
     {
+        public const int UNREAD_FETCH_LIMIT = 15;
+        
         public async Task SaveMessage(int practitionerId, int clientId, string messageBody,
             Enums.MessageOrigin messageOrigin)
         {
@@ -72,6 +74,14 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<int> GetUnreadMessagesAsPractitioner(int pracId)
         {
             return await _db.ClientMessages.CountAsync(x => x.PractitionerId == pracId && x.MessageOrigin == Enums.MessageOrigin.Client && x.MessageStatusPractitioner == Enums.MessageStatus.Unread);
+        }
+
+        public async Task<List<UnreadMessageDetailLite>> GetUnreadMessageDetailsAsPractitioner(int pracId)
+        {
+            // Get count of unread messages for each client, group by client id
+            return await _db.ClientMessages.Where(x => x.PractitionerId == pracId && x.MessageOrigin == Enums.MessageOrigin.Client && x.MessageStatusPractitioner == Enums.MessageStatus.Unread)
+                .Take(UNREAD_FETCH_LIMIT).GroupBy(x => x.ClientId).Select(g => new UnreadMessageDetailLite()
+                    { ClientId = g.Key, UnreadMessageCount = g.Count() }).ToListAsync();
         }
 
         /// <summary>

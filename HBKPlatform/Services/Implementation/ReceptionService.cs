@@ -1,8 +1,6 @@
 using HBKPlatform.Globals;
-using HBKPlatform.Helpers;
 using HBKPlatform.Models.API.MyND;
 using HBKPlatform.Repository;
-using HBKPlatform.Repository.Implementation;
 
 namespace HBKPlatform.Services.Implementation;
 
@@ -17,7 +15,7 @@ namespace HBKPlatform.Services.Implementation;
 
 public class ReceptionService(IBookingService _bookingService, IUserService _userService, IConfigurationService _config, 
     IAppointmentRepository _appointmentRepo, IClientRecordService _recordService, IClientRepository _clientRepo, 
-    IRoomReservationService _roomResService) : IReceptionService
+    IRoomReservationService _roomResService, IClientMessagingService _clientMessagingSrv) : IReceptionService
 {
     public async Task<ReceptionSummaryData> GetReceptionSummaryData()
     {
@@ -27,6 +25,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
         
         var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId, false);
         
+        // TODO: Cache stats like num appts completed, num clients registered.
         var model = new ReceptionSummaryData()
         {
             UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live).Take(BookingService.APPOINTMENTS_SELECT_LIMIT).ToList(),
@@ -45,6 +44,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
         model.AdditionalCancellations = model.RecentCancellations.Count() - BookingService.APPOINTMENTS_SELECT_LIMIT > 0
             ? model.UpcomingAppointments.Count() - BookingService.APPOINTMENTS_SELECT_LIMIT
             : 0;
+        model.UnreadMessageDetails = await _clientMessagingSrv.GetUnreadMessageDetailsAsPractitioner(pracId);
         
         return model;
     }

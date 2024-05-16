@@ -17,6 +17,14 @@ namespace HBKPlatform.Models.DTO
         public int PracticeId { get; set; }
         public string? Img { get; set; }
     }
+    
+    public class UnreadMessageDetailLite
+    {
+        public string Name { get; set; }
+        public int ClientId { get; set; }
+        public string? Img { get; set; }
+        public int UnreadMessageCount { get; set; }
+    }
 
     public class UserDetailsUac : PractitionerDetailsLite
     {
