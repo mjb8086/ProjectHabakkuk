@@ -11,7 +11,7 @@ defineProps({
   <div class="convo-entry">
     <Avatar v-bind:image="img" class="mr-2" size="small" shape="circle" />
     <div>
-      <div>{{name}} has <Badge v-bind:value="unreadMessageCount" class="badge-sml"/> unread.</div>
+      <div>{{name}} <Badge v-bind:value="unreadMessageCount" class="badge-sml"/> unread.</div>
       <div><a class="text-sm underline">Open conversation.</a></div>
     </div>
   </div>
