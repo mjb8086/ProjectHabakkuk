@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div class="generic-panel-root col-3 md:col-6 xl:col-3">
+  <div class="generic-panel-root col-6 md:col-6 xl:col-3">
     <div class="generic-panel-inner surface-card py-3 px-4 shadow-3 border-round-md h-full flex flex-column">
       <h1 class="generic-panel-title">
         <slot name="title" />

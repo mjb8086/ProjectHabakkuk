@@ -171,9 +171,8 @@ namespace HBKPlatform.Services.Implementation
                     TreatmentTitle = treatments[appointment.TreatmentId].Title,
                     ClientName = _cacheService.GetClientName(appointment.ClientId),
                     Status = appointment.Status,
-                    RoomDetails = appointment.RoomId.HasValue
-                    ? _cacheService.GetRoom(appointment.RoomId.Value).Title
-                    : null
+                    RoomDetails = appointment.RoomId.HasValue ? _cacheService.GetRoom(appointment.RoomId.Value).Title : null,
+                    WeekNum = appointment.WeekNum
                 });
             }
             return appointmentsLite;

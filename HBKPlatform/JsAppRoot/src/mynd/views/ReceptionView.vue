@@ -8,26 +8,17 @@ import RoomReservationPanel from "@/mynd/components/Reception/RoomReservationPan
 import PriorityItemPanel from "@/mynd/components/Reception/PriorityItemPanel.vue";
 import StatisticsPanel from "@/mynd/components/Reception/StatisticsPanel.vue";
 import EarningsChart from "@/mynd/components/Reception/EarningsChart.vue";
+import WeeklyAppointmentsChart from "@/mynd/components/Reception/WeeklyAppointmentsChart.vue";
+import AvailabiltyPanel from "@/mynd/components/Reception/AvailabilityPanel.vue";
 
-const summaryData = ref({summaryData:{}});
+const summaryData = ref({weeklyAppointmentsChartData: []});
 
 fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
     .then((res) => res.json())
     .then((json) => (summaryData.value = json));
 //    .catch((err) => (error = err));
 
-const sampleEarningsData = ref({
-  datasets: [
-    {
-      label: 'Earnings',
-      data: [ { x: 'May 2024', y : 1310 }, { x: 'June 2024', y: 2830 }, { x: 'July 2024', y: 1692}, { x: 'August 2024', y: 1580}, { x: 'September 2024', y: 2980}  ],
-      borderColor: ['#4e904e'],
-      backgroundColor: ['rgba(40, 136, 76, .05)'],
-      borderWidth: 2,
-      fill: true,
-    },
-  ],
-});
+const sampleEarningsData = ref([ { x: 'May 2024', y : 1310 }, { x: 'June 2024', y: 2830 }, { x: 'July 2024', y: 1692}, { x: 'August 2024', y: 1580}, { x: 'September 2024', y: 2980}  ]);
 
 </script>
 
@@ -54,9 +45,12 @@ const sampleEarningsData = ref({
 
       <UnreadMessagePanel v-bind:unreadMessageDetails="summaryData.unreadMessageDetails" />
       <RoomReservationPanel v-bind:currentReservations="summaryData.roomReservations" />
-      <EarningsChart v-bind:earningsData="sampleEarningsData" />
+      <EarningsChart v-bind:data="sampleEarningsData" />
       <PriorityItemPanel v-bind:priorityItems="summaryData.priorityItems" />
       <StatisticsPanel v-bind="summaryData" />
+      <WeeklyAppointmentsChart v-bind:data="summaryData.weeklyAppointmentsChartData" />
+      <p>{{summaryData.weeklyAppointmentsChartData}}</p>
+      <AvailabiltyPanel />
     </div>
   </main>
 </template>

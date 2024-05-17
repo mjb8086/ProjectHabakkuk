@@ -14,6 +14,10 @@ namespace HBKPlatform.Helpers
     /// </summary>
     public class DateTimeHelper
     {
+        public const string SHORTHAND_DATE_FORMAT = "dd/MM/yyyy";
+        public const string FRIENDLY_DAY_FORMAT_NO_YEAR = "d MMM";
+        public const string FRIENDLY_FULL_DATE_TIME = "dddd d MMMM yyyy, h:mm tt";
+        
         /// <summary>
         /// Get the DateTime representation from a timeslot, week number and DbStartDate.
         /// Note: WeekNumbers are 1-indexed. I.e., the week of dbStartDate will be counted as week 1
@@ -79,7 +83,7 @@ namespace HBKPlatform.Helpers
 
         public static string GetFriendlyDateTimeString(DateTime dateTime)
         {
-            return dateTime.ToString("h:mm tt, dddd d MMMM yyyy");
+            return dateTime.ToString(FRIENDLY_FULL_DATE_TIME);
         }
         
         public static string GetIsoDateTimeString(DateTime dateTime)
@@ -87,13 +91,13 @@ namespace HBKPlatform.Helpers
             return dateTime.ToString("s");
         }
 
-        public static string GetDateRangeStringFromWeekNum(string dbStartDate, int weekNum)
+        public static string GetDateRangeStringFromWeekNum(string dbStartDate, int weekNum, string? format = SHORTHAND_DATE_FORMAT)
         {
             if (weekNum <= 0) weekNum = 1;
             var startDate = DateTime.Parse(dbStartDate);
             startDate = startDate.AddDays(7 * (weekNum-1)); // week numbers are 0-indexed in practice...
             var endDate = startDate.AddDays(6);
-            return $"{startDate.ToString("dd/MM/yyyy")} - {endDate.ToString("dd/MM/yyyy")}";
+            return $"{startDate.ToString(format)} - {endDate.ToString(format)}";
         }
 
         public static string GetDateRangeStringForThisWeek(string dbStartDate)
@@ -104,7 +108,7 @@ namespace HBKPlatform.Helpers
             startDate = startDate.AddDays(7 * (thisWeek-1)); // week numbers are 0-indexed in practice...
             var endDate = startDate.AddDays(6);
         
-            return $"{now.ToString("dd/MM/yyyy")} - {endDate.ToString("dd/MM/yyyy")}";
+            return $"{now.ToString(SHORTHAND_DATE_FORMAT)} - {endDate.ToString(SHORTHAND_DATE_FORMAT)}";
         }
 
     }

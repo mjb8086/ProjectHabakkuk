@@ -3,15 +3,17 @@ import {reactive, ref} from "vue";
 import GenericLineGraphPanel from '@/common/components/GenericLineGraphPanel.vue';
 
 const props = defineProps({
-  data: Array
+  data : Array
 });
 
-const earningsData = ref({
+const dataRef = ref(props.data);
+
+const chartData = ref({
   datasets: [
     {
-      label: 'Earnings',
-      data: props.data,
-      borderColor: ['#4e904e'],
+      label: 'Appointments',
+      data: dataRef.value,
+      borderColor: ['#e5bb90'],
       backgroundColor: ['rgba(40, 136, 76, .05)'],
       borderWidth: 2,
       fill: true,
@@ -20,18 +22,19 @@ const earningsData = ref({
 });
 
 const chartOptions = ref({
-  scales: {y: {ticks: {callback: function(value, index, ticks) {return `£${value}`;}}}},
   plugins: {legend: {display:false}}
 });
-</script>
 
+</script>
 <template>
   <GenericLineGraphPanel>
     <template #title>
-        Monthly Income
+       Appointments Per Week
+      <p>Chart Data: {{JSON.stringify(chartData)}}</p>
+      <p>Data: {{data}}</p>
     </template>
     <template #chartArea>
-        <Chart type="line" :data="earningsData" :options="chartOptions" class="h-30rem" style="max-height:320px" />
+        <Chart type="line" :data="chartData" :options="chartOptions" class="h-30rem" style="max-height:320px" />
     </template>
   </GenericLineGraphPanel>
 </template>

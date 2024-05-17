@@ -101,11 +101,18 @@ namespace HBKPlatform.Models.DTO
     public class AppointmentLite
     {
         public string DateTime { get; set; }
+        public int WeekNum { get; set; }
         public string ClientName { get; set; }
         public string PractitionerName { get; set; }
         public string TreatmentTitle { get; set; }
         public string? RoomDetails { get; set; }
         public Enums.AppointmentStatus Status { get; set; }
+    }
+
+    public class ChartDatapoint
+    {
+        public string x { get; set; }
+        public string y { get; set; }
     }
     
 }

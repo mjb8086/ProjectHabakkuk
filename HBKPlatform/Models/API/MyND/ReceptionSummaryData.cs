@@ -13,4 +13,5 @@ public class ReceptionSummaryData
     public int NumAppointmentsCompleted { get; set; } 
     public int AdditionalUpcoming { get; set; }
     public int AdditionalCancellations { get; set; }
+    public List<ChartDatapoint> WeeklyAppointmentsChartData { get; set; }
 }

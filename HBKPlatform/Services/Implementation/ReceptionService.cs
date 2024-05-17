@@ -1,5 +1,7 @@
 using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
 using HBKPlatform.Models.API.MyND;
+using HBKPlatform.Models.DTO;
 using HBKPlatform.Repository;
 
 namespace HBKPlatform.Services.Implementation;
@@ -45,6 +47,11 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
             ? model.UpcomingAppointments.Count() - BookingService.APPOINTMENTS_SELECT_LIMIT
             : 0;
         model.UnreadMessageDetails = await _clientMessagingSrv.GetUnreadMessageDetailsAsPractitioner(pracId);
+        model.WeeklyAppointmentsChartData = appts.Where(x => x.Status == Enums.AppointmentStatus.Live)
+            .GroupBy(x => x.WeekNum)
+            .OrderBy(x => x.Key)
+            .Select(g => new ChartDatapoint() { x = DateTimeHelper.GetDateRangeStringFromWeekNum(dbStartDate, g.Key, DateTimeHelper.FRIENDLY_DAY_FORMAT_NO_YEAR), y = g.Count().ToString() })
+            .ToList();
         
         return model;
     }
