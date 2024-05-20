@@ -9,7 +9,7 @@
  */
 
 import 'vite/modulepreload-polyfill';
-import { createApp } from 'vue';
+import { nextTick, createApp } from 'vue';
 import { createRouter, createWebHistory } from "vue-router";
 import PrimeVue from 'primevue/config';
 
@@ -36,7 +36,7 @@ const myNd = createApp(MyNDMain);
 myNd.use(PrimeVue, { ripple: true });
 
 // Routing. Don't forget to append the new routes to MyNDMenu if appropriate.
-myNd.use( createRouter({
+const router = createRouter({
         history: createWebHistory(Consts.MYND_BASE_PATH),
         routes: [
             // RECEPTION
@@ -45,7 +45,8 @@ myNd.use( createRouter({
                 name: 'reception',
                 component: ReceptionView,
                 meta: {
-                    breadcrumb: [{label: 'Reception'}]
+                    breadcrumb: [{label: 'Reception'}],
+                    title: 'Reception'
                 }
             },
             // APPOINTMENTS
@@ -56,7 +57,8 @@ myNd.use( createRouter({
                 // which is lazy-loaded when the route is visited.
                 component: () => import('@/mynd/views/Appointments/Overview.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Appointments', label: 'Overview'}]
+                    breadcrumb: [{parent: 'Appointments', label: 'Overview'}],
+                    title: 'Appointments'
                 }
             },
             {
@@ -64,7 +66,8 @@ myNd.use( createRouter({
                 name: 'appointments-booking',
                 component: () => import('@/mynd/views/Appointments/Booking.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Appointments', label: 'Booking'}]
+                    breadcrumb: [{parent: 'Appointments', label: 'Booking'}],
+                    title: 'Appointment Booking'
                 }
             },
             {
@@ -72,7 +75,8 @@ myNd.use( createRouter({
                 name: 'availability-management',
                 component: () => import('@/mynd/views/Appointments/AvailabilityManagement.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Appointments', label: 'Availability Management'}]
+                    breadcrumb: [{parent: 'Appointments', label: 'Availability Management'}],
+                    title: 'Availability Management'
                 }
             },
             {
@@ -80,7 +84,8 @@ myNd.use( createRouter({
                 name: 'treatment-management',
                 component: () => import('@/mynd/views/Appointments/TreatmentManagement.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Appointments', label: 'Treatment Management'}]
+                    breadcrumb: [{parent: 'Appointments', label: 'Treatment Management'}],
+                    title: 'Treatment Management'
                 }
             },
             // RESERVATIONS
@@ -89,7 +94,8 @@ myNd.use( createRouter({
                 name: 'my-reservations',
                 component: () => import('@/mynd/views/Reservations/MyReservations.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Reservations', label: 'My Reservations'}]
+                    breadcrumb: [{parent: 'Reservations', label: 'My Reservations'}],
+                    title: 'My Reservations'
                 }
             },
             {
@@ -97,7 +103,8 @@ myNd.use( createRouter({
                 name: 'make-reservation',
                 component: () => import('@/mynd/views/Reservations/MakeAReservation.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Reservations', label: 'Make A Reservation'}]
+                    breadcrumb: [{parent: 'Reservations', label: 'Make A Reservation'}],
+                    title: 'Make a Reservation'
                 }
             },
             // CLIENT DATA
@@ -106,7 +113,8 @@ myNd.use( createRouter({
                 name: 'client-records',
                 component: () => import('@/mynd/views/ClientData/RecordKeeping.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Client Data', label: 'Records'}]
+                    breadcrumb: [{parent: 'Client Data', label: 'Records'}],
+                    title: 'Client Records'
                 }
             },
             {
@@ -114,7 +122,8 @@ myNd.use( createRouter({
                 name: 'client-contacts',
                 component: () => import('@/mynd/views/ClientData/ContactDetails.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Client Data', label: 'Contacts'}]
+                    breadcrumb: [{parent: 'Client Data', label: 'Contacts'}],
+                    title: 'Client Contacts'
                 }
             },
             // MESSAGING
@@ -123,7 +132,8 @@ myNd.use( createRouter({
                 name: 'messaging-inbox',
                 component: () => import('@/mynd/views/Messaging/Inbox.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Messaging', label: 'Inbox'}]
+                    breadcrumb: [{parent: 'Messaging', label: 'Inbox'}],
+                    title: 'Inbox'
                 }
             },
             {
@@ -131,7 +141,8 @@ myNd.use( createRouter({
                 name: 'messaging-archive',
                 component: () => import('@/mynd/views/Messaging/Archive.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Messaging', label: 'Archive'}]
+                    breadcrumb: [{parent: 'Messaging', label: 'Archive'}],
+                    title: 'Archive'
                 }
             },
             // CONFIGURATION
@@ -140,7 +151,8 @@ myNd.use( createRouter({
                 name: 'system-configuration',
                 component: () => import('@/mynd/views/Configuration/SysConfig.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Configuration', label: 'System'}]
+                    breadcrumb: [{parent: 'Configuration', label: 'System'}],
+                    title: 'System Configuration'
                 }
             },
             {
@@ -148,7 +160,8 @@ myNd.use( createRouter({
                 name: 'import-export',
                 component: () => import('@/mynd/views/Configuration/ImportExport.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Configuration', label: 'Import/Export'}]
+                    breadcrumb: [{parent: 'Configuration', label: 'Import/Export'}],
+                    title: 'Import/Export'
                 }
             },
             {
@@ -156,13 +169,23 @@ myNd.use( createRouter({
                 name: 'my-personal-details',
                 component: () => import('@/mynd/views/Configuration/MyPersonalDetails.vue'),
                 meta: {
-                    breadcrumb: [{parent: 'Configuration', label: 'My Personal Details'}]
+                    breadcrumb: [{parent: 'Configuration', label: 'My Personal Details'}],
+                    title: 'My Personal Details'
                 }
             },
         ]
-    })
-);
-console.log('HBKPlatform New UI booting in MyND mode.');
+    });
+
+router.afterEach((to, from) => {
+    // Use next tick to handle router history correctly
+    nextTick(() => {
+        document.title = `${Consts.MYND_BASE_TITLE} ${to.meta.title}`;
+    });
+});
+
+myNd.use(router);
+
+console.log('HBKPlatform New UI booting. MyND mode.');
 
 // Inject it into the template that was served by Asp.Net
 myNd.mount('#app');
