@@ -11,15 +11,19 @@ import EarningsChart from "@/mynd/components/Reception/EarningsChart.vue";
 import WeeklyAppointmentsChart from "@/mynd/components/Reception/WeeklyAppointmentsChart.vue";
 import AvailabiltyPanel from "@/mynd/components/Reception/AvailabilityPanel.vue";
 
+import { chartDataSource } from "@/mynd/components/Reception/State/chart-data-source.js";
+
 const summaryData = ref({weeklyAppointmentsChartData: []});
 
 fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
     .then((res) => res.json())
-    .then((json) => (summaryData.value = json));
+    .then((json) => {
+      summaryData.value = json; 
+      chartDataSource.weeklyAppointmentsChartData = json.weeklyAppointmentsChartData;
+    });
 //    .catch((err) => (error = err));
 
-const sampleEarningsData = ref([ { x: 'May 2024', y : 1310 }, { x: 'June 2024', y: 2830 }, { x: 'July 2024', y: 1692}, { x: 'August 2024', y: 1580}, { x: 'September 2024', y: 2980}  ]);
-
+chartDataSource.earningsData = [ { x: 'May 2024', y : 1310 }, { x: 'June 2024', y: 2830 }, { x: 'July 2024', y: 1692}, { x: 'August 2024', y: 1580}, { x: 'September 2024', y: 2980} ];
 </script>
 
 <template>
@@ -45,11 +49,10 @@ const sampleEarningsData = ref([ { x: 'May 2024', y : 1310 }, { x: 'June 2024', 
 
       <UnreadMessagePanel v-bind:unreadMessageDetails="summaryData.unreadMessageDetails" />
       <RoomReservationPanel v-bind:currentReservations="summaryData.roomReservations" />
-      <EarningsChart v-bind:data="sampleEarningsData" />
+      <EarningsChart :key="chartDataSource.earningsData" />
       <PriorityItemPanel v-bind:priorityItems="summaryData.priorityItems" />
       <StatisticsPanel v-bind="summaryData" />
-      <WeeklyAppointmentsChart v-bind:data="summaryData.weeklyAppointmentsChartData" />
-      <p>{{summaryData.weeklyAppointmentsChartData}}</p>
+      <WeeklyAppointmentsChart :key="chartDataSource.weeklyAppointmentsChartData" />
       <AvailabiltyPanel />
     </div>
   </main>

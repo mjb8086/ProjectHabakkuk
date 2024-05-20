@@ -1,16 +1,13 @@
 <script setup>
-import {reactive, ref} from "vue";
+import { ref, shallowRef } from "vue";
 import GenericLineGraphPanel from '@/common/components/GenericLineGraphPanel.vue';
-
-const props = defineProps({
-  data: Array
-});
+import { chartDataSource } from "@/mynd/components/Reception/State/chart-data-source.js";
 
 const earningsData = ref({
   datasets: [
     {
       label: 'Earnings',
-      data: props.data,
+      data: chartDataSource.earningsData,
       borderColor: ['#4e904e'],
       backgroundColor: ['rgba(40, 136, 76, .05)'],
       borderWidth: 2,
@@ -19,9 +16,9 @@ const earningsData = ref({
   ],
 });
 
-const chartOptions = ref({
-  scales: {y: {ticks: {callback: function(value, index, ticks) {return `£${value}`;}}}},
-  plugins: {legend: {display:false}}
+const chartOptions = shallowRef({
+  scales: { y: { ticks: { callback: function(value, index, ticks) { return `£${value}`; }}}},
+  plugins: { legend: { display: false }}
 });
 </script>
 

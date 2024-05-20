@@ -1,18 +1,14 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {ref, shallowRef} from "vue";
 import GenericLineGraphPanel from '@/common/components/GenericLineGraphPanel.vue';
 
-const props = defineProps({
-  data : Array
-});
-
-const dataRef = ref(props.data);
+import { chartDataSource } from "@/mynd/components/Reception/State/chart-data-source.js";
 
 const chartData = ref({
   datasets: [
     {
       label: 'Appointments',
-      data: dataRef.value,
+      data: chartDataSource.weeklyAppointmentsChartData,
       borderColor: ['#e5bb90'],
       backgroundColor: ['rgba(40, 136, 76, .05)'],
       borderWidth: 2,
@@ -21,8 +17,9 @@ const chartData = ref({
   ],
 });
 
-const chartOptions = ref({
-  plugins: {legend: {display:false}}
+const chartOptions = shallowRef({
+  scales: { y: { precision: 0, ticks: { stepSize: 1.0 }}},
+  plugins: { legend: { display: false }}
 });
 
 </script>
@@ -30,8 +27,6 @@ const chartOptions = ref({
   <GenericLineGraphPanel>
     <template #title>
        Appointments Per Week
-      <p>Chart Data: {{JSON.stringify(chartData)}}</p>
-      <p>Data: {{data}}</p>
     </template>
     <template #chartArea>
         <Chart type="line" :data="chartData" :options="chartOptions" class="h-30rem" style="max-height:320px" />
