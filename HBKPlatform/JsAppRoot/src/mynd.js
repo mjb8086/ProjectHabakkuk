@@ -42,8 +42,11 @@ myNd.use( createRouter({
             // RECEPTION
             {
                 path: '/',
-                name: 'home',
-                component: ReceptionView
+                name: 'reception',
+                component: ReceptionView,
+                meta: {
+                    breadcrumb: [{label: 'Reception'}]
+                }
             },
             // APPOINTMENTS
             {
@@ -51,71 +54,110 @@ myNd.use( createRouter({
                 name: 'appointments-overview',
                 // route level code-splitting, this generates a separate chunk (About.[hash].js) for this route
                 // which is lazy-loaded when the route is visited.
-                component: () => import('@/mynd/views/Appointments/Overview.vue')
+                component: () => import('@/mynd/views/Appointments/Overview.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Appointments', label: 'Overview'}]
+                }
             },
             {
                 path: '/appointments/booking',
                 name: 'appointments-booking',
-                component: () => import('@/mynd/views/Appointments/Booking.vue')
+                component: () => import('@/mynd/views/Appointments/Booking.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Appointments', label: 'Booking'}]
+                }
             },
             {
                 path: '/appointments/availability-management',
                 name: 'availability-management',
-                component: () => import('@/mynd/views/Appointments/AvailabilityManagement.vue')
+                component: () => import('@/mynd/views/Appointments/AvailabilityManagement.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Appointments', label: 'Availability Management'}]
+                }
             },
             {
                 path: '/appointments/treatment-management',
                 name: 'treatment-management',
-                component: () => import('@/mynd/views/Appointments/TreatmentManagement.vue')
+                component: () => import('@/mynd/views/Appointments/TreatmentManagement.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Appointments', label: 'Treatment Management'}]
+                }
             },
             // RESERVATIONS
             {
                 path: '/reservations/my-reservations',
                 name: 'my-reservations',
-                component: () => import('@/mynd/views/Reservations/MyReservations.vue')
+                component: () => import('@/mynd/views/Reservations/MyReservations.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Reservations', label: 'My Reservations'}]
+                }
             },
             {
                 path: '/reservations/make',
                 name: 'make-reservation',
-                component: () => import('@/mynd/views/Reservations/MakeAReservation.vue')
+                component: () => import('@/mynd/views/Reservations/MakeAReservation.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Reservations', label: 'Make A Reservation'}]
+                }
             },
             // CLIENT DATA
             {
                 path: '/client-data/records',
                 name: 'client-records',
-                component: () => import('@/mynd/views/ClientData/RecordKeeping.vue')
+                component: () => import('@/mynd/views/ClientData/RecordKeeping.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Client Data', label: 'Records'}]
+                }
             },
             {
                 path: '/client-data/contacts',
                 name: 'client-contacts',
-                component: () => import('@/mynd/views/ClientData/ContactDetails.vue')
+                component: () => import('@/mynd/views/ClientData/ContactDetails.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Client Data', label: 'Contacts'}]
+                }
             },
             // MESSAGING
             {
                 path: '/messaging/inbox',
                 name: 'messaging-inbox',
-                component: () => import('@/mynd/views/Messaging/Inbox.vue')
+                component: () => import('@/mynd/views/Messaging/Inbox.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Messaging', label: 'Inbox'}]
+                }
             },
             {
                 path: '/messaging/archive',
                 name: 'messaging-archive',
-                component: () => import('@/mynd/views/Messaging/Archive.vue')
+                component: () => import('@/mynd/views/Messaging/Archive.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Messaging', label: 'Archive'}]
+                }
             },
             // CONFIGURATION
             {
                 path: '/configuration/system',
                 name: 'system-configuration',
-                component: () => import('@/mynd/views/Configuration/SysConfig.vue')
+                component: () => import('@/mynd/views/Configuration/SysConfig.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Configuration', label: 'System'}]
+                }
             },
             {
                 path: '/configuration/import-export',
                 name: 'import-export',
-                component: () => import('@/mynd/views/Configuration/ImportExport.vue')
+                component: () => import('@/mynd/views/Configuration/ImportExport.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Configuration', label: 'Import/Export'}]
+                }
             },
             {
                 path: '/configuration/personal-details',
                 name: 'my-personal-details',
-                component: () => import('@/mynd/views/Configuration/MyPersonalDetails.vue')
+                component: () => import('@/mynd/views/Configuration/MyPersonalDetails.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Configuration', label: 'My Personal Details'}]
+                }
             },
         ]
     })
