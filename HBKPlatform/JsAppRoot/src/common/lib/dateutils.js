@@ -1,4 +1,3 @@
-import {CurrentUserSettings} from "@/common/lib/globals.js";
 import {DateTime} from 'luxon';
 
 const DateUtils = {

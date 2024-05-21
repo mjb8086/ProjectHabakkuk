@@ -12,3 +12,10 @@ const Consts = {
 
 export default Consts;
 export const API_BASE = import.meta.env.VITE_API_BASE;
+
+// ENUMS - Must match mappings defined in backend.
+export const ENUM_ROOM_SELECTION = { NotApplicable: 0, Home: 1, Clinic: 2, Online: 3 };
+
+// LIMITS
+export const MAX_APPOINTMENT_DURATION = 360;
+export const MIN_APPOINTMENT_DURATION = 5;

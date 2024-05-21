@@ -1,6 +1,5 @@
 fieldset.quick-booking {
   max-width: 40rem;
-  margin-bottom: 1rem;
   border: 0;
   
   &-end {
@@ -19,4 +18,8 @@ fieldset.quick-booking {
 
 div.quick-booking-container {
   border: 1px solid var(--surface-200);
+}
+
+div.half-width-field {
+  max-width: 20rem;
 }
