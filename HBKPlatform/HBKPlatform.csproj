@@ -36,6 +36,7 @@
     <Folder Include="JsAppRoot\src\client\" />
     <Folder Include="JsAppRoot\src\clinic\" />
     <Folder Include="JsAppRoot\src\common\views\" />
+    <Folder Include="JsAppRoot\src\mynd\Appointments\Booking\" />
     <Folder Include="Migrations\" />
     <Folder Include="wwwroot\css\contrib\" />
   </ItemGroup>

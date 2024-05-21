@@ -62,6 +62,15 @@ const router = createRouter({
                 }
             },
             {
+                path: '/appointments/calendar',
+                name: 'appointments-calendar',
+                component: () => import('@/mynd/views/Appointments/Calendar.vue'),
+                meta: {
+                    breadcrumb: [{parent: 'Appointments', label: 'Calendar'}],
+                    title: 'Calendar'
+                }
+            },
+            {
                 path: '/appointments/booking',
                 name: 'appointments-booking',
                 component: () => import('@/mynd/views/Appointments/Booking.vue'),

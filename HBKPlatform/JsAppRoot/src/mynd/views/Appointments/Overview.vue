@@ -1,16 +1,12 @@
 <template>
-  <div class="about">
-    <h1>Appointment Overview</h1>
-    <p>Calendar Here Soon</p>
-  </div>
+  <main>
+    <Panel header="Appointment Overview">
+      <p>Details of all upcoming appts Here Soon, cancellation options, even in bulk</p>
+    </Panel>
+  </main>
 </template>
 
 <style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
 </style>
+<script setup>
+</script>

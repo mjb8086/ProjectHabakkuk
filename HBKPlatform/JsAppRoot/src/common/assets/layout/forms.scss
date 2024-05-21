@@ -1,0 +1,22 @@
+fieldset.quick-booking {
+  max-width: 40rem;
+  margin-bottom: 1rem;
+  border: 0;
+  
+  &-end {
+    border-top: 1px solid var(--surface-200);
+    max-width: initial;
+    margin-bottom: initial;
+    padding: 1rem;
+  }
+}
+
+.quick-booking label {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+div.quick-booking-container {
+  border: 1px solid var(--surface-200);
+}

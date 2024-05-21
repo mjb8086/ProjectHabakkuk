@@ -4,13 +4,11 @@ import {DateTime} from 'luxon';
 const DateUtils = {
     getFormattedDateTime: function(isoDateString)
     {
-        const dt = DateTime.fromISO(isoDateString);
-        return dt.toFormat("DD t");
+        return DateTime.fromISO(isoDateString).toLocaleString({...DateTime.DATETIME_SHORT, hourCycle: "h11"});
     },
     getFriendlyDateTime: function(isoDateString)
     {
-        const dt = DateTime.fromISO(isoDateString);
-        return dt.toFormat("DD t");
+        return DateTime.fromISO(isoDateString).toLocaleString({...DateTime.DATETIME_MED_WITH_WEEKDAY, hourCycle : "h11"});
     }
 };
 

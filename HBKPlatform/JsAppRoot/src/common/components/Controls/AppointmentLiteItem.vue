@@ -13,7 +13,7 @@ defineProps({
 <div class="appointment-lite-item">
   <details>
     <summary>
-      <span class="date-time">{{DateUtils.getFormattedDateTime(dateTime)}}</span>
+      <span class="date-time">{{DateUtils.getFriendlyDateTime(dateTime)}}</span>
       <div class="client-name">{{clientName}}</div>
     </summary>
     <div class="item-body">
@@ -26,7 +26,7 @@ defineProps({
 
 <style scoped>
 div.item-body, div.client-name {
-  margin-left: 14px;
+  margin-left: 13px;
 }
 div.appointment-lite-item {
   margin: 2px 2px 6px 2px;

@@ -14,9 +14,15 @@ const model = ref([
         items: [
             {
                 label: 'Overview',
-                icon: 'pi pi-fw pi-calendar',
+                icon: 'pi pi-fw pi-clock',
                 to: '/appointments/overview',
-                colour: 'var(--teal-300)'
+                colour: 'var(--orange-400)'
+            },
+            {
+              label: 'Calendar',
+              icon: 'pi pi-fw pi-calendar',
+              to: '/appointments/calendar',
+              colour: 'var(--teal-300)'
             },
             {
                 label: 'Booking',
