@@ -43,7 +43,7 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<List<ClientDetailsLite>> GetLiteDetails()
         {
             return await _db.Clients
-                .Select(x => new ClientDetailsLite() { Id = x.Id, Name = $"{x.Forename} {x.Surname}" })
+                .Select(x => new ClientDetailsLite() { Id = x.Id, Name = $"{x.Forename} {x.Surname}", Img = x.Img })
                 .ToListAsync();
         }
 

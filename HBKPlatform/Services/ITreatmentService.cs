@@ -6,6 +6,7 @@ namespace HBKPlatform.Services
     public interface ITreatmentService
     {
         public Task<TreatmentManagementView> GetTreatmentMgmtView();
+        public Task<List<TreatmentLite>> GetTreatmentsLite();
         public Task CreateTreatment(TreatmentDto treatment);
         public Task DeleteTreatment(int treatmentId);
         public Task UpdateTreatment(TreatmentDto treatment);

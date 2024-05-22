@@ -1,16 +1,19 @@
 <script setup>
 import "@/common/assets/layout/forms.scss";
 import { ref, reactive } from 'vue';
-import {ENUM_ROOM_SELECTION, MAX_APPOINTMENT_DURATION, MIN_APPOINTMENT_DURATION} from "@/common/lib/consts.js";
+import { API_BASE, ENUM_ROOM_SELECTION, MAX_APPOINTMENT_DURATION, MIN_APPOINTMENT_DURATION } from "@/common/lib/consts.js";
+import { FormatCurrency } from "@/common/lib/format-helpers.js";
 
+// Model and Data
 const bookingDetails = reactive({
   clientId: 0, locationOption: ENUM_ROOM_SELECTION.Home, roomId: -1, timeslotId: 0, weekNum: 0, treatmentId: 0, note: "",
   meetingUrl: "", date: new Date('2024-05-22'), time: new Date('1970-01-01 15:00'), duration: 5
 });
 
-const clientData = ref([{name: 'mr. name', id: 2}, {name: 'other.name', id: 5}]);
-const treatmentData = ref([{name: 'treatment1', id: 2}, {name: 'treatment2', id: 5}]);
-const roomData = ref([{name: 'roomName', building: 'roomBldg', id: 9}]);
+const clientData = ref([]);
+const treatmentData = ref([]);
+const roomData = ref([]);
+let roomsFetched = false;
 
 const locationOptionOptions = ref([
     { name: 'Home', value: ENUM_ROOM_SELECTION.Home },
@@ -19,7 +22,28 @@ const locationOptionOptions = ref([
     { name: 'N/A', value: ENUM_ROOM_SELECTION.NotApplicable }
 ]);
 
+// API Fetches
+fetch(`${API_BASE}/api/mynd/client/getlite`).then((res) => res.json())
+    .then((json) => {
+      clientData.value = json;
+    });
+//    .catch((err) => (error = err));
+fetch(`${API_BASE}/api/mynd/treatment/getlite`).then((res) => res.json())
+    .then((json) => {
+      treatmentData.value = json;
+    });
+
 // Event Handlers
+// Only fetch room data if room selected
+function changeLocationOption(e) {
+   if (e.value === ENUM_ROOM_SELECTION.Clinic && !roomsFetched) {
+     fetch(`${API_BASE}/api/mynd/roomreservation/getreservationslite`).then((res) => res.json())
+         .then((json) => {
+           roomData.value = json;
+           roomsFetched = true;
+         });
+   }
+};
 
 </script>
 
@@ -45,7 +69,12 @@ const locationOptionOptions = ref([
               <InputGroupAddon>
                 <i class="pi pi-receipt"></i>
               </InputGroupAddon>
-                <Dropdown id="treatmentSelect" v-model="bookingDetails.treatmentId" :options="treatmentData" filter showClear optionLabel="name" optionValue="id" placeholder="Select a Treatment" class="w-full">
+                <Dropdown id="treatmentSelect" v-model="bookingDetails.treatmentId" :options="treatmentData" filter showClear optionLabel="title" optionValue="id" placeholder="Select a Treatment" class="w-full">
+                  <template #option="slotProps">
+                    <div class="treatment-select">
+                      <div>{{ slotProps.option.title }}</div> <div>{{ FormatCurrency(slotProps.option.cost) }}</div>
+                    </div>
+                  </template>
                 </Dropdown>
             </InputGroup>
           </fieldset>
@@ -58,7 +87,7 @@ const locationOptionOptions = ref([
               <InputGroupAddon>
                 <i class="pi pi-warehouse"></i>
               </InputGroupAddon>
-                <Dropdown id="roomSelect" v-model="bookingDetails.roomId" :options="roomData" filter optionLabel="name" optionValue="id" placeholder="Select a Room" class="w-full">
+                <Dropdown id="roomSelect" v-model="bookingDetails.roomId" :options="roomData" filter optionLabel="roomTitle" optionValue="id" placeholder="Select a Room" class="w-full">
                 </Dropdown>
             </InputGroup>
 
@@ -128,5 +157,10 @@ textarea#clientNote {
 }
 div#locationOption {
   margin-bottom: 8px;
+}
+div.treatment-select {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
 }
 </style>

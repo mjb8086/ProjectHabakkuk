@@ -20,8 +20,13 @@ namespace HBKPlatform.Services.Implementation
         {
             return new TreatmentManagementView()
             {
-                Treatments = await _treatmentRepo.GetPracticeTreatments()
+                Treatments = await _treatmentRepo.GetTreatmentsLite()
             };
+        }
+        
+        public async Task<List<TreatmentLite>> GetTreatmentsLite()
+        {
+            return await _treatmentRepo.GetTreatmentsLite();
         }
 
         public async Task CreateTreatment(TreatmentDto treatment)
@@ -53,7 +58,7 @@ namespace HBKPlatform.Services.Implementation
         {
             return new ClientTreatmentSelectView()
             {
-                Treatments = await _treatmentRepo.GetPracticeTreatments(true)
+                Treatments = await _treatmentRepo.GetTreatmentsLite(true)
             };
         }
     

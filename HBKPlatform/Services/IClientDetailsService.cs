@@ -12,5 +12,6 @@ namespace HBKPlatform.Services
         public ClientDetailsIndex GetClientDetailsIndex();
         public Task<ClientDto> GetClientAsClient();
         public Task UpdateClientDetailsAsClient(ClientDto client);
+        public Task<List<ClientDetailsLite>> GetClientsLite();
     }
 }

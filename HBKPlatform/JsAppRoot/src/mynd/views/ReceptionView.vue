@@ -15,7 +15,7 @@ import { chartDataSource } from "@/mynd/components/Reception/State/chart-data-so
 
 const summaryData = ref({weeklyAppointmentsChartData: []});
 
-fetch(`${API_BASE}/api/mynd/getreceptionsummary`)
+fetch(`${API_BASE}/api/mynd/reception/summary`)
     .then((res) => res.json())
     .then((json) => {
       summaryData.value = json; 

@@ -14,13 +14,13 @@ namespace HBKPlatform.Areas.MyND.Controllers.API
     /// © 2024 NowDoctor Ltd.
     /// </summary>
     
-    [Authorize(Roles="Practitioner"), Route("/api/mynd/[action]")]
+    [Area("MyND"), Authorize(Roles="Practitioner"), Route("/api/mynd/reception/[action]")]
     public class ReceptionController (IReceptionService _reception): Controller
     {
         /// <summary>
         /// Get reception summary data.
         /// </summary>
-        public async Task<IActionResult> GetReceptionSummary()
+        public async Task<IActionResult> Summary()
         {
             return Ok(await _reception.GetReceptionSummaryData());
         }

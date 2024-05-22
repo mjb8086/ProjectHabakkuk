@@ -30,7 +30,7 @@ namespace HBKPlatform.Repository.Implementation
             }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException("Could not find treatment Id");
         }
     
-        public async Task<List<TreatmentLite>> GetPracticeTreatments(bool clientOnly)
+        public async Task<List<TreatmentLite>> GetTreatmentsLite(bool clientOnly)
         {
             var query = clientOnly ? _db.Treatments.Where(x => x.TreatmentRequestability == Enums.TreatmentRequestability.ClientAndPrac) : _db.Treatments;
             return await query.Select(x => new TreatmentLite()

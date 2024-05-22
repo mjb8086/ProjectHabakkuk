@@ -55,5 +55,10 @@ namespace HBKPlatform.Services.Implementation
         {
             return new ClientDetailsIndex() { NumClients = _clientRepo.GetClientCount() };
         }
+
+        public async Task<List<ClientDetailsLite>> GetClientsLite()
+        {
+            return await _clientRepo.GetLiteDetails();
+        }
     }
 }
