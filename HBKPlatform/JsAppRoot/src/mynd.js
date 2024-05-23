@@ -23,10 +23,9 @@ import MyNDMain from '@/MyNDMain.vue';
 // TODO: Decide whether any of the theme should be imported in the cshtml, what are the tradeoffs
 import '@/common/assets/theme/theme-light/denim/theme.css'; // other options exist, explore the colours
 // Import global style including PrimeVue/Poseidon
-//import '@/common/assets/main.css'; // vue default style - remove when appropriate
 import '@/common/assets/styles.scss';
-import {getCurrentUserData} from "@/common/lib/api/user.js";
 
+import { getCurrentUserData } from "@/common/lib/api/user.js";
 
 // Assign Logo to be used by common AppTopbar
 Consts.APP_LOGO = Consts.LOGO_MYND;
