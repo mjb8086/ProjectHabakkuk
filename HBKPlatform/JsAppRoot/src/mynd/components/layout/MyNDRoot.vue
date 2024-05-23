@@ -1,6 +1,7 @@
 <script setup>
-import { computed, watch, ref, onBeforeUnmount } from 'vue';
+import { computed, watch, ref, onBeforeUnmount, onMounted } from 'vue';
 import { usePrimeVue } from 'primevue/config';
+import { useToast } from 'primevue/usetoast';
 import AppTopbar from '@/common/components/layout/AppTopbar.vue';
 import AppConfig from '@/common/components/layout/AppConfig.vue';
 import AppBreadcrumb from '@/common/components/layout/AppBreadcrumb.vue';
@@ -8,6 +9,7 @@ import MyNDSidebar from './MyNDSidebar.vue';
 import AppFooter from '@/common/components/layout/AppFooter.vue';
 //import AppRightMenu from '@/common/components/layout/AppRightMenu.vue';
 import { useLayout } from '@/common/components/layout/layout.js';
+import { InitToast } from '@/common/lib/toast-wrapper.js';
 
 const $primevue = usePrimeVue();
 const { layoutConfig, layoutState, isSidebarActive } = useLayout();
@@ -26,6 +28,11 @@ watch(isSidebarActive, (newVal) => {
 
 onBeforeUnmount(() => {
     unbindOutsideClickListener();
+});
+
+const toast = useToast();
+onMounted(() => {
+  InitToast(toast)
 });
 
 const containerClass = computed(() => {

@@ -12,6 +12,8 @@ import 'vite/modulepreload-polyfill';
 import { nextTick, createApp } from 'vue';
 import { createRouter, createWebHistory } from "vue-router";
 import PrimeVue from 'primevue/config';
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
 
 import Consts from '@/common/lib/consts.js';
 import {CurrentUserData} from '@/common/lib/globals.js';
@@ -25,6 +27,7 @@ import '@/common/assets/theme/theme-light/denim/theme.css'; // other options exi
 import '@/common/assets/styles.scss';
 import {getCurrentUserData} from "@/common/lib/api/user.js";
 
+
 // Assign Logo to be used by common AppTopbar
 Consts.APP_LOGO = Consts.LOGO_MYND;
 
@@ -32,8 +35,6 @@ Consts.APP_LOGO = Consts.LOGO_MYND;
 CurrentUserData.value = await getCurrentUserData();
 
 const myNd = createApp(MyNDMain);
-
-myNd.use(PrimeVue, { ripple: true });
 
 // Routing. Don't forget to append the new routes to MyNDMenu if appropriate.
 const router = createRouter({
@@ -193,6 +194,10 @@ router.afterEach((to, from) => {
 });
 
 myNd.use(router);
+
+myNd.use(PrimeVue, { ripple: true });
+myNd.use(ToastService);
+myNd.component('Toast', Toast);
 
 console.log('HBKPlatform New UI booting. MyND mode.');
 

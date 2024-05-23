@@ -3,6 +3,7 @@ import "@/common/assets/layout/forms.scss";
 import { ref, reactive } from 'vue';
 import { API_BASE, ENUM_ROOM_SELECTION, MAX_APPOINTMENT_DURATION, MIN_APPOINTMENT_DURATION } from "@/common/lib/consts.js";
 import { FormatCurrency } from "@/common/lib/format-helpers.js";
+import Notification from '@/common/lib/toast-wrapper.js';
 
 // Model and Data
 const bookingDetails = reactive({
@@ -26,12 +27,11 @@ const locationOptionOptions = ref([
 fetch(`${API_BASE}/api/mynd/client/getlite`).then((res) => res.json())
     .then((json) => {
       clientData.value = json;
-    });
-//    .catch((err) => (error = err));
+    }).catch((err) => (Notification.error('', err.message)));
 fetch(`${API_BASE}/api/mynd/treatment/getlite`).then((res) => res.json())
     .then((json) => {
       treatmentData.value = json;
-    });
+    }).catch((err) => (Notification.error('', err.message)));
 
 // Event Handlers
 // Only fetch room data if room selected
@@ -41,7 +41,7 @@ function changeLocationOption(e) {
          .then((json) => {
            roomData.value = json;
            roomsFetched = true;
-         });
+         }).catch((err) => (Notification.error('', err.message)));
    }
 };
 
@@ -136,7 +136,6 @@ function changeLocationOption(e) {
               </div>
             </div>
           </fieldset>
-
           
           <fieldset class="quick-booking">
             <label for="clientNote">Note</label>
@@ -144,7 +143,7 @@ function changeLocationOption(e) {
           </fieldset>
           
           <fieldset class="quick-booking quick-booking-end">
-            <Button title="Click to review before confirming your booking on the next screen.">Preview Booking...</Button>
+            <Button @click="Notification.info('', 'nothing')" title="Click to review before confirming your booking on the next screen.">Preview Booking...</Button>
           </fieldset>
         </div>
     </Panel>
