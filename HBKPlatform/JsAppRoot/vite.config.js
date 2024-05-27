@@ -13,7 +13,7 @@ export default defineConfig (({ command, mode, isSsrBuild, isPreview }) => {
     const commonConfig = {
       build: {
         outDir: '../../wwwroot/dist',
-        assetsDir: '',
+        assetsDir: 'assets',
         emptyOutDir: true,
         manifest: true,
         rollupOptions: {

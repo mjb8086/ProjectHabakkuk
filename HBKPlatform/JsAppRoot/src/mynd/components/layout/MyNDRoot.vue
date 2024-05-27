@@ -30,9 +30,8 @@ onBeforeUnmount(() => {
     unbindOutsideClickListener();
 });
 
-const toast = useToast();
 onMounted(() => {
-  InitToast(toast)
+  InitToast(useToast());
 });
 
 const containerClass = computed(() => {

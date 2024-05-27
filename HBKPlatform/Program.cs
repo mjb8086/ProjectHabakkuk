@@ -174,6 +174,8 @@ try
     app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
     app.MapRazorPages();
     app.MapControllers(); // will fill in routes as declared in decorators - use these for the API
+    
+    app.UseWebSockets();
 
     /*
     var options = new RewriteOptions()
