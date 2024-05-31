@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database
@@ -18,6 +16,8 @@ namespace HBKPlatform.Database
         public int PractitionerId { get; set; }
         public int TreatmentId { get; set; }
         public int TimeslotId { get; set; }
+        public int Duration { get; set; }
+        public int? FinalAdjustment { get; set; }
         public int? RoomId { get; set; }
         public int? RoomReservationId { get; set; }
         public string? Note { get; set; }
@@ -32,6 +32,5 @@ namespace HBKPlatform.Database
         public virtual Timeslot Timeslot { get; set; }
         public virtual Room? Room { get; set; }
         public virtual RoomReservation? RoomReservation { get; set; }
-
     }
 }

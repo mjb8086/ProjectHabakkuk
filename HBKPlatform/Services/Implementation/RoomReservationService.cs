@@ -101,7 +101,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
         
-        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.Id);
+        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
         _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
@@ -119,7 +119,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
         
-        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.Id);
+        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
         _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
 
         return BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
@@ -132,7 +132,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         
-        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.Id);
+        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
         _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum);
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
@@ -264,7 +264,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             _indefAvaLookup = await _avaRepo.GetRoomLookupForIndefAnyTenancy(roomId);
         
             // If the ts is unavailable, return true. Fixme: may be inefficient?
-            return new SortedSet<TimeslotDto>(timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.Id)));
+            return new SortedSet<TimeslotDto>(timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotId)));
         }
         
         /// <summary>

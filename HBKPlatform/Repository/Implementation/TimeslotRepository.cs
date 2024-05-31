@@ -19,23 +19,23 @@ namespace HBKPlatform.Repository.Implementation
         {
             return await _db.Timeslots.Where(x => x.Id == timeslotId).Select(x => new TimeslotDto()
             {
-                Id = x.Id,
+                TimeslotId = x.Id,
                 Description = x.Description,
-                Duration = x.Duration,
+                DurationMinutes = x.Duration,
                 Day = x.Day,
-                Time = x.Time
+                Time = x.StartTime
             }).FirstOrDefaultAsync() ?? throw new IdxNotFoundException("Could not find timeslot Id");
         }
 
         public async Task<List<TimeslotDto>> GetPracticeTimeslots()
         {
-            return await _db.Timeslots.OrderBy(x => x.Day).ThenBy(x => x.Time).Select(x => new TimeslotDto()
+            return await _db.Timeslots.OrderBy(x => x.Day).ThenBy(x => x.StartTime).Select(x => new TimeslotDto()
             {
-                Id = x.Id,
+                TimeslotId = x.Id,
                 Description = x.Description,
-                Duration = x.Duration,
+                DurationMinutes = x.Duration,
                 Day = x.Day,
-                Time = x.Time
+                Time = x.StartTime
             }).ToListAsync();
         }
 
@@ -59,8 +59,8 @@ namespace HBKPlatform.Repository.Implementation
             {
                 Day = dto.Day,
                 Description = dto.Description,
-                Time = dto.Time,
-                Duration = dto.Duration
+                StartTime = dto.Time,
+                Duration = dto.DurationMinutes
             };
         }
     }

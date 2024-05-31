@@ -45,14 +45,14 @@ namespace HBKPlatform.Database.Helpers
                 }
 
 
+                // TEMP while we still have old TS system
+                timeslots = ctx.Timeslots.ToList();
                 if (ctx.Timeslots.Any())
                 {
-                    timeslots = ctx.Timeslots.ToList();
                 }
                 else
                 {
-                    timeslots = TimeslotHelper.GenerateDefaultTimeslots(TimeslotHelper.DEFAULT_START,
-                        TimeslotHelper.DEFAULT_END);
+//                    timeslots = TimeslotHelper.GenerateDefaultTimeslots(TimeslotHelper.DEFAULT_START, TimeslotHelper.DEFAULT_END);
                     await ctx.AddRangeAsync(timeslots);
                     await ctx.SaveChangesAsync();
                 }

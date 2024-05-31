@@ -45,13 +45,13 @@ namespace HBKPlatform.Repository.Implementation
         public async Task<List<AppointmentDto>> GetAppointmentsForClient(int clientId)
         {
             return await _db.Appointments.Include("Timeslot").Where(x => x.ClientId == clientId && x.Status == Enums.AppointmentStatus.Live)
-                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
+                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.StartTime)
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
-                        Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
+                        Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
                     }
                 }).AsNoTracking().ToListAsync();
         }
@@ -65,13 +65,13 @@ namespace HBKPlatform.Repository.Implementation
             if (status.HasValue) query = query.Where(x => x.Status == status.Value);
             
             return await query.Where(x => x.PractitionerId == pracId)
-                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
+                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.StartTime)
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
-                        Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
+                        Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
                     }
                 }).AsNoTracking().ToListAsync();
         }
@@ -91,14 +91,14 @@ namespace HBKPlatform.Repository.Implementation
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
             
             return await query 
-                .Where(x => x.PractitionerId == pracId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
-                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
+                .Where(x => x.PractitionerId == pracId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
+                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.StartTime)
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
                     PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
-                        Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration
+                        Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
                     }
                 }).AsNoTracking().ToListAsync();
         }
@@ -165,11 +165,11 @@ namespace HBKPlatform.Repository.Implementation
             var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
             return await _db.Appointments.Include("Timeslot").IgnoreQueryFilters()
-                .Where(x => x.RoomId == roomId && x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
-                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.Time)
+                .Where(x => x.RoomId == roomId && x.Status == Enums.AppointmentStatus.Live && (x.WeekNum > weekNum || x.WeekNum == weekNum && x.Timeslot.Day > today || x.WeekNum == weekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
+                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.StartTime)
                 .Select(x => new TimeslotDto()
                 {
-                    Day = x.Timeslot.Day, Time = x.Timeslot.Time, Duration = x.Timeslot.Duration, WeekNum = x.WeekNum
+                    Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration, WeekNum = x.WeekNum
                 }).AsNoTracking().ToListAsync();
         }
         
@@ -186,7 +186,7 @@ namespace HBKPlatform.Repository.Implementation
                 .Where(x => x.PractitionerId == pracId && x.Status == Enums.AppointmentStatus.Live &&
                             (x.WeekNum < weekNum || x.WeekNum == weekNum && x.Timeslot.Day < today ||
                              x.WeekNum == weekNum && x.Timeslot.Day == today &&
-                             x.Timeslot.Time < TimeOnly.FromDateTime(now))).CountAsync();
+                             x.Timeslot.StartTime < TimeOnly.FromDateTime(now))).CountAsync();
         }
         
 

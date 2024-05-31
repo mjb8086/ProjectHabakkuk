@@ -8,13 +8,13 @@ namespace HBKPlatform.Models.DTO
     [DebuggerDisplay("WeekNum={WeekNum} Day={Day} Time={Time} Desc={Description}")]
     public class TimeslotDto: IComparable<TimeslotDto>
     {
-        public int Id { get; set; }
+        public int TimeslotId { get; set; }
         public string Description { get; set; }
-        public int PracticeId { get; set; }
         public Enums.Day Day { get; set; }
         public TimeOnly Time { get; set; }
         [Range(10,300)]
-        public int Duration { get; set; }
+        public int DurationMinutes { get; set; }
+        public int DurationTss { get; set; }
         public int WeekNum { get; set; }
 
         /// <summary>
@@ -25,12 +25,11 @@ namespace HBKPlatform.Models.DTO
         {
             return new TimeslotDto()
             {
-                Id = this.Id,
+                TimeslotId = this.TimeslotId,
                 Description = this.Description,
-                PracticeId = this.PracticeId,
                 Day = this.Day,
                 Time = this.Time,
-                Duration = this.Duration,
+                DurationMinutes = this.DurationMinutes,
                 WeekNum = this.WeekNum
             };
         }
@@ -38,8 +37,8 @@ namespace HBKPlatform.Models.DTO
         public bool IsClash(TimeslotDto other)
         {
             return (other.WeekNum == this.WeekNum && other.Day == this.Day &&
-                    (this.Time < other.Time.AddMinutes(other.Duration) &&
-                     this.Time.AddMinutes(this.Duration) > other.Time));
+                    (this.Time < other.Time.AddMinutes(other.DurationMinutes) &&
+                     this.Time.AddMinutes(this.DurationMinutes) > other.Time));
         }
     
         public bool IsNotClashAny(List<TimeslotDto> others)
@@ -57,7 +56,7 @@ namespace HBKPlatform.Models.DTO
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
-            return x.Id == y.Id && x.Description == y.Description && x.PracticeId == y.PracticeId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+            return x.TimeslotId == y.TimeslotId && x.Description == y.Description && x.Day == y.Day && x.Time.Equals(y.Time) && x.DurationMinutes == y.DurationMinutes && x.WeekNum == y.WeekNum;
         }
 
         public int CompareTo(TimeslotDto? next)
@@ -101,12 +100,12 @@ namespace HBKPlatform.Models.DTO
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.Id == y.Id && x.Description == y.Description && x.PracticeId == y.PracticeId && x.Day == y.Day && x.Time.Equals(y.Time) && x.Duration == y.Duration && x.WeekNum == y.WeekNum;
+                return x.TimeslotId == y.TimeslotId && x.Description == y.Description && x.Day == y.Day && x.Time.Equals(y.Time) && x.DurationMinutes == y.DurationMinutes && x.WeekNum == y.WeekNum;
             }
 
             public int GetHashCode(TimeslotDto obj)
             {
-                return HashCode.Combine(obj.Id, obj.Description, obj.PracticeId, (int)obj.Day, obj.Time, obj.Duration, obj.WeekNum);
+                return HashCode.Combine(obj.TimeslotId, obj.Description, (int)obj.Day, obj.Time, obj.DurationMinutes, obj.WeekNum);
             }
         }
 
@@ -117,9 +116,9 @@ namespace HBKPlatform.Models.DTO
             return new()
             {
                 Description = timeslot.Description,
-                Id = timeslot.Id,
+                TimeslotId = timeslot.Id,
                 Day = timeslot.Day,
-                Time = timeslot.Time
+                Time = timeslot.StartTime
             };
         }
 

@@ -14,13 +14,15 @@ namespace HBKPlatform.Database
     public class TimeslotAvailability: HbkBaseEntity
     {
         public int TimeslotId { get; set; }
+        public int Duration { get; set; }
+        public int? EndAdjustment { get; set; }
         public int? PractitionerId { get; set; }
         public int? RoomId { get; set; }
         public int WeekNum { get; set; }
         public bool IsIndefinite { get; set; }
         public Enums.AvailabilityEntity Entity { get; set; }
         public Enums.TimeslotAvailability Availability { get; set; }
-        public int Interlude { get; set; }
+//        public int Interlude { get; set; }
     
         // EF Navigations
         public virtual Timeslot Timeslot { get; set; }

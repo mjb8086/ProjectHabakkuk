@@ -21,7 +21,7 @@ namespace HBKPlatform.Helpers
         /// <summary>
         /// Get the DateTime representation from a timeslot, week number and DbStartDate.
         /// Note: WeekNumbers are 1-indexed. I.e., the week of dbStartDate will be counted as week 1
-        /// Uses either the timeslotDto's weekNum or the explicit weekNum, with the explicit weekNum
+        /// Uses either the timeslotDto's weekNum or the parameter weekNum, with the parameter weekNum
         /// taking priority in the calculation.
         /// </summary>
         /// <exception cref="InvalidUserOperationException"></exception>
@@ -34,6 +34,18 @@ namespace HBKPlatform.Helpers
 
             // subtract 1 from weekNum to account for the first week being week 1 (origin)
             return new DateTime(DateOnly.Parse(dbStartDate), timeslot.Time).AddDays((((weekNum ?? timeslot.WeekNum)-1) * 7) + (int)timeslot.Day);
+        }
+        
+        
+        public static DateTime FromTimeslotIdx(string dbStartDate, int tsIdx, int weekNum)
+        {
+            if (string.IsNullOrEmpty(dbStartDate) || weekNum < 1 || tsIdx < 0 || tsIdx > TimeslotHelper.TIMESLOTS_PER_WEEK)
+            {
+                throw new InvalidUserOperationException("Invalid parameters, cannot produce a DateTime.");
+            }
+
+            // subtract 1 from weekNum to account for the first week being week 1 (origin)
+            return new DateTime(DateOnly.Parse(dbStartDate), TimeslotHelper.GetTime(tsIdx)).AddDays((((weekNum-1) * 7) + (int)TimeslotHelper.GetDay(tsIdx)));
         }
 
         /// <summary>

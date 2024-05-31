@@ -256,5 +256,25 @@ namespace HBK.Test
         {
             Assert.Equal(expected, DateTimeHelper.GetDateRangeStringFromWeekNum(DB_START_DATE, weekNum));
         }
+        
+        // New Timeslot system tests
+        [Theory]
+        [InlineData("2024-01-01 00:00",  0, 1)] 
+        [InlineData("2024-01-01 00:05",  1, 1)] 
+        [InlineData("2024-01-01 00:35",  7, 1)] 
+        [InlineData("2024-01-01 12:00",  144, 1)] 
+        [InlineData("2024-01-02 00:00",  288, 1)] 
+        [InlineData("2024-01-07 23:55",  2015, 1)] 
+        [InlineData("2024-01-08 00:00",  0, 2)] 
+        [InlineData("2024-01-10 00:00",  576, 2)] 
+        [InlineData("2024-01-10 01:40",  596, 2)] 
+        [InlineData("2024-12-29 22:40",  2000, 52)] 
+        [InlineData("2024-12-29 23:55",  2015, 52)] 
+        public void TimeslotDateIsCorrect(string expected, int tsIdx, int weekNum)
+        {
+            Assert.Equal(expected, DateTimeHelper.FromTimeslotIdx(DB_START_DATE, tsIdx, weekNum).ToString("yyyy-MM-dd HH:mm"));
+        }
+        
+        // TODO check exception throws for out of range values
     }
 }

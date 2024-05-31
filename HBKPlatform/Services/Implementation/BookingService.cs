@@ -66,7 +66,7 @@ namespace HBKPlatform.Services.Implementation
             var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
         
             // If the ts is unavailable, return true
-            return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.Id)).ToList();
+            return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotId)).ToList();
         }
 
         /// <summary>

@@ -12,7 +12,7 @@
 <h2>Select a timeslot</h2>
 @foreach (var timeslot in Model.AvailableTimeslots)
 {
-    <p>@timeslot.Description <a asp-area="MyND" asp-controller="RoomReservation" asp-action="ConfirmReservation" asp-route-roomId="@Model.RoomId" asp-route-weekNum="@timeslot.WeekNum" asp-route-timeslotId="@timeslot.Id">book</a></p>
+    <p>@timeslot.Description <a asp-area="MyND" asp-controller="RoomReservation" asp-action="ConfirmReservation" asp-route-roomId="@Model.RoomId" asp-route-weekNum="@timeslot.WeekNum" asp-route-timeslotId="@timeslot.TimeslotId">book</a></p>
 }
 
 <p>NB: This is an alpha-quality view. New UI will have better searching and filtering using a calendar-like view.</p>

@@ -50,7 +50,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
         return await _db.RoomReservations.Include("Timeslot").IgnoreQueryFilters()
-            .Where(x => x.ClinicId == clinicId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+            .Where(x => x.ClinicId == clinicId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
             .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
             .ToListAsync();
     }
@@ -61,7 +61,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
         return await _db.RoomReservations.Include("Timeslot")
-            .Where(x => x.PractitionerId == practitionerId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.Time >= TimeOnly.FromDateTime(now)))
+            .Where(x => x.PractitionerId == practitionerId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
             .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
             .ToListAsync();
     }
