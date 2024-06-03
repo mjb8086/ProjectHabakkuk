@@ -1,5 +1,4 @@
 ﻿using HBKPlatform.Globals;
-using HBKPlatform.Helpers;
 using HBKPlatform.Services.Implementation;
 
 using Microsoft.AspNetCore.Identity;
@@ -125,7 +124,7 @@ namespace HBKPlatform.Database.Helpers
                         ClientBio = "inventor of the flux capacitor",
                         Location = "hill valley",
                         DateOfBirth = new DateOnly(1932, 07, 08),
-                        Img = new string("/samples/brown.jpg"),
+                        Img = "/samples/brown.jpg",
                         User = user1,
                         GmcNumber = "foo",
                         Tenancy = t
@@ -139,7 +138,7 @@ namespace HBKPlatform.Database.Helpers
                         ClientBio = "layabout",
                         Location = "the pub",
                         DateOfBirth = new DateOnly(1992, 07, 08),
-                        Img = new string("/samples/second.jpg"),
+                        Img = "/samples/second.jpg",
                         Tenancy = t,
                         GmcNumber = "foo",
                         User =  new ()
@@ -186,7 +185,7 @@ namespace HBKPlatform.Database.Helpers
                         Title = Enums.Title.Mr,
                         Address = "a garage",
                         DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = new string("/samples/marty.jpg"),
+                        Img = "/samples/marty.jpg",
                         Telephone = "999",
                         User = client1User,
                         Tenancy = t
@@ -438,7 +437,6 @@ namespace HBKPlatform.Database.Helpers
                     };
                     await ctx.AddAsync(clinic1);
                     await ctx.SaveChangesAsync();
-                    
                     
                     // BEGIN T2 PRACTICE
                     var t2 = new Tenancy()

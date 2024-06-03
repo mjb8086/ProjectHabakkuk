@@ -20,7 +20,6 @@ namespace HBK.Test
 
         /*
          * These first tests check bounds on the DateTimeHelper FromTimeslot method.
-         *
          * Helpful ref: https://www.epochconverter.com/weeks/2024 to get week numbers
          */
         [Fact]
