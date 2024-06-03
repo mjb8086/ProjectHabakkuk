@@ -259,22 +259,93 @@ namespace HBK.Test
         
         // New Timeslot system tests
         [Theory]
-        [InlineData("2024-01-01 00:00",  0, 1)] 
-        [InlineData("2024-01-01 00:05",  1, 1)] 
-        [InlineData("2024-01-01 00:35",  7, 1)] 
-        [InlineData("2024-01-01 12:00",  144, 1)] 
-        [InlineData("2024-01-02 00:00",  288, 1)] 
-        [InlineData("2024-01-07 23:55",  2015, 1)] 
-        [InlineData("2024-01-08 00:00",  0, 2)] 
-        [InlineData("2024-01-10 00:00",  576, 2)] 
-        [InlineData("2024-01-10 01:40",  596, 2)] 
-        [InlineData("2024-12-29 22:40",  2000, 52)] 
-        [InlineData("2024-12-29 23:55",  2015, 52)] 
+        [InlineData("2024-01-01 00:00",  1, 1)] 
+        [InlineData("2024-01-01 00:05",  2, 1)] 
+        [InlineData("2024-01-01 00:35",  8, 1)] 
+        [InlineData("2024-01-01 12:00",  145, 1)] 
+        [InlineData("2024-01-01 23:55",  288, 1)] 
+        [InlineData("2024-01-02 00:00",  289, 1)] 
+        [InlineData("2024-01-02 12:00",  433, 1 )]  // 12:00 Tue
+        [InlineData("2024-01-02 23:55",  576, 1)]  // 23:55 Tue
+        [InlineData("2024-01-03 00:00",  577 , 1)]  // 00:00 Wed
+        [InlineData("2024-01-03 23:55",  864 , 1)]  // 23:55 Wed
+        [InlineData("2024-01-04 00:00",  865 , 1)]  // 00:00 Thur
+        [InlineData("2024-01-04 23:55",  1152 , 1)]  // 23:55 Thur
+        [InlineData("2024-01-05 00:00",  1153 , 1)]  // 00:00 Fri
+        [InlineData("2024-01-05 23:55",  1440 , 1)]  // 23:55 Fri
+        [InlineData("2024-01-06 00:00",  1441 , 1)]  // 00:00 Sat
+        [InlineData("2024-01-06 23:55",  1728 , 1)]  // 23:55 Sat
+        [InlineData("2024-01-07 00:00",  1729 , 1)]  // 00:00 Sun
+        [InlineData("2024-01-07 23:55",  2016, 1)]  // 22:55 Sun
+        [InlineData("2024-01-08 00:00",  1, 2)] 
+        [InlineData("2024-01-10 00:00",  577, 2)] 
+        [InlineData("2024-01-10 01:40",  597, 2)] 
+        [InlineData("2024-12-29 22:40",  2001, 52)] 
+        [InlineData("2024-12-29 23:55",  2016, 52)] 
         public void TimeslotDateIsCorrect(string expected, int tsIdx, int weekNum)
         {
             Assert.Equal(expected, DateTimeHelper.FromTimeslotIdx(DB_START_DATE, tsIdx, weekNum).ToString("yyyy-MM-dd HH:mm"));
         }
         
-        // TODO check exception throws for out of range values
+        // check exception throws for out of range values
+        [Theory]
+        [InlineData( 0, 1)] 
+        [InlineData( 1, 0)] 
+        [InlineData( -1, 1)] 
+        [InlineData( -101, -1)] 
+        [InlineData( 2017, 1)] 
+        [InlineData( 100000, 1)] 
+        [InlineData( 100000, 293940234)] 
+        [InlineData( 100000, -293940234)] 
+        [InlineData( 1, -293940234)] 
+        public void TimeslotDateIsIncorrect(int tsIdx, int weekNum)
+        {
+            Assert.Throws<InvalidUserOperationException>(() => DateTimeHelper.FromTimeslotIdx(DB_START_DATE, tsIdx, weekNum));
+        }
+        
+        // Test GetTime and GetDay for edge cases
+        [Theory]
+        [InlineData("00:00",  1 )]  // 00:00 Mon
+        [InlineData("12:00",  145 )]  // 12:00 Mon
+        [InlineData("23:55",  288 )]  // 23:55 Mon
+        [InlineData("00:00",  289 )]  // 00:00 Tue
+        [InlineData("12:00",  433 )]  // 12:00 Tue
+        [InlineData("23:55",  576 )]  // 23:55 Tue
+        [InlineData("00:00",  577 )]  // 00:00 Wed
+        [InlineData("23:55",  864 )]  // 23:55 Wed
+        [InlineData("00:00",  865 )]  // 00:00 Thur
+        [InlineData("23:55",  1152 )]  // 23:55 Thur
+        [InlineData("00:00",  1153 )]  // 00:00 Fri
+        [InlineData("23:55",  1440 )]  // 23:55 Fri
+        [InlineData("00:00",  1441 )]  // 00:00 Sat
+        [InlineData("23:55",  1728 )]  // 23:55 Sat
+        [InlineData("00:00",  1729 )]  // 00:00 Sun
+        [InlineData("23:55",  2016 )]  // 23:55 Sun
+        public void GetTimeIsCorrect(string expected, int tsIdx)
+        {
+            Assert.Equal(expected, TimeslotHelper.GetTime(tsIdx).ToString("HH:mm"));
+        }
+        
+        [Theory]
+        [InlineData(Enums.Day.Monday,  1 )]  // 00:00 Mon
+        [InlineData(Enums.Day.Monday,  145 )]  // 12:00 Mon
+        [InlineData(Enums.Day.Monday,  288 )]  // 23:55 Mon
+        [InlineData(Enums.Day.Tuesday,  289 )]  // 00:00 Tue
+        [InlineData(Enums.Day.Tuesday,  433 )]  // 12:00 Tue
+        [InlineData(Enums.Day.Tuesday,  576 )]  // 23:55 Tue
+        [InlineData(Enums.Day.Wednesday,  577 )]  // 00:00 Wed
+        [InlineData(Enums.Day.Wednesday,  864 )]  // 23:55 Wed
+        [InlineData(Enums.Day.Thursday,  865 )]  // 00:00 Thur
+        [InlineData(Enums.Day.Thursday,  1152 )]  // 23:55 Thur
+        [InlineData(Enums.Day.Friday,  1153 )]  // 00:00 Fri
+        [InlineData(Enums.Day.Friday,  1440 )]  // 23:55 Fri
+        [InlineData(Enums.Day.Saturday,  1441 )]  // 00:00 Sat
+        [InlineData(Enums.Day.Saturday,  1728 )]  // 23:55 Sat
+        [InlineData(Enums.Day.Sunday,  1729 )]  // 00:00 Sun
+        [InlineData(Enums.Day.Sunday,  2016 )]  // 23:55 Sun
+        public void GetDayIsCorrect(Enums.Day expected, int tsIdx)
+        {
+            Assert.Equal(expected, TimeslotHelper.GetDay(tsIdx));
+        }
     }
 }

@@ -70,14 +70,16 @@ namespace HBKPlatform.Helpers
 
         public static TimeOnly GetTime(int tsIdx)
         {
-            var timeslots = tsIdx % TIMESLOTS_PER_DAY;
+            // Adjust for 1-indexing
+            var timeslots = (tsIdx-1) % TIMESLOTS_PER_DAY;
             var minutes = timeslots * TIMESLOT_DURATION_MINUTES;
             return new TimeOnly(minutes/60, minutes%60);
         }
 
         public static Enums.Day GetDay(int tsIdx)
         {
-            return (Enums.Day) (tsIdx / TIMESLOTS_PER_DAY);
+            // Adjust for 1-indexing
+            return (Enums.Day) ((tsIdx-1) / TIMESLOTS_PER_DAY);
         }
         
     }

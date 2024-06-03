@@ -17,6 +17,8 @@ namespace HBKPlatform.Helpers
         public const string SHORTHAND_DATE_FORMAT = "dd/MM/yyyy";
         public const string FRIENDLY_DAY_FORMAT_NO_YEAR = "d MMM";
         public const string FRIENDLY_FULL_DATE_TIME = "dddd d MMMM yyyy, h:mm tt";
+        public const int WEEKNUM_ORIGIN = 1;
+        public const int TS_IDX_ORIGIN = 1;
         
         /// <summary>
         /// Get the DateTime representation from a timeslot, week number and DbStartDate.
@@ -39,7 +41,7 @@ namespace HBKPlatform.Helpers
         
         public static DateTime FromTimeslotIdx(string dbStartDate, int tsIdx, int weekNum)
         {
-            if (string.IsNullOrEmpty(dbStartDate) || weekNum < 1 || tsIdx < 0 || tsIdx > TimeslotHelper.TIMESLOTS_PER_WEEK)
+            if (string.IsNullOrEmpty(dbStartDate) || weekNum < WEEKNUM_ORIGIN || tsIdx < TS_IDX_ORIGIN || tsIdx > TimeslotHelper.TIMESLOTS_PER_WEEK)
             {
                 throw new InvalidUserOperationException("Invalid parameters, cannot produce a DateTime.");
             }
