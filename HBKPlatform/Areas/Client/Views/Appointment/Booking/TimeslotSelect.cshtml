@@ -11,5 +11,5 @@
 <h2>Select a timeslot</h2>
 @foreach (var timeslot in Model.AvailableTimeslots)
 {
-    <p>@timeslot.Description <a asp-area="Client" asp-controller="Appointment" asp-action="BookingConfirm" asp-route-treatmentId="@Model.TreatmentId" asp-route-weekNum="@timeslot.WeekNum" asp-route-timeslotId="@timeslot.TimeslotId">book</a></p>
+    <p>@timeslot.Description <a asp-area="Client" asp-controller="Appointment" asp-action="BookingConfirm" asp-route-treatmentId="@Model.TreatmentId" asp-route-weekNum="@timeslot.WeekNum" asp-route-timeslotId="@timeslot.TimeslotIdx">book</a></p>
 }

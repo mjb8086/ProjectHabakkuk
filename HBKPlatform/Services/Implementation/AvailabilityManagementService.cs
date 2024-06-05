@@ -238,7 +238,7 @@ namespace HBKPlatform.Services.Implementation
                 dailyTimeslotLookup[day] = thisDayTs.Select(x => new AvailabilityLite()
                 {
                     // IsAvailable depends on CurrentAvailability being populated.
-                    Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.TimeslotId), TimeslotId = x.TimeslotId, IsIndefiniteAvailable = IsIndefiniteAvailable(x.TimeslotId)
+                    Description = x.Time.ToShortTimeString(), IsAvailable = IsAvailable(x.TimeslotIdx), TimeslotId = x.TimeslotIdx, IsIndefiniteAvailable = IsIndefiniteAvailable(x.TimeslotIdx)
                 }).ToList();
             }
 

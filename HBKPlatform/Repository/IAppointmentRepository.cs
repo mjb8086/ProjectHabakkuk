@@ -17,7 +17,7 @@ namespace HBKPlatform.Repository
         public Task<List<TimeslotDto>> GetFutureOccupiedTimeslotsForRoomAnyTenancy(int roomId, DateTime now);
         
         // Statistical methods
-        public Task<int> GetNumberOfCompletedAppointments(int pracId, string dbStartDate, DateTime now);
+        public Task<int> GetNumberOfCompletedAppointments(int weekNum, int currentTick, int pracId);
 
     }
 }

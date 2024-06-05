@@ -12,7 +12,7 @@ namespace HBKPlatform.Helpers
                 if (timeslot.WeekNum < 1 ) continue;
                 lites.Add(new TimeslotLite()
                 {
-                    Id = timeslot.TimeslotId,
+                    Id = timeslot.TimeslotIdx,
                     Description = string.IsNullOrWhiteSpace(timeslot.Description) ? DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslot)) : timeslot.Description,
                     WeekNum = timeslot.WeekNum
                 });

@@ -36,7 +36,7 @@ namespace HBKPlatform.Database
         public DbSet<Practice> Practices { get; set; } = default!;
         public DbSet<Practitioner> Practitioners { get; set; } = default!;
         public DbSet<Tenancy> Tenancies { get; set; } = default!;
-        public DbSet<Timeslot> Timeslots { get; set; } = default!;
+//        public DbSet<Timeslot> Timeslots { get; set; } = default!;
         public DbSet<TimeslotAvailability> TimeslotAvailability { get; set; } = default!;
         public DbSet<Treatment> Treatments { get; set; } = default!;
         public DbSet<Setting> Settings { get; set; } = default!;

@@ -53,7 +53,7 @@ namespace HBK.Test
                 {
                     var newTs = new TimeslotDto()
                     {
-                        TimeslotId = id++, Day = day, Time = time, DurationMinutes = duration, WeekNum = weekNum, 
+                        TimeslotIdx = id++, Day = day, Time = time, DurationMinutes = duration, WeekNum = weekNum, 
                     };
                     if(weekNum > 0) newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(DB_START_DATE, newTs));
                     timeslots.Add(newTs);
@@ -117,13 +117,13 @@ namespace HBK.Test
             {
                 foreach (var ts in tsList)
                 {
-                    ava.Add(new TimeslotAvailabilityDto() { Availability = Enums.TimeslotAvailability.Available, TimeslotId = ts.TimeslotId, IsIndefinite = true, WeekNum = -1});
+                    ava.Add(new TimeslotAvailabilityDto() { Availability = Enums.TimeslotAvailability.Available, TimeslotId = ts.TimeslotIdx, IsIndefinite = true, WeekNum = -1});
                 }
             }
 
             foreach (var ts in tsList)
             {
-                 ava.Add(new TimeslotAvailabilityDto() { Availability = Enums.TimeslotAvailability.Available, TimeslotId = ts.TimeslotId, IsIndefinite = false, WeekNum = ts.WeekNum});
+                 ava.Add(new TimeslotAvailabilityDto() { Availability = Enums.TimeslotAvailability.Available, TimeslotId = ts.TimeslotIdx, IsIndefinite = false, WeekNum = ts.WeekNum});
             }
             return ava.DistinctBy(x => x.TimeslotId).ToList();
         }
@@ -218,7 +218,7 @@ namespace HBK.Test
             // NB: AppointmentRepo includes Timeslot data in select, thus the appointment's timeslot must be instantiated
             var appointments = new List<AppointmentDto>()
             {
-                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotId == TS_ID), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotIdx == TS_ID), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
             };
             
             // Instantiate booking service
@@ -236,9 +236,9 @@ namespace HBK.Test
             Assert.Equal(266, timeslotsNoAppts.Count);
             
             // Is the booked timeslot excluded? 
-            Assert.False(timeslots.Any(x => x.TimeslotId == TS_ID && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            Assert.False(timeslots.Any(x => x.TimeslotIdx == TS_ID && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
             // And the control group...
-            Assert.True(timeslotsNoAppts.Any(x => x.TimeslotId == TS_ID && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslotsNoAppts.Any(x => x.TimeslotIdx == TS_ID && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
         }
         
         [Fact]
@@ -251,9 +251,9 @@ namespace HBK.Test
             // NB: AppointmentRepo includes Timeslot data in select, thus the appointment's timeslot must be instantiated
             var appointments = new List<AppointmentDto>()
             {
-                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotId == 21), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
-                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotId == 41), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
-                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotId == 30), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotIdx == 21), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotIdx == 41), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID},
+                new () { PractitionerId = FAKE_PRACTITIONER_ID, WeekNum = WEEK_NUM, Timeslot = timeslotList.First(x => x.TimeslotIdx == 30), Status = Enums.AppointmentStatus.Live, TreatmentId = FAKE_TREATMENT_ID}
             };
             
             // Instantiate booking service
@@ -268,14 +268,14 @@ namespace HBK.Test
             Assert.Equal(263, timeslots.Count);
             
             // Is the booked timeslot excluded? 
-            Assert.False(timeslots.Any(x => x.TimeslotId == 21 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
-            Assert.False(timeslots.Any(x => x.TimeslotId == 30 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
-            Assert.False(timeslots.Any(x => x.TimeslotId == 41 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            Assert.False(timeslots.Any(x => x.TimeslotIdx == 21 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            Assert.False(timeslots.Any(x => x.TimeslotIdx == 30 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
+            Assert.False(timeslots.Any(x => x.TimeslotIdx == 41 && x.WeekNum == WEEK_NUM), "A booked timeslot was present in the list of available.");
             
-            Assert.True(timeslots.Any(x => x.TimeslotId == 22 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
-            Assert.True(timeslots.Any(x => x.TimeslotId == 23 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
-            Assert.True(timeslots.Any(x => x.TimeslotId == 29 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
-            Assert.True(timeslots.Any(x => x.TimeslotId == 31 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.TimeslotIdx == 22 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.TimeslotIdx == 23 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.TimeslotIdx == 29 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
+            Assert.True(timeslots.Any(x => x.TimeslotIdx == 31 && x.WeekNum == WEEK_NUM), "An unbooked timeslot was missing from the list of available.");
         }
         
         // TODO: More of the appointment booking tests.

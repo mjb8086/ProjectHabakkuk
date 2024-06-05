@@ -8,13 +8,12 @@ namespace HBKPlatform.Models.DTO
     [DebuggerDisplay("WeekNum={WeekNum} Day={Day} Time={Time} Desc={Description}")]
     public class TimeslotDto: IComparable<TimeslotDto>
     {
-        public int TimeslotId { get; set; }
+        public int TimeslotIdx { get; set; }
         public string Description { get; set; }
         public Enums.Day Day { get; set; }
         public TimeOnly Time { get; set; }
         [Range(10,300)]
         public int DurationMinutes { get; set; }
-        public int DurationTss { get; set; }
         public int WeekNum { get; set; }
 
         /// <summary>
@@ -25,7 +24,7 @@ namespace HBKPlatform.Models.DTO
         {
             return new TimeslotDto()
             {
-                TimeslotId = this.TimeslotId,
+                TimeslotIdx = this.TimeslotIdx,
                 Description = this.Description,
                 Day = this.Day,
                 Time = this.Time,
@@ -56,7 +55,7 @@ namespace HBKPlatform.Models.DTO
             if (ReferenceEquals(x, null)) return false;
             if (ReferenceEquals(y, null)) return false;
             if (x.GetType() != y.GetType()) return false;
-            return x.TimeslotId == y.TimeslotId && x.Description == y.Description && x.Day == y.Day && x.Time.Equals(y.Time) && x.DurationMinutes == y.DurationMinutes && x.WeekNum == y.WeekNum;
+            return x.TimeslotIdx == y.TimeslotIdx && x.Description == y.Description && x.Day == y.Day && x.Time.Equals(y.Time) && x.DurationMinutes == y.DurationMinutes && x.WeekNum == y.WeekNum;
         }
 
         public int CompareTo(TimeslotDto? next)
@@ -100,12 +99,12 @@ namespace HBKPlatform.Models.DTO
                 if (ReferenceEquals(x, null)) return false;
                 if (ReferenceEquals(y, null)) return false;
                 if (x.GetType() != y.GetType()) return false;
-                return x.TimeslotId == y.TimeslotId && x.Description == y.Description && x.Day == y.Day && x.Time.Equals(y.Time) && x.DurationMinutes == y.DurationMinutes && x.WeekNum == y.WeekNum;
+                return x.TimeslotIdx == y.TimeslotIdx && x.Description == y.Description && x.Day == y.Day && x.Time.Equals(y.Time) && x.DurationMinutes == y.DurationMinutes && x.WeekNum == y.WeekNum;
             }
 
             public int GetHashCode(TimeslotDto obj)
             {
-                return HashCode.Combine(obj.TimeslotId, obj.Description, (int)obj.Day, obj.Time, obj.DurationMinutes, obj.WeekNum);
+                return HashCode.Combine(obj.TimeslotIdx, obj.Description, (int)obj.Day, obj.Time, obj.DurationMinutes, obj.WeekNum);
             }
         }
 
@@ -116,7 +115,7 @@ namespace HBKPlatform.Models.DTO
             return new()
             {
                 Description = timeslot.Description,
-                TimeslotId = timeslot.Id,
+                TimeslotIdx = timeslot.Id,
                 Day = timeslot.Day,
                 Time = timeslot.StartTime
             };

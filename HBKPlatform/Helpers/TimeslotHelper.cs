@@ -1,4 +1,3 @@
-using HBKPlatform.Database;
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
 
@@ -14,24 +13,6 @@ namespace HBKPlatform.Helpers
         public static readonly TimeOnly DEFAULT_START = new (00, 00, 00);
         public static readonly TimeOnly DEFAULT_END = new (24, 00, 00);
     
-        public static List<TimeslotDto> GenerateDefaultTimeslots(TimeOnly startTime, TimeOnly maxTime, int duration = TIMESLOT_DURATION_MINUTES)
-        {
-            var time = startTime;
-            var timeslots = new List<TimeslotDto>();
-            var days = new [] {Enums.Day.Monday, Enums.Day.Tuesday, Enums.Day.Wednesday, Enums.Day.Thursday, Enums.Day.Friday, Enums.Day.Saturday, Enums.Day.Sunday};
-            int idx = 0;
-            foreach (var day in days)
-            {
-                while (time <= maxTime)
-                {
-                    timeslots.Add(new TimeslotDto() { TimeslotId = idx++, Description = $"{day} {time.ToShortTimeString()}", Day = day, Time = time, DurationMinutes = duration });
-                    time = time.AddMinutes(duration);
-                }
-                time = startTime;
-            }
-            return timeslots;
-        }
-        
         /// <summary>
         /// Get a list of timeslots in the future, from this week day until the upper bound of the BookingAdvanceWeeks
         /// value. Each Ts DTO will have its weekNum field populated.
@@ -80,6 +61,26 @@ namespace HBKPlatform.Helpers
         {
             // Adjust for 1-indexing
             return (Enums.Day) ((tsIdx-1) / TIMESLOTS_PER_DAY);
+        }
+
+        // HBK day
+        public static int GetFirstTickOfTheDay(Enums.Day day)
+        {
+            return (TIMESLOTS_PER_DAY * (int) day) + 1;
+        }
+        
+        // .NET day
+        public static int GetFirstTickOfTheDay(DayOfWeek day)
+        {
+            return (TIMESLOTS_PER_DAY * (int) DateTimeHelper.ConvertDotNetDay(day)) + 1;
+        }
+
+        public static int GetCurrentTick(DateTime? now = null)
+        {
+            now ??= DateTime.UtcNow;
+            var ticksSinceMidnight = (now.Value.Hour * 60 + now.Value.Minute) / 5;
+            var firstTickOfTheDay = GetFirstTickOfTheDay(now.Value.DayOfWeek);
+            return ticksSinceMidnight + firstTickOfTheDay;
         }
         
     }

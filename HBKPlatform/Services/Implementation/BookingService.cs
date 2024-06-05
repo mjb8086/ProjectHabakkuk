@@ -66,7 +66,7 @@ namespace HBKPlatform.Services.Implementation
             var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
         
             // If the ts is unavailable, return true
-            return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotId)).ToList();
+            return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotIdx)).ToList();
         }
 
         /// <summary>
@@ -277,12 +277,13 @@ namespace HBKPlatform.Services.Implementation
             return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, null, true);
         }
 
-        public async Task<BookingConfirm> DoBookingPractitioner(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId)
+        public async Task<BookingConfirm> DoBookingPractitionerOld(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId)
         {
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
 
             return await DoBooking(timeslotId, pracId, weekNum, clientId, treatmentId, roomResId, false);
         }
+        
     
         private async Task<BookingConfirm> DoBooking(int timeslotId, int pracId, int weekNum, int clientId, int treatmentId, int? roomResId, bool isClientAction)
         {
@@ -316,7 +317,7 @@ namespace HBKPlatform.Services.Implementation
                 appt.PractitionerId = pracId;
                 appt.TreatmentId = treatmentId;
                 appt.WeekNum = weekNum;
-                appt.TimeslotId = timeslotId;
+                appt.TimeslotIdx = timeslotId;
                 
                 if (roomResId.HasValue && roomResId > 0)
                 {
@@ -368,7 +369,7 @@ namespace HBKPlatform.Services.Implementation
         public async Task<BookingCancel> GetBookingCancelView(int appointmentId)
         {
             var appointment = await _appointmentRepo.GetAppointment(appointmentId);
-            var timeslot = await _timeslotRepo.GetTimeslot(appointment.TimeslotId);
+            var timeslot = await _timeslotRepo.GetTimeslot(appointment.TimeslotIdx);
             var treatments = await _cacheService.GetTreatments();
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
 
@@ -386,6 +387,96 @@ namespace HBKPlatform.Services.Implementation
         {
             // todo - security checks
             await _appointmentRepo.CancelAppointment(appointmentId, reason, actioner);
+        }
+        
+        // New Methods
+        public async Task<BookingConfirm> DoBookingPractitioner(AppointmentRequestDto appointmentReq)
+        {
+            appointmentReq.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
+            return await DoBooking(appointmentReq);
+        }
+        
+        private async Task<BookingConfirm> DoBooking(AppointmentRequestDto appointmentReq)
+        {
+            var appt = new AppointmentDto();
+            RoomLite? roomDetails = null;
+            // first check for no clashes
+            if (await ClashCheckNew(appointmentReq))
+            {
+                throw new DoubleBookingException("Cannot create a booking for this time. This is due either to another appointment overlapping, or a timeslot is unavailable with this practitioner.");
+            }
+        
+            if (roomResId.HasValue && roomResId.Value > 0)
+            {
+                var roomRes = await _roomRes.GetReservation(roomResId.Value);
+                await _roomRes.VerifyRoomReservationPractitioner(roomRes, timeslotId, weekNum);
+                appt.RoomId = roomRes.RoomId;
+                appt.RoomReservationId = roomResId;
+            }
+
+            var treatments = await _cacheService.GetTreatments();
+            if (!treatments.TryGetValue(treatmentId, out var treatment) || (isClientAction && treatment.Requestability == Enums.TreatmentRequestability.PracOnly))
+            {
+                throw new IdxNotFoundException($"TreatmentId {treatmentId} does not exist or cannot be booked.");
+            }
+        
+            // all clear? then create the booking
+            // TODO: Make this resilient - may involve consolidating more to the repository
+            try
+            {
+                appt.ClientId = clientId;
+                appt.PractitionerId = pracId;
+                appt.TreatmentId = treatmentId;
+                appt.WeekNum = weekNum;
+                appt.TimeslotIdx = timeslotId;
+                
+                if (roomResId.HasValue && roomResId > 0)
+                {
+                    await _roomRes.ConfirmRoomBookingPractitioner(roomResId.Value);
+                }
+                await _appointmentRepo.CreateAppointment(appt);
+            }
+            catch (Exception e)
+            {
+                throw new InvalidUserOperationException($"Problem when creating booking: {e.Message}.");
+            }
+
+            // todo: notify, email
+            var timeslotDto = await _timeslotRepo.GetTimeslot(timeslotId);
+            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        
+            return new BookingConfirm()
+            {
+                TreatmentId = treatmentId,
+                WeekNum = weekNum,
+                TimeslotId = timeslotId,
+                PractitionerName = _cacheService.GetPractitionerName(pracId),
+                ClientName = _cacheService.GetClientName(clientId),
+                TreatmentTitle = treatment.Title,
+                RoomReservationDetails = roomDetails?.Title ?? "",
+                RoomReservationId = roomResId,
+                BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
+            };
+        }
+        
+        private async Task<bool> ClashCheckNew(AppointmentRequestDto appointmentReq)
+        {
+            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+            // TODO: Replace this with simple query check like in Room double booking check
+            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, dbStartDate);
+            _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeek(pracId, weekNum);
+            _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
+        
+            // If the ts is unavailable, return true
+            if (!IsAvailable(weekNum, timeslotId)) return true;
+        
+            // TODO: If new appointment statuses are added, update predicate
+            var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
+            var ts = await _timeslotRepo.GetTimeslot(timeslotId);
+            ts.WeekNum = weekNum;
+        
+            // check for clashes with other appointments
+            return false;
         }
 
     }

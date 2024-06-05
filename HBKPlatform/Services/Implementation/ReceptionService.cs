@@ -23,7 +23,10 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+        
         var now = DateTime.UtcNow;
+        var currentTick = TimeslotHelper.GetCurrentTick(now);
+        var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         
         var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId, false);
         
@@ -34,7 +37,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
             RecentCancellations =
                 appts.Where(x => x.Status is Enums.AppointmentStatus.CancelledByClient or Enums.AppointmentStatus.
                     CancelledByPractitioner).Take(BookingService.APPOINTMENTS_SELECT_LIMIT).ToList(),
-            NumAppointmentsCompleted = await _appointmentRepo.GetNumberOfCompletedAppointments(pracId, dbStartDate, now),
+            NumAppointmentsCompleted = await _appointmentRepo.GetNumberOfCompletedAppointments(weekNum, currentTick, pracId),
             PriorityItems = await _recordService.GetPopulatedLiteRecords(true),
             RoomReservations = await _roomResService.GetHeldReservationsPractitioner(),
             NumClientsRegistered = _clientRepo.GetClientCount(),

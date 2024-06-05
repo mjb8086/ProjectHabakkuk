@@ -7,6 +7,7 @@ namespace HBKPlatform.Repository.Implementation
 {
     /// <summary>
     /// HBKPlatform Timeslot repository.
+    /// ALL DEPRECATED
     /// 
     /// Author: Mark Brown
     /// Authored: 11/01/2024
@@ -15,6 +16,7 @@ namespace HBKPlatform.Repository.Implementation
     /// </summary>
     public class TimeslotRepository(ApplicationDbContext _db) : ITimeslotRepository
     {
+        /*
         public async Task<TimeslotDto> GetTimeslot(int timeslotId)
         {
             return await _db.Timeslots.Where(x => x.Id == timeslotId).Select(x => new TimeslotDto()
@@ -63,5 +65,6 @@ namespace HBKPlatform.Repository.Implementation
                 Duration = dto.DurationMinutes
             };
         }
+    */
     }
 }

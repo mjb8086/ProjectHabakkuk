@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using HBKPlatform.Database;
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
@@ -24,7 +25,7 @@ namespace HBKPlatform.Repository.Implementation
             {
                 ClientId = appointmentDto.ClientId,
                 PractitionerId = appointmentDto.PractitionerId,
-                TimeslotId = appointmentDto.TimeslotId,
+                TimeslotIdx = appointmentDto.TimeslotIdx,
                 WeekNum = appointmentDto.WeekNum,
                 TreatmentId = appointmentDto.TreatmentId,
                 RoomId = appointmentDto.RoomId,
@@ -38,7 +39,7 @@ namespace HBKPlatform.Repository.Implementation
         {
             return await _db.Appointments.Where(x => x.Id == appointmentId).Select(x => new AppointmentDto()
             {
-                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId
+                Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotIdx = x.TimeslotIdx
             }).AsNoTracking().FirstOrDefaultAsync() ?? throw new IdxNotFoundException($"Appointment Id {appointmentId} not found.");
         }
 
@@ -49,7 +50,7 @@ namespace HBKPlatform.Repository.Implementation
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
-                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
+                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotIdx = x.TimeslotIdx, Timeslot = new TimeslotDto()
                     {
                         Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
                     }
@@ -69,7 +70,7 @@ namespace HBKPlatform.Repository.Implementation
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
-                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
+                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotIdx = x.TimeslotIdx, Timeslot = new TimeslotDto()
                     {
                         Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
                     }
@@ -96,7 +97,7 @@ namespace HBKPlatform.Repository.Implementation
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
-                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotId = x.TimeslotId, Timeslot = new TimeslotDto()
+                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, TimeslotIdx = x.TimeslotId, Timeslot = new TimeslotDto()
                     {
                         Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
                     }
@@ -148,10 +149,10 @@ namespace HBKPlatform.Repository.Implementation
             if (currentRoomResId.HasValue)
             {
                 return await _db.Appointments.IgnoreQueryFilters().AnyAsync(x =>
-                    x.WeekNum == weekNum && x.TimeslotId == timeslotId && x.RoomId == roomId && x.RoomReservationId != currentRoomResId);
+                    x.WeekNum == weekNum && x.TimeslotIdx == timeslotId && x.RoomId == roomId && x.RoomReservationId != currentRoomResId);
             }
             return await _db.Appointments.IgnoreQueryFilters().AnyAsync(x =>
-                x.WeekNum == weekNum && x.TimeslotId == timeslotId && x.RoomId == roomId);
+                x.WeekNum == weekNum && x.TimeslotIdx == timeslotId && x.RoomId == roomId);
         }
         
         /// <summary>
@@ -177,18 +178,26 @@ namespace HBKPlatform.Repository.Implementation
         /// <summary>
         /// Statistics: Get the count of past appointments that have been completed by the Practitioner.
         /// </summary>
-        public async Task<int> GetNumberOfCompletedAppointments(int pracId, string dbStartDate, DateTime now)
+        public async Task<int> GetNumberOfCompletedAppointments(int weekNum, int currentTick, int pracId)
         {
-            var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
-            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
-            
-            return await _db.Appointments.Include("Timeslot")
+            return await _db.Appointments
                 .Where(x => x.PractitionerId == pracId && x.Status == Enums.AppointmentStatus.Live &&
-                            (x.WeekNum < weekNum || x.WeekNum == weekNum && x.Timeslot.Day < today ||
-                             x.WeekNum == weekNum && x.Timeslot.Day == today &&
-                             x.Timeslot.StartTime < TimeOnly.FromDateTime(now))).CountAsync();
+                            (x.WeekNum < weekNum || x.WeekNum == weekNum && x.TimeslotIdx < currentTick)).CountAsync();
         }
         
 
+        /// <summary>
+        /// Fast double booking check. Will check if any live appointments exist on the same weeknum, for the same
+        /// practitioner Id, then check if the timeslot Idx + ticks fall overlap.
+        /// Note - ticks has 1 subtracted manually, this is because Tick 1 == TimeslotIdx. See Wiki for more explanation.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> CheckForDoubleBooking(int practitionerId, int weekNum, int timeslotIdx, int ticks)
+        {
+            return await _db.Appointments
+                .AnyAsync(x => x.WeekNum == weekNum && x.PractitionerId == practitionerId &&
+                                x.TimeslotIdx < timeslotIdx + (ticks -1) && x.TimeslotIdx + (x.Ticks -1) > timeslotIdx &&
+                                x.Status == Enums.AppointmentStatus.Live);
+        }
     }
 }

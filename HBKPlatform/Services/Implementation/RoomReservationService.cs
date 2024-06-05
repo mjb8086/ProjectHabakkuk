@@ -264,7 +264,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
             _indefAvaLookup = await _avaRepo.GetRoomLookupForIndefAnyTenancy(roomId);
         
             // If the ts is unavailable, return true. Fixme: may be inefficient?
-            return new SortedSet<TimeslotDto>(timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotId)));
+            return new SortedSet<TimeslotDto>(timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotIdx)));
         }
         
         /// <summary>

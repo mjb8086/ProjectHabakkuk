@@ -9,7 +9,8 @@ namespace HBKPlatform.Models.DTO
         public int PractitionerId { get; set; }
         public int TreatmentId { get; set; }
         public int WeekNum { get; set; }
-        public int TimeslotId { get; set; }
+        public int TimeslotIdx { get; set; }
+        public int Ticks { get; set; }
         public int? RoomId { get; set; }
         public int? RoomReservationId { get; set; }
         public string? Note { get; set; }
@@ -23,4 +24,19 @@ namespace HBKPlatform.Models.DTO
 
         public TimeslotDto Timeslot { get; set; }
     }
+
+    public class AppointmentRequestDto
+    {
+        public int ClientId { get; set; }
+        public int PractitionerId { get; set; }
+        public int TreatmentId { get; set; }
+        public int WeekNum { get; set; }
+        public int TimeslotIdx { get; set; }
+        public int Ticks { get; set; }
+        public int? RoomId { get; set; }
+        public int? RoomReservationId { get; set; }
+        public string? Note { get; set; }
+        
+    }
+
 }

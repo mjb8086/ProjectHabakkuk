@@ -120,7 +120,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
     
         public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId)
         {
-            return View(await _bookingService.DoBookingPractitioner(treatmentId, timeslotId, weekNum, clientId, roomResId));
+            return View(await _bookingService.DoBookingPractitionerOld(treatmentId, timeslotId, weekNum, clientId, roomResId));
         }
 
         public async Task<IActionResult> CancelBooking(int appointmentId)

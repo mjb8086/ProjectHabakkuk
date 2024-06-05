@@ -16,15 +16,15 @@ namespace HBKPlatform.Database
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    [Index("StartTime")]
-    [Index("Day")]
     public class Timeslot
     {
-        [Key, Column(Order = 1)]
+//        [Key, Column(Order = 1)]
+        /*
         public int Id { get; set; } 
         public Enums.Day Day { get; set; }
         public TimeOnly StartTime { get; set; }
         public int Duration { get; set; }
         public string Description { get; set; }
+        */
     }
 }

@@ -15,7 +15,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
             {
                 RoomId = reservation.RoomId,
                 ClinicId = reservation.ClinicId,
-                TimeslotId = reservation.TimeslotId,
+                TimeslotIdx = reservation.TimeslotId,
                 PractitionerId = reservation.PractitionerId,
                 PracticeNote = reservation.PracticeNote,
                 WeekNum = reservation.WeekNum,
@@ -76,7 +76,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         return await _db.RoomReservations.IgnoreQueryFilters()
                    .Select(x => new RoomReservationDto()
                    {
-                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum,
+                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotIdx, WeekNum = x.WeekNum,
                        PractitionerId = x.PractitionerId, Status = x.ReservationStatus
                    })
                    .FirstOrDefaultAsync(x => x.Id == roomResId) ??
@@ -88,7 +88,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         return await _db.RoomReservations.IgnoreQueryFilters()
                    .Select(x => new RoomReservationDto()
                    {
-                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum,
+                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotIdx, WeekNum = x.WeekNum,
                        PractitionerId = x.PractitionerId, Status = x.ReservationStatus
                    })
                    .FirstOrDefaultAsync(x => x.Id == roomResId) ??
@@ -103,7 +103,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     public async Task<bool> CheckForClashingReservationAnyTenant(int weekNum, int timeslotId, int roomId)
     {
         return await _db.RoomReservations.IgnoreQueryFilters()
-            .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum && 
+            .AnyAsync(x => x.RoomId == roomId && x.TimeslotIdx == timeslotId && x.WeekNum == weekNum && 
                            (x.ReservationStatus == Enums.ReservationStatus.Booked || 
                             x.ReservationStatus == Enums.ReservationStatus.Approved));
     }
@@ -115,7 +115,8 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     public async Task<bool> CheckForDoubleBookingAnyTenant(int weekNum, int timeslotId, int roomId, int currentResId)
     {
         return await _db.RoomReservations.IgnoreQueryFilters()
-            .AnyAsync(x => x.RoomId == roomId && x.TimeslotId == timeslotId && x.WeekNum == weekNum && x.Id != currentResId &&
+            .AnyAsync(x => x.RoomId == roomId && x.TimeslotIdx == timeslotId && x.WeekNum == weekNum && x.Id != currentResId &&
                            (x.ReservationStatus == Enums.ReservationStatus.Booked));
     }
+    
 }

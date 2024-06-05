@@ -29,7 +29,7 @@ namespace HBK.Test.Dto
                 Day = originalDay,
                 Description = originalDescription,
                 DurationMinutes = originalDuration,
-                TimeslotId = 100,
+                TimeslotIdx = 100,
                 Time = originalTime,
                 WeekNum = 27
             };
@@ -38,7 +38,7 @@ namespace HBK.Test.Dto
             timeslot2.Day = Enums.Day.Wednesday;
             timeslot2.Description = "Bar";
             timeslot2.DurationMinutes = 40;
-            timeslot2.TimeslotId = 101;
+            timeslot2.TimeslotIdx = 101;
             timeslot2.Time = timeslot2.Time.AddHours(5);
             timeslot2.WeekNum = 10;
         
@@ -47,7 +47,7 @@ namespace HBK.Test.Dto
             Assert.NotEqual(timeslot1.Day, timeslot2.Day);
             Assert.NotEqual(timeslot1.Description, timeslot2.Description);
             Assert.NotEqual(timeslot1.DurationMinutes, timeslot2.DurationMinutes);
-            Assert.NotEqual(timeslot1.TimeslotId, timeslot2.TimeslotId);
+            Assert.NotEqual(timeslot1.TimeslotIdx, timeslot2.TimeslotIdx);
             Assert.NotEqual(timeslot1.Time, timeslot2.Time);
             Assert.NotEqual(timeslot1.WeekNum, timeslot2.WeekNum);
         
