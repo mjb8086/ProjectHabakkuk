@@ -87,34 +87,24 @@ namespace HBKPlatform.Repository.Implementation
         
         /// <summary>
         /// Get upcoming appointments for the practitionerId.
-        /// TODO: another method to Return only timeslots for booking clash checking
+        /// TODO: another method to Return only timeslots for booking clash checking ??? NEEDED WITH NEW SYSTEM???
         /// </summary>
-        public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly, int? limit)
+        public async Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, int currentWeekNum, int currentTick, bool liveOnly, int? limit)
         {
-            var query = _db.Appointments.Include("Timeslot");
+            IQueryable<Appointment> query = _db.Appointments;
 
             if (liveOnly) query = query.Where(x => x.Status == Enums.AppointmentStatus.Live);
             if (limit.HasValue) query = query.Take(limit.Value);
             
-            var currentWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
-            var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
-            
-            throw new NotImplementedException("BROKEN!");
-            return new List<AppointmentDto>();
-            
-            /*
             return await query 
-                .Where(x => x.PractitionerId == pracId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
-                .OrderBy(x => x.WeekNum).ThenBy(x => x.Timeslot.Day).ThenBy(x => x.Timeslot.StartTime)
+                .Where(x => x.PractitionerId == pracId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.StartTick >= currentTick))
+                .OrderBy(x => x.WeekNum).ThenBy(x => x.StartTick)
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
-                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, StartTick = x.TimeslotId, Timeslot = new TimeslotDto()
-                    {
-                        Day = x.Timeslot.Day, Time = x.Timeslot.StartTime, DurationMinutes = x.Timeslot.Duration
-                    }
+                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, StartTick = x.StartTick, EndTick = x.EndTick,
+                    Timeslot = new TimeslotDto()
                 }).AsNoTracking().ToListAsync();
-                */
         }
 
         /*

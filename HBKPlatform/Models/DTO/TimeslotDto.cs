@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using HBKPlatform.Database;
 using HBKPlatform.Globals;
 
 namespace HBKPlatform.Models.DTO
 {
+    // this is probably for the cutter too
+    
     [DebuggerDisplay("WeekNum={WeekNum} Day={Day} Time={Time} Desc={Description}")]
     public class TimeslotDto: IComparable<TimeslotDto>
     {

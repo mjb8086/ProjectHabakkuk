@@ -28,7 +28,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
         var currentTick = TimeslotHelper.GetCurrentTick(now);
         var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         
-        var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId, false);
+        var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId, weekNum, currentTick, false);
         
         // TODO: Cache stats like num appts completed, num clients registered.
         var model = new ReceptionSummaryData()
@@ -39,7 +39,8 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
                     CancelledByPractitioner).Take(BookingService.APPOINTMENTS_SELECT_LIMIT).ToList(),
             NumAppointmentsCompleted = await _appointmentRepo.GetNumberOfCompletedAppointments(weekNum, currentTick, pracId),
             PriorityItems = await _recordService.GetPopulatedLiteRecords(true),
-            RoomReservations = await _roomResService.GetHeldReservationsPractitioner(),
+//            RoomReservations = await _roomResService.GetHeldReservationsPractitioner(),
+            RoomReservations = new List<RoomReservationLite>(),
             NumClientsRegistered = _clientRepo.GetClientCount(),
         };
         

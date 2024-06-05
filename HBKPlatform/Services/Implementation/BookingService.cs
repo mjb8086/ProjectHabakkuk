@@ -58,16 +58,19 @@ namespace HBKPlatform.Services.Implementation
         private async Task<List<TimeslotDto>> FilterOutUnsuitableTimeslots(SortedSet<TimeslotDto> timeslots, int pracId)
         {
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now, dbStartDate);
+            throw new NotImplementedException("Broken");
+//            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, _dateTime.Now, dbStartDate);
             // populate lookups for IsAvailable check
             _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeeks(pracId, timeslots.Select(x => x.WeekNum).Distinct().ToArray());
             _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
         
             // TODO: If new appointment statuses are added, update predicate
-            var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
+ //           var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
         
             // If the ts is unavailable, return true
-            return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotIdx)).ToList();
+           // return timeslots.Where(x => x.IsNotClashAny(occupiedTimeslots) && IsAvailable(x.WeekNum, x.TimeslotIdx)).ToList();
+
+           return new List<TimeslotDto>();
         }
 
         /// <summary>
@@ -80,7 +83,7 @@ namespace HBKPlatform.Services.Implementation
             return false;
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
             // TODO: Replace this with simple query check like in Room double booking check
-            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, dbStartDate);
+            //            var futureAppts = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, dbStartDate);
             _weeklyAvaLookup = await _avaRepo.GetPractitionerLookupForWeek(pracId, weekNum);
             _indefAvaLookup = await _avaRepo.GetPractitionerLookupForIndef(pracId);
         
@@ -88,12 +91,12 @@ namespace HBKPlatform.Services.Implementation
             if (!IsAvailable(weekNum, timeslotId)) return true;
         
             // TODO: If new appointment statuses are added, update predicate
-            var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
+            //var occupiedTimeslots = futureAppts.Where(x => x.Status == Enums.AppointmentStatus.Live).Select(x => x.Timeslot).ToList();
 //            var ts = await _timeslotRepo.GetTimeslot(timeslotId);
  //           ts.WeekNum = weekNum;
         
             // check for clashes with other appointments
-            foreach (var occupiedTs in occupiedTimeslots)
+            //foreach (var occupiedTs in occupiedTimeslots)
             {
   //              if (ts.IsClash(occupiedTs)) return true;
             }
@@ -158,16 +161,16 @@ namespace HBKPlatform.Services.Implementation
             return appointments;
         }
     
-        public async Task<List<AppointmentLite>> GetUpcomingAppointmentsForPractitioner(int pracId, bool liveOnly, string? dbStartDate)
+        public async Task<List<AppointmentLite>> GetUpcomingAppointmentsForPractitioner(int pracId, int currentWeekNum, int currentTick, bool liveOnly)
         {
-            dbStartDate ??= (await _config.GetSettingOrDefault("DbStartDate")).Value;
-            var appointments = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, DateTime.UtcNow, dbStartDate, liveOnly);
+            var appointments = await _appointmentRepo.GetFutureAppointmentsForPractitioner(pracId, currentWeekNum, currentTick, liveOnly);
             var treatments = await _cacheService.GetTreatments();
-
+            var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
+            
             var appointmentsLite = new List<AppointmentLite>();
             foreach (var appointment in appointments)
             {
-                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
+                var dateTime = DateTimeHelper.FromTimeslotIdx(dbStartDate, appointment.StartTick, appointment.WeekNum);
                 appointmentsLite.Add(new AppointmentLite()
                 {
                     DateTime = dateTime.ToString("s"),
