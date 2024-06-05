@@ -21,7 +21,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var practitionerId = _userService.GetClaimFromCookie("PractitionerId");
         await ClashCheck(roomId, timeslotId, weekNum);
         var room = _cache.GetRoom(roomId);
-        await _roomResRepo.Create(new RoomReservationDto() { RoomId = roomId, PractitionerId = practitionerId, WeekNum = weekNum, TimeslotId = timeslotId, ClinicId = room.ClinicId });
+        await _roomResRepo.Create(new RoomReservationDto() { RoomId = roomId, PractitionerId = practitionerId, WeekNum = weekNum, StartTick = timeslotId, ClinicId = room.ClinicId });
     }
 
 
@@ -34,7 +34,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     {
         var res = await _roomResRepo.GetReservationAnyTenancy(id);
         if (res.Status == Enums.ReservationStatus.Approved) return;
-        await ClashCheck(res.RoomId, res.TimeslotId, res.WeekNum);
+        await ClashCheck(res.RoomId, res.StartTick, res.WeekNum);
         await _roomResRepo.UpdateStatusClinic(id, Enums.ReservationStatus.Approved, note);
     }
     
@@ -63,14 +63,14 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
 
     public async Task<ConfirmReservation> GetConfirmReservationView(int roomId, int weekNum, int timeslotId)
     {
-        var ts = await _timeslotRepo.GetTimeslot(timeslotId);
+//        var ts = await _timeslotRepo.GetTimeslot(timeslotId);
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, ts, weekNum);
+ //       var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, ts, weekNum);
         var room = _cache.GetRoom(roomId);
         
         return new ConfirmReservation()
         {
-            ProspectiveDateTime = DateTimeHelper.GetFriendlyDateTimeString(dateTime),
+  //          ProspectiveDateTime = DateTimeHelper.GetFriendlyDateTimeString(dateTime),
             RoomDetails = room.Title,
             RoomId = room.Id,
             WeekNum = weekNum,
@@ -101,7 +101,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
         
-        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
+//        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
         _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
@@ -119,7 +119,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
         
-        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
+//        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
         _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
 
         return BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
@@ -132,7 +132,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         
-        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
+ //       _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
         _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum);
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
@@ -174,7 +174,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         
         foreach (var res in _reservations)
         {
-            if (res.Status != status || !_tsDict.TryGetValue(res.TimeslotId, out var ts)) continue;
+            if (res.Status != status || !_tsDict.TryGetValue(res.StartTick, out var ts)) continue;
             list.Add(new RoomReservationLite()
             {
                 Id = res.Id,
@@ -206,7 +206,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         } 
         
         // then check whether an appointment exists at this time
-        if (await _appointmentRepo.CheckForDoubleBookingsAnyTenant(weekNum, timeslotId, roomId))
+        if (true)//await _appointmentRepo.CheckForDoubleBookingsAnyTenant(weekNum, timeslotId, roomId))
         {
             throw new DoubleBookingException("An appointment already exists in the room on this date and time. Cannot continue.");
         }
@@ -221,33 +221,34 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
    /// <summary>
    /// Check existing reservations, appointments and availability to ensure the room is not approved in a double
    /// booking. Exclude the current room res Id from consideration - a double booking cannot happen against itself.
+   /// This method checks Appointments on the room res + timeslot across all tenancies.
    /// </summary>
-    public async Task VerifyRoomReservationPractitioner(RoomReservationDto roomRes, int bookingTimeslotId, int bookingWeekNum)
+    public async Task VerifyRoomReservationPractitioner(RoomReservationDto roomRes, AppointmentRequestDto appointmentReq)
     {
         // ensure this is actually allowed
-        if (roomRes.TimeslotId != bookingTimeslotId || roomRes.WeekNum != bookingWeekNum)
+        if (roomRes.WeekNum != appointmentReq.WeekNum || !(appointmentReq.StartTick < roomRes.EndTick && appointmentReq.EndTick > roomRes.StartTick))
         {
             throw new InvalidUserOperationException(
                 "Cannot book a room outside of its reservation's date and time.");
         } 
         if (roomRes.Status != Enums.ReservationStatus.Approved)
         {
-            throw new InvalidUserOperationException($"Room reservation is not available. Status: {roomRes.Status}");
+            throw new InvalidUserOperationException($"Room reservation is not approved. Status: {roomRes.Status}");
         }
         
         // now check if there is a reservation already made for the time
-        if (await _roomResRepo.CheckForDoubleBookingAnyTenant(bookingWeekNum, bookingTimeslotId, roomRes.RoomId, roomRes.Id))
+        if (await _roomResRepo.CheckForDoubleBookingAnyTenant(roomRes))
         {
             throw new DoubleBookingException("Another reservation already exists on this date and time. Cannot continue.");
         } 
         
-        // then check whether an appointment exists at this time
-        if (await _appointmentRepo.CheckForDoubleBookingsAnyTenant(bookingWeekNum, bookingTimeslotId, roomRes.RoomId, roomRes.Id))
+        // then check whether an appointment exists at this time across other tenancies
+        if (await _appointmentRepo.CheckForDoubleBookingsAnyTenant(appointmentReq, roomRes.RoomId, roomRes.Id))
         {
             throw new DoubleBookingException("An appointment already exists in the room on this date and time. Cannot continue.");
         }
-        // finally check the room availability
-        if (!await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.TimeslotId))
+        // finally check the room availability, has the clinic set it to be unavailable?
+        if (!await _avaRepo.IsRoomAvailableForWeekAnyTenancy(roomRes.RoomId, roomRes.WeekNum, roomRes.StartTick))
         {
             throw new TimeslotUnavailableException("The room is not available at this time.");
         }

@@ -1,5 +1,6 @@
 using HBKPlatform.Globals;
 using HBKPlatform.Models.DTO;
+using HBKPlatform.Models.View;
 using HBKPlatform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -57,8 +58,9 @@ namespace HBKPlatform.Areas.Client.Controllers
         {
             if (await _config.IsSettingEnabled("SelfBookingEnabled"))
             {
-                var model = await _bookingService.DoBookingClient(treatmentId, timeslotId, weekNum);
-                return View("Booking/BookingConfirmed", model);
+//                var model = await _bookingService.DoBookingClient(treatmentId, timeslotId, weekNum);
+                throw new NotImplementedException("Deprecated");
+                return View("Booking/BookingConfirmed", new BookingConfirm());
             }
             return RedirectToRoute(new { controller = "Appointment", action = "Index" });
         }

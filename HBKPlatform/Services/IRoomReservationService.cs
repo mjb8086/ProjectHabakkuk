@@ -20,5 +20,5 @@ public interface IRoomReservationService
     public Task<List<RoomReservationLite>> GetHeldReservationsPractitioner();
     public Task<RoomLite> GetRoomDetailsFromReservation(int roomResId);
     public Task<RoomReservationDto> GetReservation(int reservationId);
-    public Task VerifyRoomReservationPractitioner(RoomReservationDto roomRes, int bookingTimeslotId, int bookingWeekNum);
+    public Task VerifyRoomReservationPractitioner(RoomReservationDto roomRes, AppointmentRequestDto appointmentReq);
 }

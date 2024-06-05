@@ -14,5 +14,5 @@ public interface IRoomReservationRepository
     public Task<RoomReservationDto> GetReservationAnyTenancy(int roomResId);
 
     public Task<bool> CheckForClashingReservationAnyTenant(int weekNum, int timeslotId, int roomId);
-    public Task<bool> CheckForDoubleBookingAnyTenant(int weekNum, int timeslotId, int roomId, int currentResId);
+    public Task<bool> CheckForDoubleBookingAnyTenant(RoomReservationDto roomRes);
 }

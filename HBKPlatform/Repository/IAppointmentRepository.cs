@@ -13,11 +13,16 @@ namespace HBKPlatform.Repository
         public Task<List<AppointmentDto>> GetFutureAppointmentsForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly = true, int? limit = null);
 //        public Task<int> GetFutureAppointmentCountForPractitioner(int pracId, DateTime now, string dbStartDate, bool liveOnly = true);
         public Task CancelAppointment(int appointmentId, string reason, Enums.AppointmentStatus actioner);
-        public Task<bool> CheckForDoubleBookingsAnyTenant(int weekNum, int timeslotId, int roomId, int? currentRoomResId = null);
+
+        public Task<bool> CheckForDoubleBookingsAnyTenant(AppointmentRequestDto appointmentReq, int roomId,
+            int? currentRoomResId = null);
         public Task<List<TimeslotDto>> GetFutureOccupiedTimeslotsForRoomAnyTenancy(int roomId, DateTime now);
         
         // Statistical methods
         public Task<int> GetNumberOfCompletedAppointments(int weekNum, int currentTick, int pracId);
+        
+        // NEW TS METHODS
+        public Task<bool> CheckForDoubleBooking(int practitionerId, int weekNum, int startTick, int endTick);
 
     }
 }

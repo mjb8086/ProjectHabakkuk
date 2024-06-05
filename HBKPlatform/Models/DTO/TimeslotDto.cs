@@ -110,16 +110,5 @@ namespace HBKPlatform.Models.DTO
 
         public static IEqualityComparer<TimeslotDto> TimeslotDtoComparer { get; } = new TimeslotDtoEqualityComparer();
 
-        public static TimeslotDto FromDbTimeslot(Timeslot timeslot)
-        {
-            return new()
-            {
-                Description = timeslot.Description,
-                TimeslotIdx = timeslot.Id,
-                Day = timeslot.Day,
-                Time = timeslot.StartTime
-            };
-        }
-
     }
 }

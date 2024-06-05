@@ -57,7 +57,7 @@ namespace HBKPlatform.Services.Implementation
                 ? DateTimeHelper.GetDateRangeStringForThisWeek(dbStartDate)
                 : DateTimeHelper.GetDateRangeStringFromWeekNum(dbStartDate, weekNum);
         
-            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+//            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
             _currentAvailability = await _availabilityRepo.GetPractitionerLookupForWeek(pracId, weekNum);
             _indefiniteAvailability = await _availabilityRepo.GetPractitionerLookupForIndef( pracId);
@@ -66,7 +66,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 WeekStr = dateRangeStr,
                 WeekNum = weekNum,
-                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots)
+ //               DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots)
             };
         }
     
@@ -77,7 +77,7 @@ namespace HBKPlatform.Services.Implementation
         {
             var pracId = _userService.GetClaimFromCookie("PractitionerId");
         
-            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+  //          var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
             // identical for indef model construction
             _indefiniteAvailability = await _availabilityRepo.GetPractitionerLookupForIndef(pracId);
@@ -85,7 +85,7 @@ namespace HBKPlatform.Services.Implementation
         
             return new AvailabilityModel()
             {
-                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
+ //               DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
             };
         }
 
@@ -141,6 +141,7 @@ namespace HBKPlatform.Services.Implementation
         
             var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
             
+  throw new NotImplementedException("BROKEN");
             if (weekNum < currentWeek || weekNum > currentWeek + DefaultSettings.AVAILABILITY_ADVANCE_WEEKS)
             {
                 throw new InvalidUserOperationException("Week number out of permitted range.");
@@ -150,7 +151,7 @@ namespace HBKPlatform.Services.Implementation
                 ? DateTimeHelper.GetDateRangeStringForThisWeek(dbStartDate)
                 : DateTimeHelper.GetDateRangeStringFromWeekNum(dbStartDate, weekNum);
         
-            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+  //          var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
 
             _currentAvailability = await _availabilityRepo.GetRoomLookupForWeek(roomId, weekNum);
             _indefiniteAvailability = await _availabilityRepo.GetRoomLookupForIndef(roomId);
@@ -159,7 +160,7 @@ namespace HBKPlatform.Services.Implementation
             {
                 WeekStr = dateRangeStr,
                 WeekNum = weekNum,
-                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
+//                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
                 RoomId = roomId
             };
         }
@@ -169,7 +170,8 @@ namespace HBKPlatform.Services.Implementation
         /// </summary>
         public async Task<AvailabilityModel> GetRoomModelForIndef(int roomId)
         {
-            var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+  //          var allTimeslots = await _timeslotRepo.GetPracticeTimeslots();
+  throw new NotImplementedException("BROKEN");
 
             // identical for indef model construction
             _indefiniteAvailability = await _availabilityRepo.GetRoomLookupForIndef(roomId);
@@ -177,7 +179,7 @@ namespace HBKPlatform.Services.Implementation
         
             return new AvailabilityModel()
             {
-                DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
+   //             DailyTimeslotLookup = BuildAvaLiteDict(allTimeslots),
                 RoomId = roomId
             };
         }

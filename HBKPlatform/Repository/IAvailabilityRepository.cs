@@ -25,5 +25,8 @@ namespace HBKPlatform.Repository
         public Task<List<TimeslotAvailabilityDto>> GetRoomLookupForWeeksAnyTenancy(int roomId, int[] weekNums);
         public Task<bool> IsRoomAvailableForWeekAnyTenancy(int roomId, int weekNum, int timeslotId);
         public Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndefAnyTenancy(int roomId);
+        
+        // NEW TS METHODS
+        public Task<bool> IsTimeslotAvailable(int weekNum, int startTick, int endTick, int pracId);
     }
 }

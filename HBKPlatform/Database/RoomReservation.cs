@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using HBKPlatform.Globals;
 
 namespace HBKPlatform.Database;
@@ -15,8 +16,10 @@ public class RoomReservation : HbkBaseEntity
     public int RoomId { get; set; }
     public int ClinicId { get; set; }
     public int PractitionerId { get; set; }
-    public int TimeslotIdx { get; set; }
-    public int Ticks { get; set; }
+    public int StartTick { get; set; }
+    public int EndTick { get; set; }
+//    public int Ticks { get; set; }
+    [Range(0,5)]
     public int? EndAdjustment { get; set; }
     
     public string? PracticeNote { get; set; }

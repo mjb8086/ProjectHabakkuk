@@ -15,7 +15,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
             {
                 RoomId = reservation.RoomId,
                 ClinicId = reservation.ClinicId,
-                TimeslotIdx = reservation.TimeslotId,
+                StartTick = reservation.StartTick,
                 PractitionerId = reservation.PractitionerId,
                 PracticeNote = reservation.PracticeNote,
                 WeekNum = reservation.WeekNum,
@@ -48,11 +48,15 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     {
         var now = DateTime.UtcNow;
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
-        
+
+        throw new NotImplementedException("BROKEN!");
+        return new List<RoomReservationDto>();
+        /*
         return await _db.RoomReservations.Include("Timeslot").IgnoreQueryFilters()
             .Where(x => x.ClinicId == clinicId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
-            .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
+            .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, StartTick = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
             .ToListAsync();
+            */
     }
 
     public async Task<List<RoomReservationDto>> GetUpcomingReservationsPractitioner(int practitionerId, int currentWeekNum)
@@ -60,10 +64,14 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         var now = DateTime.UtcNow;
         var today = DateTimeHelper.ConvertDotNetDay(now.DayOfWeek);
         
+        throw new NotImplementedException("BROKEN!");
+        return new List<RoomReservationDto>();
+        /*
         return await _db.RoomReservations.Include("Timeslot")
             .Where(x => x.PractitionerId == practitionerId && (x.WeekNum > currentWeekNum || x.WeekNum == currentWeekNum && x.Timeslot.Day > today || x.WeekNum == currentWeekNum && x.Timeslot.Day == today && x.Timeslot.StartTime >= TimeOnly.FromDateTime(now)))
-            .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
+            .Select(x => new RoomReservationDto() { Id = x.Id, RoomId = x.RoomId, StartTick = x.TimeslotId, WeekNum = x.WeekNum, PractitionerId = x.PractitionerId, Status = x.ReservationStatus })
             .ToListAsync();
+            */
     }
     
     
@@ -76,7 +84,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         return await _db.RoomReservations.IgnoreQueryFilters()
                    .Select(x => new RoomReservationDto()
                    {
-                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotIdx, WeekNum = x.WeekNum,
+                       Id = x.Id, RoomId = x.RoomId, StartTick = x.StartTick, EndTick = x.EndTick, WeekNum = x.WeekNum,
                        PractitionerId = x.PractitionerId, Status = x.ReservationStatus
                    })
                    .FirstOrDefaultAsync(x => x.Id == roomResId) ??
@@ -88,7 +96,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
         return await _db.RoomReservations.IgnoreQueryFilters()
                    .Select(x => new RoomReservationDto()
                    {
-                       Id = x.Id, RoomId = x.RoomId, TimeslotId = x.TimeslotIdx, WeekNum = x.WeekNum,
+                       Id = x.Id, RoomId = x.RoomId, StartTick = x.StartTick, EndTick = x.EndTick, WeekNum = x.WeekNum,
                        PractitionerId = x.PractitionerId, Status = x.ReservationStatus
                    })
                    .FirstOrDefaultAsync(x => x.Id == roomResId) ??
@@ -103,7 +111,7 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     public async Task<bool> CheckForClashingReservationAnyTenant(int weekNum, int timeslotId, int roomId)
     {
         return await _db.RoomReservations.IgnoreQueryFilters()
-            .AnyAsync(x => x.RoomId == roomId && x.TimeslotIdx == timeslotId && x.WeekNum == weekNum && 
+            .AnyAsync(x => x.RoomId == roomId && x.StartTick == timeslotId && x.WeekNum == weekNum && 
                            (x.ReservationStatus == Enums.ReservationStatus.Booked || 
                             x.ReservationStatus == Enums.ReservationStatus.Approved));
     }
@@ -112,11 +120,12 @@ public class RoomReservationRepository (ApplicationDbContext _db): IRoomReservat
     /// Check that on the same Timeslot and WeekNum there are no other Booked reservations for the room Id
     /// Excludes the current reservationId because that is our reservation and therefore not a double booking
     /// </summary>
-    public async Task<bool> CheckForDoubleBookingAnyTenant(int weekNum, int timeslotId, int roomId, int currentResId)
+    public async Task<bool> CheckForDoubleBookingAnyTenant(RoomReservationDto roomRes)
     {
         return await _db.RoomReservations.IgnoreQueryFilters()
-            .AnyAsync(x => x.RoomId == roomId && x.TimeslotIdx == timeslotId && x.WeekNum == weekNum && x.Id != currentResId &&
-                           (x.ReservationStatus == Enums.ReservationStatus.Booked));
+            .AnyAsync(x => x.RoomId == roomRes.RoomId && x.StartTick < roomRes.EndTick && 
+                           x.EndTick > roomRes.StartTick && x.WeekNum == roomRes.WeekNum && x.Id != roomRes.Id &&
+                           x.ReservationStatus == Enums.ReservationStatus.Booked);
     }
     
 }

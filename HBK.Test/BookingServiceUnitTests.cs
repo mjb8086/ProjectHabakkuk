@@ -77,7 +77,7 @@ namespace HBK.Test
             var mockApptRepo = new Mock<IAppointmentRepository>();
             var mockTimeslotService = new Mock<ITimeslotService>();
             
-            mockTimeslotRepo.Setup(x => x.GetPracticeTimeslots()).ReturnsAsync(timeslotList);
+//            mockTimeslotRepo.Setup(x => x.GetPracticeTimeslots()).ReturnsAsync(timeslotList);
             mockConfigService.Setup(x => x.GetSettingOrDefault("DbStartDate")).ReturnsAsync(new SettingDto() {Value = DB_START_DATE});
             mockConfigService.Setup(x => x.GetSettingOrDefault("BookingAdvanceWeeks")).ReturnsAsync(new SettingDto() {Value = advanceWeeks});
             mockDateTimeHelper.Setup(x => x.Now).Returns(now);

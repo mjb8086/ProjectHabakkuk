@@ -15,21 +15,21 @@ namespace HBKPlatform.Repository.Implementation
         {
             return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => x.WeekNum == weekNum && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner)
-                .Select(x => new TimeslotAvailabilityDto() {WeekNum = x.WeekNum, Availability = x.Availability, TimeslotId = x.TimeslotIdx}).ToListAsync();
+                .Select(x => new TimeslotAvailabilityDto() {WeekNum = x.WeekNum, Availability = x.Availability, TimeslotId = x.StartTick}).ToListAsync();
         }
     
         public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetPractitionerLookupForIndef(int pracId)
         {
             return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => x.IsIndefinite && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner)
-                .ToDictionaryAsync(x => x.TimeslotIdx, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotIdx});
+                .ToDictionaryAsync(x => x.StartTick, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.StartTick});
         }
     
         public async Task<List<TimeslotAvailabilityDto>> GetPractitionerLookupForWeeks(int pracId, int[] weekNums)
         {
             return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => weekNums.Contains(x.WeekNum) && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner)
-                .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.TimeslotIdx, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
+                .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.StartTick, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
         }
 
         public async Task UpdatePracForWeek(int weekNum, int pracId, Dictionary<int, bool> tsAvaDict)
@@ -38,7 +38,7 @@ namespace HBKPlatform.Repository.Implementation
             
             // 1. Find and update any existing availability records
             var existingRecords = await _db.TimeslotAvailability.Include("Timeslot").Where(x =>
-                x.WeekNum == weekNum && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner).ToDictionaryAsync(x => x.TimeslotIdx);
+                x.WeekNum == weekNum && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner).ToDictionaryAsync(x => x.StartTick);
 
             UpdateExistingRecords(tsAvaDict, existingRecords);
         
@@ -53,7 +53,7 @@ namespace HBKPlatform.Repository.Implementation
         {
             // 1. Find and update any existing availability records
             var existingRecords = await _db.TimeslotAvailability.Include("Timeslot").Where(x =>
-                x.IsIndefinite  && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner).ToDictionaryAsync(x => x.TimeslotIdx);
+                x.IsIndefinite  && x.PractitionerId == pracId && x.Entity == Enums.AvailabilityEntity.Practitioner).ToDictionaryAsync(x => x.StartTick);
 
             UpdateExistingRecords(tsAvaDict, existingRecords);
         
@@ -82,14 +82,14 @@ namespace HBKPlatform.Repository.Implementation
         {
             return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => x.WeekNum == weekNum && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
-                .Select(x => new TimeslotAvailabilityDto() {WeekNum = x.WeekNum, Availability = x.Availability, TimeslotId = x.TimeslotIdx}).ToListAsync();
+                .Select(x => new TimeslotAvailabilityDto() {WeekNum = x.WeekNum, Availability = x.Availability, TimeslotId = x.StartTick}).ToListAsync();
         }
     
         public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndef(int roomId)
         {
             return await _db.TimeslotAvailability.Include("Timeslot")
                 .Where(x => x.IsIndefinite && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
-                .ToDictionaryAsync(x => x.TimeslotIdx, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotIdx});
+                .ToDictionaryAsync(x => x.StartTick, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.StartTick});
         }
     
 
@@ -100,7 +100,7 @@ namespace HBKPlatform.Repository.Implementation
         {
             // 1. Find and update any existing availability records
             var existingRecords = await _db.TimeslotAvailability.Include("Timeslot").Where(x =>
-                x.WeekNum == weekNum && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room).ToDictionaryAsync(x => x.TimeslotIdx);
+                x.WeekNum == weekNum && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room).ToDictionaryAsync(x => x.StartTick);
 
             UpdateExistingRecords(tsAvaDict, existingRecords);
         
@@ -115,7 +115,7 @@ namespace HBKPlatform.Repository.Implementation
         {
             // 1. Find and update any existing availability records
             var existingRecords = await _db.TimeslotAvailability.Include("Timeslot").Where(x =>
-                x.IsIndefinite  && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room).ToDictionaryAsync(x => x.TimeslotIdx);
+                x.IsIndefinite  && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room).ToDictionaryAsync(x => x.StartTick);
 
             UpdateExistingRecords(tsAvaDict, existingRecords);
         
@@ -145,13 +145,13 @@ namespace HBKPlatform.Repository.Implementation
         {
             // Any per-week availability?
             var isPerWeekAvailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
-                x.TimeslotIdx == timeslotId && x.WeekNum == weekNum && x.RoomId == roomId &&
+                x.StartTick == timeslotId && x.WeekNum == weekNum && x.RoomId == roomId &&
                 x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
             if (isPerWeekAvailable) return true;
             
             // If not, check Indef. 
              return await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
-                x.TimeslotIdx == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
+                x.StartTick == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
                 x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
         }
         
@@ -159,14 +159,14 @@ namespace HBKPlatform.Repository.Implementation
         {
             return await _db.TimeslotAvailability.Include("Timeslot").IgnoreQueryFilters()
                 .Where(x => weekNums.Contains(x.WeekNum) && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
-                .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.TimeslotIdx, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
+                .Select(x => new TimeslotAvailabilityDto() { TimeslotId= x.StartTick, Availability = x.Availability, WeekNum = x.WeekNum}).ToListAsync();
         }
         
         public async Task<Dictionary<int, TimeslotAvailabilityDto>> GetRoomLookupForIndefAnyTenancy(int roomId)
         {
             return await _db.TimeslotAvailability.Include("Timeslot").IgnoreQueryFilters()
                 .Where(x => x.IsIndefinite && x.RoomId == roomId && x.Entity == Enums.AvailabilityEntity.Room)
-                .ToDictionaryAsync(x => x.TimeslotIdx, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.TimeslotIdx});
+                .ToDictionaryAsync(x => x.StartTick, x => new TimeslotAvailabilityDto() {Availability = x.Availability, IsIndefinite = x.IsIndefinite, TimeslotId = x.StartTick});
         }
         
         // NEW TS METHODS
@@ -175,18 +175,19 @@ namespace HBKPlatform.Repository.Implementation
         /// This method checks the DB on the timeslot's weekly and indefinite availability, if there is, it will return true.
         /// Precedence is given to Per-week.
         /// </summary>
-        public async Task<bool> IsTimeslotAvailable(int weekNum, int timeslotIdx, int ticks, int pracId)
+        public async Task<bool> IsTimeslotAvailable(int weekNum, int startTick, int endTick, int pracId)
         {
             // Any per-week availability?
             var isPerWeekAvailable = await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
-                x.WeekNum == weekNum && x.TimeslotIdx == timeslotId &&  
+                x.PractitionerId == pracId && x.WeekNum == weekNum && x.StartTick < endTick && x.EndTick > startTick &&
                 x.Entity == Enums.AvailabilityEntity.Practitioner && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
             if (isPerWeekAvailable) return true;
             
             // If not, check Indef. 
              return await _db.TimeslotAvailability.IgnoreQueryFilters().Where(x =>
-                x.TimeslotIdx == timeslotId && x.RoomId == roomId && x.IsIndefinite &&
-                x.Entity == Enums.AvailabilityEntity.Room && x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
+                x.IsIndefinite && x.PractitionerId == pracId && x.WeekNum == weekNum && 
+                x.StartTick < endTick && x.EndTick > startTick && x.Entity == Enums.AvailabilityEntity.Room && 
+                x.Availability == Enums.TimeslotAvailability.Available).AnyAsync();
         }
         
         //////////////////////////////////////////////////////////////////////////////// 
@@ -216,7 +217,7 @@ namespace HBKPlatform.Repository.Implementation
             {
                 newAva.Add(new TimeslotAvailability()
                 {
-                    TimeslotIdx = tsId, WeekNum = weekNum, PractitionerId = pracId, IsIndefinite = isIndefinite,
+                    StartTick = tsId, WeekNum = weekNum, PractitionerId = pracId, IsIndefinite = isIndefinite,
                     Entity = Enums.AvailabilityEntity.Practitioner,
                     Availability = tsAvaDict[tsId]
                         ? Enums.TimeslotAvailability.Available
@@ -233,7 +234,7 @@ namespace HBKPlatform.Repository.Implementation
             {
                 newAva.Add(new TimeslotAvailability()
                 {
-                    TimeslotIdx = tsId, WeekNum = weekNum, RoomId = roomId, IsIndefinite = isIndefinite, 
+                    StartTick = tsId, WeekNum = weekNum, RoomId = roomId, IsIndefinite = isIndefinite, 
                     Entity = Enums.AvailabilityEntity.Room,
                     Availability = tsAvaDict[tsId]
                         ? Enums.TimeslotAvailability.Available

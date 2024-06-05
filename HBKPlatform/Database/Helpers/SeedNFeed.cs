@@ -43,18 +43,7 @@ namespace HBKPlatform.Database.Helpers
                     await roleStore.CreateAsync(clinicMgrRole);
                 }
 
-
-                // TEMP while we still have old TS system
-                timeslots = ctx.Timeslots.ToList();
-                if (ctx.Timeslots.Any())
-                {
-                }
-                else
-                {
-//                    timeslots = TimeslotHelper.GenerateDefaultTimeslots(TimeslotHelper.DEFAULT_START, TimeslotHelper.DEFAULT_END);
-                    await ctx.AddRangeAsync(timeslots);
-                    await ctx.SaveChangesAsync();
-                }
+                // Removed old Timeslot create
 
                 if (!ctx.Tenancies.Any() && !ctx.Practitioners.Any() && !ctx.Clients.Any() && !ctx.Practices.Any()) {
 
@@ -308,7 +297,8 @@ namespace HBKPlatform.Database.Helpers
                         {
                             Client = client1,
                             Practitioner = prac1,
-                            Timeslot = timeslots[1],
+                            StartTick = 100,
+                            EndTick = 120,
                             Status = Enums.AppointmentStatus.Live,
                             Treatment = treatment1,
                             WeekNum = 4,
@@ -318,7 +308,8 @@ namespace HBKPlatform.Database.Helpers
                         {
                             Client = client1,
                             Practitioner = prac1,
-                            Timeslot = timeslots[2],
+                            StartTick = 500,
+                            EndTick = 550,
                             Status = Enums.AppointmentStatus.CancelledByClient,
                             CancellationReason = "Someone else does it cheaper, sorry",
                             Treatment = treatment1,
@@ -329,7 +320,8 @@ namespace HBKPlatform.Database.Helpers
                         {
                             Client = client1,
                             Practitioner = prac1,
-                            Timeslot = timeslots[2],
+                            StartTick = 600,
+                            EndTick = 750,
                             Status = Enums.AppointmentStatus.CancelledByPractitioner,
                             CancellationReason = "bollocks",
                             Treatment = treatment2,
@@ -348,11 +340,11 @@ namespace HBKPlatform.Database.Helpers
                     };
                     ctx.Add(startDate);
 
+                    // TODO: Start and End ticks for availability
                     var ta = new List<TimeslotAvailability>()
                     {
                         new()
                         {
-                            Timeslot = timeslots[100],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
                             WeekNum = 20,
@@ -360,7 +352,6 @@ namespace HBKPlatform.Database.Helpers
                         },
                         new ()
                         {
-                            Timeslot = timeslots[101],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
                             WeekNum = 20,
@@ -368,7 +359,6 @@ namespace HBKPlatform.Database.Helpers
                         },
                         new ()
                         {
-                            Timeslot = timeslots[102],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Unavailable,
                             WeekNum = 20,
@@ -376,14 +366,13 @@ namespace HBKPlatform.Database.Helpers
                         },
                         new ()
                         {
-                            Timeslot = timeslots[104],
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Available,
                             WeekNum = 20,
                             Tenancy = t
                         },
                     };
-                    ctx.AddRange(ta);
+//                    ctx.AddRange(ta);
                     ctx.SaveChanges();
                     
                     // Now add Clinic and rooms for rental

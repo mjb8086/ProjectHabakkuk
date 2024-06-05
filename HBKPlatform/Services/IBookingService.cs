@@ -14,7 +14,7 @@ namespace HBKPlatform.Services
         public Task<ClientUpcomingAppointmentsView> GetClientUpcomingAppointmentsView();
         public Task<BookingConfirm> GetBookingConfirmModel(PractitionerBookingFormModel model);
         public Task<BookingConfirm> GetBookingConfirmModel(int treatmentId, int timeslotId, int weekNum, int? roomResId = null, int? clientId = null);
-        public Task<BookingConfirm> DoBookingClient(int treatmentId, int timeslotId, int weekNum);
+        public Task<BookingConfirm> DoBookingClient(AppointmentRequestDto appointmentReq);
         public Task<BookingConfirm> DoBookingPractitionerOld(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId = null);
         public Task<BookClientTreatment> GetBookClientTreatmentView();
         public Task<BookingCancel> GetBookingCancelView(int appointmentId);
