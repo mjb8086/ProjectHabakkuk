@@ -1,4 +1,5 @@
 ﻿using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
 using HBKPlatform.Services.Implementation;
 
 using Microsoft.AspNetCore.Identity;
@@ -308,8 +309,19 @@ namespace HBKPlatform.Database.Helpers
                         {
                             Client = client1,
                             Practitioner = prac1,
-                            StartTick = 500,
-                            EndTick = 550,
+                            StartTick = 100,
+                            EndTick = 120,
+                            Status = Enums.AppointmentStatus.Live,
+                            Treatment = treatment1,
+                            WeekNum = 40,
+                            Tenancy = t
+                        },
+                        new ()
+                        {
+                            Client = client1,
+                            Practitioner = prac1,
+                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 14, 15),
+                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 15, 00),
                             Status = Enums.AppointmentStatus.CancelledByClient,
                             CancellationReason = "Someone else does it cheaper, sorry",
                             Treatment = treatment1,
@@ -323,7 +335,19 @@ namespace HBKPlatform.Database.Helpers
                             StartTick = 600,
                             EndTick = 750,
                             Status = Enums.AppointmentStatus.CancelledByPractitioner,
-                            CancellationReason = "bollocks",
+                            CancellationReason = "bollocks leak",
+                            Treatment = treatment2,
+                            WeekNum = 30,
+                            Tenancy = t
+                        },
+                        new ()
+                        {
+                            Client = client1,
+                            Practitioner = prac1,
+                            StartTick = 2000,
+                            EndTick = 2016,
+                            Status = Enums.AppointmentStatus.CancelledByPractitioner,
+                            CancellationReason = "bollocks ache",
                             Treatment = treatment2,
                             WeekNum = 30,
                             Tenancy = t
@@ -346,37 +370,48 @@ namespace HBKPlatform.Database.Helpers
                         new()
                         {
                             Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Unavailable,
+                            Availability = Enums.TimeslotAvailability.Available,
                             WeekNum = 20,
                             Tenancy = t,
-                        },
-                        new ()
-                        {
-                            Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                        new ()
-                        {
-                            Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20,
-                            Tenancy = t
+                            Entity = Enums.AvailabilityEntity.Practitioner,
+                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Monday, 12, 00),
+                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Monday, 15, 15)
                         },
                         new ()
                         {
                             Practitioner = prac1,
                             Availability = Enums.TimeslotAvailability.Available,
                             WeekNum = 20,
-                            Tenancy = t
+                            Tenancy = t,
+                            Entity = Enums.AvailabilityEntity.Practitioner,
+                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 09, 00),
+                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 19, 15)
+                        },
+                        new ()
+                        {
+                            Practitioner = prac1,
+                            Availability = Enums.TimeslotAvailability.Unavailable,
+                            WeekNum = 20,
+                            Tenancy = t,
+                            Entity = Enums.AvailabilityEntity.Practitioner,
+                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 12, 00),
+                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 18, 15)
+                        },
+                        new ()
+                        {
+                            Practitioner = prac1,
+                            Availability = Enums.TimeslotAvailability.Available,
+                            WeekNum = 20,
+                            Tenancy = t,
+                            Entity = Enums.AvailabilityEntity.Practitioner,
+                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 10, 00),
+                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 15, 45)
                         },
                     };
-//                    ctx.AddRange(ta);
+                    ctx.AddRange(ta);
                     ctx.SaveChanges();
                     
                     // Now add Clinic and rooms for rental
-                    
                     var clinicTenancy = new Tenancy() {
                         OrgName = "The Coachman",
                         LicenceStatus = Enums.LicenceStatus.Active,

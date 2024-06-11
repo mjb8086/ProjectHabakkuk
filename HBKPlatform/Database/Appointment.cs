@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using HBKPlatform.Globals;
+using HBKPlatform.Helpers;
 
 namespace HBKPlatform.Database
 {
@@ -16,9 +17,10 @@ namespace HBKPlatform.Database
         public int ClientId { get; set; }
         public int PractitionerId { get; set; }
         public int TreatmentId { get; set; }
+        [Range(0, TimeslotHelper.TIMESLOTS_PER_WEEK)]
         public int StartTick { get; set; }
+        [Range(0, TimeslotHelper.TIMESLOTS_PER_WEEK)]
         public int EndTick { get; set; }
-//        public int Ticks { get; set; }
         [Range(0,5)]
         public int? EndAdjustment { get; set; }
         public int? RoomId { get; set; }

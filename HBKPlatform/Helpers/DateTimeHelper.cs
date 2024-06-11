@@ -39,7 +39,7 @@ namespace HBKPlatform.Helpers
         }
         
         
-        public static DateTime FromTimeslotIdx(string dbStartDate, int tsIdx, int weekNum)
+        public static DateTime FromTick(string dbStartDate, int tsIdx, int weekNum)
         {
             if (string.IsNullOrEmpty(dbStartDate) || weekNum < WEEKNUM_ORIGIN || tsIdx < TS_IDX_ORIGIN || tsIdx > TimeslotHelper.TIMESLOTS_PER_WEEK)
             {

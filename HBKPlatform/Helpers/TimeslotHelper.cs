@@ -10,9 +10,6 @@ namespace HBKPlatform.Helpers
         public const int TIMESLOTS_PER_DAY = 24 * TIMESLOTS_PER_HOUR;
         public const int TIMESLOTS_PER_WEEK = 7 * TIMESLOTS_PER_DAY;
         
-        public static readonly TimeOnly DEFAULT_START = new (00, 00, 00);
-        public static readonly TimeOnly DEFAULT_END = new (24, 00, 00);
-    
         /// <summary>
         /// Get a list of timeslots in the future, from this week day until the upper bound of the BookingAdvanceWeeks
         /// value. Each Ts DTO will have its weekNum field populated.
@@ -78,10 +75,59 @@ namespace HBKPlatform.Helpers
         public static int GetCurrentTick(DateTime? now = null)
         {
             now ??= DateTime.UtcNow;
-            var ticksSinceMidnight = (now.Value.Hour * 60 + now.Value.Minute) / 5;
+            var ticksSinceMidnight = (now.Value.Hour * 60 + now.Value.Minute) / TIMESLOT_DURATION_MINUTES;
             var firstTickOfTheDay = GetFirstTickOfTheDay(now.Value.DayOfWeek);
             return ticksSinceMidnight + firstTickOfTheDay;
         }
+
+        public static int GetTickFromDayHourMin(Enums.Day day, int hour, int min)
+        {
+            return GetFirstTickOfTheDay(day) + hour * TIMESLOTS_PER_HOUR + min / TIMESLOT_DURATION_MINUTES;
+        }
+
+        public static bool IsTickRangeValid(int startTick, int endTick)
+        {
+            return endTick > startTick;
+        }
         
+        /// <summary>
+        /// Merge all consecutive timeblocks in this list.
+        /// </summary>
+        public static List<TimeblockDto> FlattenTimeblocks(this List<TimeblockDto> source, bool isOrdered = false)
+        {
+            var count = source.Count();
+            if (count <= 1) return source;
+            
+            if (!isOrdered) source = source.OrderBy(x => x.WeekNum).ThenBy(x => x.StartTick).ToList();
+            var newSource = new List<TimeblockDto>();
+            foreach (var tb in source)
+            {
+                newSource.Add(FlattenTwoTbsMaybe(tb, source.Slice(1, source.Count)));
+            }
+
+            return newSource;
+        }
+
+        /// <summary>
+        /// Recursive function that will 'flatten', i.e. merge consecutive timeblocks
+        /// </summary>
+        private static TimeblockDto FlattenTwoTbsMaybe(TimeblockDto me, List<TimeblockDto> myNeighbours)
+        {
+            if (myNeighbours.Count < 1) return me;
+            if (me.EndTick == myNeighbours[1].StartTick)
+                FlattenTwoTbsMaybe(
+                    new TimeblockDto()
+                        { StartTick = me.StartTick, EndTick = myNeighbours[1].EndTick, WeekNum = me.WeekNum },
+                    myNeighbours.Slice(1, myNeighbours.Count));
+            return me;
+        }
+
+        /// <summary>
+        /// Takes a list of Timeblocks and populates the StartTime and EndTimes for each.
+        /// </summary>
+        public static List<TimeblockDto> InsertDateRanges(this List<TimeblockDto> source, string DbStartDate)
+        {
+            
+        }
     }
 }

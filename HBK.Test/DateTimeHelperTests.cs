@@ -283,7 +283,7 @@ namespace HBK.Test
         [InlineData("2024-12-29 23:55",  2016, 52)] 
         public void TimeslotDateIsCorrect(string expected, int tsIdx, int weekNum)
         {
-            Assert.Equal(expected, DateTimeHelper.FromTimeslotIdx(DB_START_DATE, tsIdx, weekNum).ToString("yyyy-MM-dd HH:mm"));
+            Assert.Equal(expected, DateTimeHelper.FromTick(DB_START_DATE, tsIdx, weekNum).ToString("yyyy-MM-dd HH:mm"));
         }
         
         // check exception throws for out of range values
@@ -299,7 +299,7 @@ namespace HBK.Test
         [InlineData( 1, -293940234)] 
         public void TimeslotDateIsIncorrect(int tsIdx, int weekNum)
         {
-            Assert.Throws<InvalidUserOperationException>(() => DateTimeHelper.FromTimeslotIdx(DB_START_DATE, tsIdx, weekNum));
+            Assert.Throws<InvalidUserOperationException>(() => DateTimeHelper.FromTick(DB_START_DATE, tsIdx, weekNum));
         }
         
         // Test GetTime and GetDay for edge cases
@@ -345,6 +345,21 @@ namespace HBK.Test
         public void GetDayIsCorrect(Enums.Day expected, int tsIdx)
         {
             Assert.Equal(expected, TimeslotHelper.GetDay(tsIdx));
+        }
+
+        [Theory]
+        [InlineData(Enums.Day.Monday, 12, 00, 145)]  // 12:00 Mon
+        [InlineData(Enums.Day.Monday, 22, 55, 276)]  
+        [InlineData(Enums.Day.Monday, 23, 55, 288)]  
+        [InlineData(Enums.Day.Tuesday, 00, 00, 289)]  
+        [InlineData(Enums.Day.Thursday, 00, 00, 865)]  
+        [InlineData(Enums.Day.Thursday, 15, 17, 1048)]  // will be rounded to 15:15, handle as Adjustment
+        [InlineData(Enums.Day.Friday, 09, 30, 1267)]
+        [InlineData(Enums.Day.Sunday, 00, 00, 1729)]
+        [InlineData(Enums.Day.Sunday, 23, 55, 2016)]
+        public void GetTicksFromDayHourMin_IsCorrect(Enums.Day day, int hour, int min, int tick)
+        {
+            Assert.Equal(tick, TimeslotHelper.GetTickFromDayHourMin(day, hour, min));
         }
     }
 }

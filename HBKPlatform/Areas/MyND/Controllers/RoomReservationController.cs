@@ -18,7 +18,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
     {
         public async Task<IActionResult> MyReservations()
         {
-            return View(await _roomRes.GetUpcomingReservationsPractitioner());
+            return View();
         }
         
         public async Task<IActionResult> MakeAReservation()

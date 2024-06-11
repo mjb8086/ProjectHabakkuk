@@ -16,8 +16,8 @@ public interface IRoomReservationService
     public Task DenyReservation(int id, string? note = null);
     public Task ConfirmRoomBookingPractitioner(int id);
     public Task<TimeslotSelect> GetTimeslotSelectView(int roomId);
-    public Task<MyReservations> GetUpcomingReservationsPractitioner();
-    public Task<List<RoomReservationLite>> GetHeldReservationsPractitioner();
+    public Task<MyReservations> GetUpcomingReservationsPractitioner(DateTime now);
+    public Task<List<RoomReservationLite>> GetHeldReservationsPractitioner(DateTime? now=null);
     public Task<RoomLite> GetRoomDetailsFromReservation(int roomResId);
     public Task<RoomReservationDto> GetReservation(int reservationId);
     public Task VerifyRoomReservationPractitioner(RoomReservationDto roomRes, AppointmentRequestDto appointmentReq);

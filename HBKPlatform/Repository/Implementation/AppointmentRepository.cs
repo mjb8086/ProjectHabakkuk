@@ -102,8 +102,7 @@ namespace HBKPlatform.Repository.Implementation
                 .Select(x => new AppointmentDto()
                 {
                     Id = x.Id, WeekNum = x.WeekNum, ClientId = x.ClientId, Note = x.Note, Status = x.Status, RoomId = x.RoomId,
-                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, StartTick = x.StartTick, EndTick = x.EndTick,
-                    Timeslot = new TimeslotDto()
+                    PractitionerId = x.PractitionerId, TreatmentId = x.TreatmentId, StartTick = x.StartTick, EndTick = x.EndTick
                 }).AsNoTracking().ToListAsync();
         }
 
@@ -142,7 +141,6 @@ namespace HBKPlatform.Repository.Implementation
             appointment.CancellationReason = reason;
             await _db.SaveChangesAsync();
         }
-
         
         /// <summary>
         /// Check all tenancies for a matching booking for the room on the WeekNum and TimeslotId. If there is a 'current'
@@ -212,6 +210,24 @@ namespace HBKPlatform.Repository.Implementation
                 .AnyAsync(x => x.WeekNum == weekNum && x.PractitionerId == practitionerId &&
                                 x.StartTick < endTick && x.EndTick > startTick &&
                                 x.Status == Enums.AppointmentStatus.Live);
+        }
+
+        public async Task<List<TimeblockDto>> GetFutureAppointmentTimeblocks(int pracId, int startWeek, int endWeek, int currentTick)
+        {
+            /*
+            int weeksBetween = endWeek - startWeek;
+            if (weeksBetween > 0)
+            { */
+                return await _db.Appointments.Where(x =>
+                    x.PractitionerId == pracId &&
+                    (x.WeekNum == startWeek && x.StartTick >= currentTick) ||
+                    (x.WeekNum >= startWeek + 1 && x.WeekNum < endWeek) ||
+                    (x.WeekNum == endWeek && x.StartTick < currentTick)).Select(x => new TimeblockDto() { WeekNum = x.WeekNum, StartTick = x.StartTick, EndTick = x.EndTick }).ToListAsync();
+            /*}
+            return await _db.Appointments.Where(x =>
+                (x.WeekNum == startWeek && x.StartTick >= currentTick) ||
+                (x.WeekNum == endWeek && x.StartTick < currentTick)).Select(x => new TimeblockDto() { WeekNum = x.WeekNum, StartTick = x.StartTick, EndTick = x.EndTick }).ToListAsync();
+                */
         }
     }
 }

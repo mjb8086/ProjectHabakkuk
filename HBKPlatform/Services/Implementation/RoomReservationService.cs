@@ -12,7 +12,6 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     IAppointmentRepository _appointmentRepo, IAvailabilityRepository _avaRepo, ITimeslotService _tsSrv, IDateTimeWrapper _dateTime): IRoomReservationService
 {
     private List<RoomReservationDto> _reservations;
-    private Dictionary<int, TimeslotDto> _tsDict;
     private List<TimeslotAvailabilityDto> _weeklyAvaLookup;
     private Dictionary<int, TimeslotAvailabilityDto> _indefAvaLookup;
     
@@ -94,15 +93,15 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         };
     }
 
-    public async Task<MyReservations> GetUpcomingReservationsPractitioner()
+    public async Task<MyReservations> GetUpcomingReservationsPractitioner(DateTime now)
     {
         var model = new MyReservations();
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
+        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
+        var currentTick = TimeslotHelper.GetCurrentTick(now);
         
-//        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
-        _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
+        _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum, currentTick);
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
         model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
@@ -113,14 +112,14 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         return model;
     }
     
-    public async Task<List<RoomReservationLite>> GetHeldReservationsPractitioner()
+    public async Task<List<RoomReservationLite>> GetHeldReservationsPractitioner(DateTime? now)
     {
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
+        now ??= DateTime.UtcNow;
+        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now.Value);
         
-//        _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
-        _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum);
+        _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum, TimeslotHelper.GetCurrentTick(now));
 
         return BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
     }
@@ -129,11 +128,11 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     {
         var model = new RoomReservationOverview();
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, DateTime.UtcNow);
+        var now = DateTime.UtcNow;
+        var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         
- //       _tsDict = (await _timeslotRepo.GetPracticeTimeslots()).ToDictionary(x => x.TimeslotId);
-        _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum);
+        _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum, TimeslotHelper.GetCurrentTick(now));
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
         model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
@@ -174,13 +173,13 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         
         foreach (var res in _reservations)
         {
-            if (res.Status != status || !_tsDict.TryGetValue(res.StartTick, out var ts)) continue;
+            if (res.Status != status) continue;
             list.Add(new RoomReservationLite()
             {
                 Id = res.Id,
                 RoomTitle = _cache.GetRoom(res.RoomId).Title,
                 When = DateTimeHelper.GetIsoDateTimeString(
-                    DateTimeHelper.FromTimeslot(dbStartDate, ts, res.WeekNum)),
+                    DateTimeHelper.FromTick(dbStartDate, res.StartTick, res.WeekNum)),
                 Status = res.Status,
                 Whom = _cache.GetPractitionerName(res.PractitionerId)
             });

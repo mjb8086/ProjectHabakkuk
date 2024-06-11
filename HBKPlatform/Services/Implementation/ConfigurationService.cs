@@ -18,6 +18,19 @@ namespace HBKPlatform.Services.Implementation
          return DefaultSettings.DefaultSetting[key];
       }
 
+      public async Task<int> GetIntValueOrDefault(string key)
+      {
+         try
+         {
+            return Int32.Parse((await GetSettingOrDefault(key)).Value);
+         }
+         catch (Exception e)
+         {
+            _logger.LogError($"Integer could not be parsed from Setting value. Message: {e.Message}");
+            throw e;
+         }
+      }
+
       public async Task<bool> IsSettingEnabled(string key)
       {
          var setting = await GetSettingOrDefault(key);

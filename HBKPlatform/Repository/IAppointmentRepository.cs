@@ -25,6 +25,7 @@ namespace HBKPlatform.Repository
         
         // NEW TS METHODS
         public Task<bool> CheckForDoubleBooking(int practitionerId, int weekNum, int startTick, int endTick);
+        public Task<List<TimeblockDto>> GetFutureAppointmentTimeblocks(int pracId, int startWeek, int endWeek, int currentTick);
 
     }
 }

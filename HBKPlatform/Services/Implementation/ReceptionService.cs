@@ -34,13 +34,11 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
         var model = new ReceptionSummaryData()
         {
             UpcomingAppointments = appts.Where(x => x.Status == Enums.AppointmentStatus.Live).Take(BookingService.APPOINTMENTS_SELECT_LIMIT).ToList(),
-            RecentCancellations =
-                appts.Where(x => x.Status is Enums.AppointmentStatus.CancelledByClient or Enums.AppointmentStatus.
+            RecentCancellations = appts.Where(x => x.Status is Enums.AppointmentStatus.CancelledByClient or Enums.AppointmentStatus.
                     CancelledByPractitioner).Take(BookingService.APPOINTMENTS_SELECT_LIMIT).ToList(),
             NumAppointmentsCompleted = await _appointmentRepo.GetNumberOfCompletedAppointments(weekNum, currentTick, pracId),
             PriorityItems = await _recordService.GetPopulatedLiteRecords(true),
-//            RoomReservations = await _roomResService.GetHeldReservationsPractitioner(),
-            RoomReservations = new List<RoomReservationLite>(),
+            RoomReservations = await _roomResService.GetHeldReservationsPractitioner(now),
             NumClientsRegistered = _clientRepo.GetClientCount(),
         };
         
