@@ -71,7 +71,7 @@ namespace HBKPlatform.Database.Helpers
                     
                     var t = new Tenancy()
                     {
-                        OrgName = "Hill Valley Medical, Inc",
+                        OrgName = "Lawrence Street Practice",
                         ContactEmail = "foo@bar.net",
                         LicenceStatus = Enums.LicenceStatus.Active,
                         RegistrationDate = DateTime.UtcNow,
@@ -103,31 +103,32 @@ namespace HBKPlatform.Database.Helpers
                     // CREATE PRACS on T1
                     tenancySrv.SetTenancyId(t.Id);
                     
+                    var user1Email = "drwallace@lawrencestreetpractice.com";
                     var user1 = new User()
                     {
-                        Email = "outoftime@hillvalley.com",
-                        NormalizedEmail = "outoftime@hillvalley.com".ToUpper(),
-                        UserName = "outoftime@hillvalley.com",
-                        NormalizedUserName = "outoftime@hillvalley.com".ToUpper(),
+                        Email = user1Email,
+                        NormalizedEmail = user1Email.ToUpper(),
+                        UserName = user1Email.ToUpper(),
+                        NormalizedUserName = user1Email.ToUpper(),
                         EmailConfirmed = true,
                         LockoutEnabled = true,
                         PhoneNumber = "0898 333 201",
                         PhoneNumberConfirmed = true,
                         Tenancy = t
                     };
-                    user1.PasswordHash = passwordHasher.HashPassword(user1, "88milesperhour");
+                    user1.PasswordHash = passwordHasher.HashPassword(user1, "trustmeiamadoctor");
                     
                     var prac1 = new Practitioner()
                     {
-                        Forename = "Emmett",
-                        Surname = "Brown",
+                        Forename = "Roger",
+                        Surname = "Wallace",
                         Title = Enums.Title.Dr,
-                        ClientBio = "inventor of the flux capacitor",
-                        Location = "hill valley",
-                        DateOfBirth = new DateOnly(1932, 07, 08),
-                        Img = new string("/samples/brown.jpg"),
+                        ClientBio = "10 year's experience in a field",
+                        Location = "Belfast",
+                        DateOfBirth = new DateOnly(1992, 07, 08),
+                        Img = new string("/samples/wallace.jpg"),
                         User = user1,
-                        GmcNumber = "foo",
+                        GmcNumber = "1234",
                         Tenancy = t
                     };
                     
@@ -155,9 +156,9 @@ namespace HBKPlatform.Database.Helpers
                             Tenancy = t
                         }
                     };
-                    prac2.User.PasswordHash = passwordHasher.HashPassword(prac2.User, "88milesperhour");
+                    prac2.User.PasswordHash = passwordHasher.HashPassword(prac2.User, "trustmeiamadoctor");
 
-                    var client1Email = "mmf@hillvalleyhigh.com";
+                    var client1Email = "edward@fsmail.net";
                     var client1User = new User()
                     {
                         Email = client1Email,
@@ -170,7 +171,7 @@ namespace HBKPlatform.Database.Helpers
                         PhoneNumberConfirmed = true,
                         Tenancy = t
                     };
-                    client1User.PasswordHash = passwordHasher.HashPassword(client1User, "toodamnloud");
+                    client1User.PasswordHash = passwordHasher.HashPassword(client1User, "eddie_metal");
 
                     var setting = new Setting()
                     {
@@ -181,18 +182,18 @@ namespace HBKPlatform.Database.Helpers
                     
                     var client1 = new Client()
                     {
-                        Forename = "Marty",
-                        Surname = "McFly",
+                        Forename = "Edward",
+                        Surname = "Stewart",
                         Title = Enums.Title.Mr,
                         Address = "a garage",
-                        DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = new string("/samples/marty.jpg"),
+                        DateOfBirth = new DateOnly(1992, 07, 08),
+                        Img = new string("/samples/edward.jpg"),
                         Telephone = "999",
                         User = client1User,
                         Tenancy = t
                     };
                     
-                    var client2Email = "biff@hillvalleyhigh.com";
+                    var client2Email = "laura@hotmail.com";
                     var client2User = new User()
                     {
                         Email = client2Email,
@@ -209,12 +210,12 @@ namespace HBKPlatform.Database.Helpers
                     
                     var client2 = new Client()
                     {
-                        Forename = "Biff",
-                        Surname = "Tenant",
-                        Title = Enums.Title.Mr,
+                        Forename = "Laura",
+                        Surname = "McMaster",
+                        Title = Enums.Title.Ms,
                         Address = "A big house somewhere",
-                        DateOfBirth = new DateOnly(1962, 07, 08),
-                        Img = "/samples/biff.jpg",
+                        DateOfBirth = new DateOnly(1972, 07, 08),
+                        Img = "/samples/laura.jpg",
                         Telephone = "299",
                         User = client2User,
                         Tenancy = t
@@ -223,7 +224,7 @@ namespace HBKPlatform.Database.Helpers
                     var practice = new Practice()
                     {
                         EmailAddress = "foo@bar.com",
-                        Description = "Hill Valley Practice",
+                        Description = "Lawrence Street Practice",
                         Telephone = "0898 333 201",
                         Clients = new List<Client>() {client1, client2},
                         Practitioners = new List<Practitioner>() {prac1, prac2},
@@ -260,24 +261,24 @@ namespace HBKPlatform.Database.Helpers
                     conversation.Add(new ()
                     {
                         ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Client,
-                        MessageBody = "lost the plutonium sorry", Tenancy = t
+                        MessageBody = "Help my head is inflamed", Tenancy = t
                     });
                     conversation.Add(new ()
                     {
                         ClientId = client1.Id, PractitionerId = prac1.Id, MessageOrigin = Enums.MessageOrigin.Practitioner,
-                        MessageBody = "ah bollocks", Tenancy = t
+                        MessageBody = "That sounds painful, when did you first notice?", Tenancy = t
                     });
                     conversation.Add(new ()
                     {
                         ClientId = client2.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Practitioner,
-                        MessageBody = "don't steal that almanac you tool", Tenancy = t
+                        MessageBody = "Morning!", Tenancy = t
                     });
                     ctx.AddRange(conversation);
 
                     var clientRecord1 = new ClientRecord()
                     {
                         Client = client1, RecordVisibility = Enums.RecordVisibility.ClientAndPrac,
-                        Title = "Bad news for the bowels", NoteBody = "bother shifting the goods", Practitioner = prac1, Tenancy = t
+                        Title = "", NoteBody = "bother shifting the goods", Practitioner = prac1, Tenancy = t
                     };
                     ctx.Add(clientRecord1);
 
@@ -330,7 +331,7 @@ namespace HBKPlatform.Database.Helpers
                         {
                             Client = client1,
                             Practitioner = prac1,
-                            Timeslot = timeslots[2],
+                            Timeslot = timeslots[20],
                             Status = Enums.AppointmentStatus.CancelledByPractitioner,
                             CancellationReason = "bollocks",
                             Treatment = treatment2,
@@ -388,18 +389,17 @@ namespace HBKPlatform.Database.Helpers
                     ctx.SaveChanges();
                     
                     // Now add Clinic and rooms for rental
-                    
+                    var mgr1Email = "wolseley@btinternet.com";
                     var clinicTenancy = new Tenancy() {
-                        OrgName = "The Coachman",
+                        OrgName = "Wolseley Street Clinic",
                         LicenceStatus = Enums.LicenceStatus.Active,
                         Type = TenancyType.Clinic,
-                        ContactEmail = "coachm@btinternet.com"
+                        ContactEmail = mgr1Email
                     };
                     await ctx.AddAsync(clinicTenancy);
                     await ctx.SaveChangesAsync();
                     tenancySrv.SetTenancyId(clinicTenancy.Id);
                     
-                    var mgr1Email = "coach@btinternet.com";
                     var managerUser = new User()
                     {
                         Email = mgr1Email,
@@ -411,7 +411,7 @@ namespace HBKPlatform.Database.Helpers
                         PhoneNumber = "98989",
                         PhoneNumberConfirmed = true,
                         Tenancy = clinicTenancy,
-                        FullName = "mr. davey"
+                        FullName = "Lucy McGrogan"
                     };
                     managerUser.PasswordHash = passwordHasher.HashPassword(client1User, "vip_pass_mode");
                     await ctx.AddAsync(managerUser);
@@ -425,15 +425,14 @@ namespace HBKPlatform.Database.Helpers
                     await ctx.AddAsync(mgrUser);
                     var clinic1 = new Clinic()
                     {
-                        EmailAddress = "coachm@btinternet.com",
-                        StreetAddress = "Broad Street\nMagherafelt",
-                        Telephone = "1690",
+                        EmailAddress = mgr1Email,
+                        StreetAddress = "203 Wolseley Street\nBelfast",
+                        Telephone = "90901",
                         ManagerUserId = managerUser.Id,
                         Rooms = new List<Room>()
                         {
-                            new() { Description = "Pool room", Title = "Pool Room", PricePerUse = 8.8},
-                            new() { Description = "Drinks and a jukebox", Title = "Front Bar", PricePerUse = 100.0},
-                            new() { Description = "bring coat", Title = "Beer garden", PricePerUse = 3.0}
+                            new() { Description = "", Title = "Surgery Room 1", PricePerUse = 38.8},
+                            new() { Description = "", Title = "Surgery Room 2", PricePerUse = 40.0}
                         }
                     };
                     await ctx.AddAsync(clinic1);
