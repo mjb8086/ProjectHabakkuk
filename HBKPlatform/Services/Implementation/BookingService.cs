@@ -12,7 +12,7 @@ namespace HBKPlatform.Services.Implementation
 {
     /// <summary>
     /// HBKPlatform Booking service.
-    /// Middleware for appointment booking and timeslots.
+    /// Here for appointment booking and timeslots.
     /// 
     /// Author: Mark Brown
     /// Authored: 11/01/2024
