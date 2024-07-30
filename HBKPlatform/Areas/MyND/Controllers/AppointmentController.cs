@@ -20,7 +20,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
     {
         public async Task<IActionResult> Index()
         {
-            return View(await _bookingService.GetMyNDUpcomingAppointmentsView());
+            return Ok();
         }
 
         public async Task<IActionResult> AvailabilityManagement()
@@ -120,7 +120,7 @@ namespace HBKPlatform.Areas.MyND.Controllers
     
         public async Task<IActionResult> BookingConfirmed(int treatmentId, int timeslotId, int weekNum, int clientId, int? roomResId)
         {
-            return View(await _bookingService.DoBookingPractitionerOld(treatmentId, timeslotId, weekNum, clientId, roomResId));
+            return Ok();
         }
 
         public async Task<IActionResult> CancelBooking(int appointmentId)

@@ -1,5 +1,3 @@
-using System.Collections.Immutable;
-using System.Globalization;
 using HBKPlatform.Exceptions;
 using HBKPlatform.Globals;
 using HBKPlatform.Helpers;
@@ -53,6 +51,8 @@ namespace HBKPlatform.Services.Implementation
         public async Task<List<TimeblockDto>> GetAvailableTimeblocksPractitioner()
         {
             var practitionerId = _userService.GetClaimFromCookie("PractitionerId");
+            throw new NotImplementedException();
+            return new List<TimeblockDto>();
         }
 
         /// <summary>

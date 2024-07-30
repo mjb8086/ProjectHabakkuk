@@ -102,9 +102,9 @@ namespace HBK.Test
             
             mockTimeslotService.Setup(x => x.GetPopulatedFutureTimeslots()).ReturnsAsync(TimeslotHelper.GetPopulatedFutureTimeslots(now, timeslotList, DB_START_DATE, Int32.Parse(advanceWeeks)));
 
-            return new BookingService(mockTimeslotRepo.Object, mockUserService.Object, mockCacheService.Object, 
+            return new BookingService(mockUserService.Object, mockCacheService.Object, 
                 mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object, 
-                new Mock<IRoomReservationService>().Object, mockTimeslotService.Object, new Mock<ILogger<BookingService>>().Object);
+                new Mock<IRoomReservationService>().Object, new Mock<ILogger<BookingService>>().Object);
         }
 
         // Set everything as available when we don't care to test availability, i.e. just testing timeslots in isolaiton

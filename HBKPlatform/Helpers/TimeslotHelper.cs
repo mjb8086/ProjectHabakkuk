@@ -125,9 +125,75 @@ namespace HBKPlatform.Helpers
         /// <summary>
         /// Takes a list of Timeblocks and populates the StartTime and EndTimes for each.
         /// </summary>
-        public static List<TimeblockDto> InsertDateRanges(this List<TimeblockDto> source, string DbStartDate)
+        public static List<TimeblockDto> PopulateStartEndTimes(this List<TimeblockDto> source, int weekNum, string dbStartDate)
         {
+            foreach (var tb in source)
+            {
+                tb.StartTime = DateTimeHelper.FromTick(dbStartDate, tb.StartTick, weekNum);
+                tb.EndTime = DateTimeHelper.FromTick(dbStartDate, tb.EndTick, weekNum);
+            }
+
+            return source;
+        }
+
+        ///
+        /// Source is the bigger list, other is the list we are subtracting.
+        /// Assumes that the lists are sorted.
+        /// 
+        public static List<TimeblockDto> Difference(this List<TimeblockDto> source, List<TimeblockDto> other)
+        {
+            var newSource = new List<TimeblockDto>();
+            int otherLen = other.Count;
+            int otherStartIdx = 0;
             
+            if (other.Count < 1) return source;
+            
+            int startTick = source.First().StartTick, endTick = 0;
+            foreach (var sourceTb in source)
+            {
+                bool shouldSkipNext = false;
+                // if we exhaust the otherList, just add this source element to the new list
+                if (otherStartIdx == otherLen)
+                {
+                    newSource.Add(sourceTb);
+                    continue;
+                }
+                
+                for (int i=otherStartIdx; i < otherLen; i++)
+                {
+                    if (shouldSkipNext) // skip this iteration because two adjacent TBs have been merged
+                    {
+                        shouldSkipNext = false;
+                        continue;
+                    }
+                    // exit iteration if otherTb falls outside of sourceTb, we are done with the sourceTb
+                    otherStartIdx = i;
+                    if (other[i].StartTick > sourceTb.EndTick)
+                    {
+                        break; // NO
+                    }
+                    
+                    if (i == otherLen - 1 || other[i].EndTick > sourceTb.EndTick) // we are at the end or we have a problem -  just use end time of source block
+                    {
+                        endTick = sourceTb.EndTick;
+                    }
+                    else
+                    {
+                        endTick = other[i].StartTick;
+                    }
+                    /*
+                    else if (i < otherLen - 1 && endIdx == other[i + 1].StartTick) // merge two conjoining blocks
+                    {
+                        endIdx = other[i + 1].EndTick; // SIGNAL TO SKIP NEXT....
+                        shouldSkipNext = true;
+                    }
+                    */
+                    newSource.Add(new TimeblockDto(){StartTick = startTick, EndTick = endTick}); 
+                    startTick = other[i].EndTick;
+                }
+                // disregard anything out of range
+            }
+            return newSource;
         }
     }
 }
