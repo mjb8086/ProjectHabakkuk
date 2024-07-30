@@ -153,7 +153,7 @@ namespace HBKPlatform.Helpers
             {
                 bool shouldSkipNext = false;
                 // if we exhaust the otherList, just add this source element to the new list
-                if (otherStartIdx == otherLen)
+                if (otherStartIdx == otherLen-1)
                 {
                     newSource.Add(sourceTb);
                     continue;
@@ -173,7 +173,7 @@ namespace HBKPlatform.Helpers
                         break; // NO
                     }
                     
-                    if (i == otherLen - 1 || other[i].EndTick > sourceTb.EndTick) // we are at the end or we have a problem -  just use end time of source block
+                    if (other[i].EndTick > sourceTb.EndTick) // we have a problem - just use end time of source block
                     {
                         endTick = sourceTb.EndTick;
                     }
@@ -190,6 +190,13 @@ namespace HBKPlatform.Helpers
                     */
                     newSource.Add(new TimeblockDto(){StartTick = startTick, EndTick = endTick}); 
                     startTick = other[i].EndTick;
+                    
+                    if (i == otherLen-1) // we are at the end 
+                    {
+                        endTick = sourceTb.EndTick;
+                        newSource.Add(new TimeblockDto(){StartTick = startTick, EndTick = endTick}); 
+                    }
+                    
                 }
                 // disregard anything out of range
             }
