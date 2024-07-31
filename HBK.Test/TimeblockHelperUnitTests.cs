@@ -14,7 +14,7 @@ namespace HBK.Test
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class TimeslotHelperUnitTests(ITestOutputHelper _testOutputHelper)
+    public class TimeblockHelperUnitTests(ITestOutputHelper _testOutputHelper)
     {
         public static string DB_START_DATE = "2024-01-01";
 
@@ -100,9 +100,78 @@ namespace HBK.Test
         public void TestEquality_2()
         {
             var tb1 = new TimeblockDto() { StartTick = 100, EndTick = 200, Duration = 100};
-            var tb2 = new TimeblockDto() { StartTick = 100, EndTick = 200, Duration = 0}; // bug!
+            var tb2 = new TimeblockDto() { StartTick = 100, EndTick = 200, Duration = 0}; // malformed!
             Assert.NotEqual(tb1, tb2);
         }
+
+        [Fact]
+        public void TestMergingOfConsecutiveBlocks_DoesNotMerge()
+        {
+            var tbListBefore = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 140},
+                new() {StartTick = 145, EndTick = 150},
+                new() {StartTick = 160, EndTick = 170}
+            };
+            var tbListAfter = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 140},
+                new() {StartTick = 145, EndTick = 150},
+                new() {StartTick = 160, EndTick = 170}
+            };
+            tbListBefore = tbListBefore.FlattenTimeblocks();
+            Assert.Equivalent(tbListAfter, tbListBefore, true);
+        }
         
+        [Fact]
+        public void TestMergingOfConsecutiveBlocks_DoesMerge()
+        {
+            var tbListBefore = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 145},
+                new() {StartTick = 145, EndTick = 150},
+            };
+            var tbListAfter = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 150},
+            };
+            tbListBefore = tbListBefore.FlattenTimeblocks();
+            Assert.Equivalent(tbListAfter, tbListBefore, true);
+        }
+        
+        [Fact]
+        public void TestMergingOfConsecutiveBlocks_DoesMerge_2()
+        {
+            var tbListBefore = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 145},
+                new() {StartTick = 145, EndTick = 150},
+                new() {StartTick = 150, EndTick = 170},
+            };
+            var tbListAfter = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 170},
+            };
+            tbListBefore = tbListBefore.FlattenTimeblocks();
+            Assert.Equivalent(tbListAfter, tbListBefore, true);
+        }
+        
+        [Fact]
+        public void TestMergingOfConsecutiveBlocks_DoesMerge_3()
+        {
+            var tbListBefore = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 145},
+                new() {StartTick = 145, EndTick = 150},
+                new() {StartTick = 155, EndTick = 170},
+            };
+            var tbListAfter = new List<TimeblockDto>()
+            {
+                new() {StartTick = 120, EndTick = 150},
+                new() {StartTick = 155, EndTick = 170},
+            };
+            tbListBefore = tbListBefore.FlattenTimeblocks();
+            Assert.Equivalent(tbListAfter, tbListBefore, true);
+        }
     }
 }

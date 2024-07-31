@@ -41,13 +41,13 @@ namespace HBKPlatform.Helpers
         
         public static DateTime FromTick(string dbStartDate, int tsIdx, int weekNum)
         {
-            if (string.IsNullOrEmpty(dbStartDate) || weekNum < WEEKNUM_ORIGIN || tsIdx < TS_IDX_ORIGIN || tsIdx > TimeslotHelper.TIMESLOTS_PER_WEEK)
+            if (string.IsNullOrEmpty(dbStartDate) || weekNum < WEEKNUM_ORIGIN || tsIdx < TS_IDX_ORIGIN || tsIdx > TimeblockHelper.TICKS_PER_WEEK)
             {
                 throw new InvalidUserOperationException("Invalid parameters, cannot produce a DateTime.");
             }
 
             // subtract 1 from weekNum to account for the first week being week 1 (origin)
-            return new DateTime(DateOnly.Parse(dbStartDate), TimeslotHelper.GetTime(tsIdx)).AddDays((((weekNum-1) * 7) + (int)TimeslotHelper.GetDay(tsIdx)));
+            return new DateTime(DateOnly.Parse(dbStartDate), TimeblockHelper.GetTime(tsIdx)).AddDays((((weekNum-1) * 7) + (int)TimeblockHelper.GetDay(tsIdx)));
         }
 
         /// <summary>

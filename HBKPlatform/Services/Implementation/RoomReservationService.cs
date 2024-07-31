@@ -99,7 +99,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var pracId = _userService.GetClaimFromCookie("PractitionerId");
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
-        var currentTick = TimeslotHelper.GetCurrentTick(now);
+        var currentTick = TimeblockHelper.GetCurrentTick(now);
         
         _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum, currentTick);
 
@@ -119,7 +119,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         now ??= DateTime.UtcNow;
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now.Value);
         
-        _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum, TimeslotHelper.GetCurrentTick(now));
+        _reservations = await _roomResRepo.GetUpcomingReservationsPractitioner(pracId, thisWeekNum, TimeblockHelper.GetCurrentTick(now));
 
         return BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);
     }
@@ -132,7 +132,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
         var thisWeekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         var clinicId = _userService.GetClaimFromCookie("ClinicId");
         
-        _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum, TimeslotHelper.GetCurrentTick(now));
+        _reservations = await _roomResRepo.GetUpcomingReservationsClinic(clinicId, thisWeekNum, TimeblockHelper.GetCurrentTick(now));
 
         model.Requested = BuildRoomResList(Enums.ReservationStatus.Requested, dbStartDate);
         model.Approved = BuildRoomResList(Enums.ReservationStatus.Approved, dbStartDate);

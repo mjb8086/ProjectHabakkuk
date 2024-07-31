@@ -25,7 +25,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         
         var now = DateTime.UtcNow;
-        var currentTick = TimeslotHelper.GetCurrentTick(now);
+        var currentTick = TimeblockHelper.GetCurrentTick(now);
         var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         
         var appts = await _bookingService.GetUpcomingAppointmentsForPractitioner(pracId, weekNum, currentTick, false);

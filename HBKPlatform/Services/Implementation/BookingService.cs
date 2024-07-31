@@ -217,7 +217,7 @@ namespace HBKPlatform.Services.Implementation
             var bookingAdvanceWeeks = await _config.GetIntValueOrDefault("BookingAdvanceWeeks");
             
             var now = DateTime.UtcNow;
-            var currentTick = TimeslotHelper.GetCurrentTick(now);
+            var currentTick = TimeblockHelper.GetCurrentTick(now);
             var weekNum = DateTimeHelper.GetWeekNumFromDateTime(dbStartDate, now);
         
             var treatments = await _cacheService.GetTreatments();

@@ -322,7 +322,7 @@ namespace HBK.Test
         [InlineData("23:55",  2016 )]  // 23:55 Sun
         public void GetTimeIsCorrect(string expected, int tsIdx)
         {
-            Assert.Equal(expected, TimeslotHelper.GetTime(tsIdx).ToString("HH:mm"));
+            Assert.Equal(expected, TimeblockHelper.GetTime(tsIdx).ToString("HH:mm"));
         }
         
         [Theory]
@@ -344,7 +344,7 @@ namespace HBK.Test
         [InlineData(Enums.Day.Sunday,  2016 )]  // 23:55 Sun
         public void GetDayIsCorrect(Enums.Day expected, int tsIdx)
         {
-            Assert.Equal(expected, TimeslotHelper.GetDay(tsIdx));
+            Assert.Equal(expected, TimeblockHelper.GetDay(tsIdx));
         }
 
         [Theory]
@@ -359,7 +359,7 @@ namespace HBK.Test
         [InlineData(Enums.Day.Sunday, 23, 55, 2016)]
         public void GetTicksFromDayHourMin_IsCorrect(Enums.Day day, int hour, int min, int tick)
         {
-            Assert.Equal(tick, TimeslotHelper.GetTickFromDayHourMin(day, hour, min));
+            Assert.Equal(tick, TimeblockHelper.GetTickFromDayHourMin(day, hour, min));
         }
     }
 }

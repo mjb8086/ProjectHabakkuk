@@ -100,7 +100,7 @@ namespace HBK.Test
                 .ReturnsAsync(indefAvailability);
 //            mockApptRepo.Setup(x => x.GetFutureAppointmentsForPractitioner(FAKE_PRACTITIONER_ID, mockDateTimeHelper.Object.Now, DB_START_DATE, true, null)) .ReturnsAsync(appointments);
             
-            mockTimeslotService.Setup(x => x.GetPopulatedFutureTimeslots()).ReturnsAsync(TimeslotHelper.GetPopulatedFutureTimeslots(now, timeslotList, DB_START_DATE, Int32.Parse(advanceWeeks)));
+            mockTimeslotService.Setup(x => x.GetPopulatedFutureTimeslots()).ReturnsAsync(TimeblockHelper.GetPopulatedFutureTimeslots(now, timeslotList, DB_START_DATE, Int32.Parse(advanceWeeks)));
 
             return new BookingService(mockUserService.Object, mockCacheService.Object, 
                 mockApptRepo.Object, mockConfigService.Object, mockDateTimeHelper.Object, mockAvaRepo.Object, 

@@ -17,9 +17,9 @@ public class RoomReservation : HbkBaseEntity
     public int RoomId { get; set; }
     public int ClinicId { get; set; }
     public int PractitionerId { get; set; }
-    [Range(0, TimeslotHelper.TIMESLOTS_PER_WEEK)]
+    [Range(0, TimeblockHelper.TICKS_PER_WEEK)]
     public int StartTick { get; set; }
-    [Range(0, TimeslotHelper.TIMESLOTS_PER_WEEK)]
+    [Range(0, TimeblockHelper.TICKS_PER_WEEK)]
     public int EndTick { get; set; }
     [Range(0,5)]
     public int? EndAdjustment { get; set; }

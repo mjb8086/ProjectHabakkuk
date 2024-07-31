@@ -321,8 +321,8 @@ namespace HBKPlatform.Database.Helpers
                         {
                             Client = client1,
                             Practitioner = prac1,
-                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 14, 15),
-                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 15, 00),
+                            StartTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 14, 15),
+                            EndTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 15, 00),
                             Status = Enums.AppointmentStatus.CancelledByClient,
                             CancellationReason = "Someone else does it cheaper, sorry",
                             Treatment = treatment1,
@@ -375,8 +375,8 @@ namespace HBKPlatform.Database.Helpers
                             WeekNum = 20,
                             Tenancy = t,
                             Entity = Enums.AvailabilityEntity.Practitioner,
-                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Monday, 12, 00),
-                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Monday, 15, 15)
+                            StartTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Monday, 12, 00),
+                            EndTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Monday, 15, 15)
                         },
                         new ()
                         {
@@ -385,8 +385,8 @@ namespace HBKPlatform.Database.Helpers
                             WeekNum = 20,
                             Tenancy = t,
                             Entity = Enums.AvailabilityEntity.Practitioner,
-                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 09, 00),
-                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 19, 15)
+                            StartTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 09, 00),
+                            EndTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Wednesday, 19, 15)
                         },
                         new ()
                         {
@@ -395,8 +395,8 @@ namespace HBKPlatform.Database.Helpers
                             WeekNum = 20,
                             Tenancy = t,
                             Entity = Enums.AvailabilityEntity.Practitioner,
-                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 12, 00),
-                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 18, 15)
+                            StartTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 12, 00),
+                            EndTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 18, 15)
                         },
                         new ()
                         {
@@ -405,8 +405,8 @@ namespace HBKPlatform.Database.Helpers
                             WeekNum = 20,
                             Tenancy = t,
                             Entity = Enums.AvailabilityEntity.Practitioner,
-                            StartTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 10, 00),
-                            EndTick = TimeslotHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 15, 45)
+                            StartTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 10, 00),
+                            EndTick = TimeblockHelper.GetTickFromDayHourMin(Enums.Day.Thursday, 15, 45)
                         },
                     };
                     ctx.AddRange(ta);
