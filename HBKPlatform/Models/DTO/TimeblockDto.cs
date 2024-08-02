@@ -8,12 +8,22 @@ namespace HBKPlatform.Models.DTO;
 [DebuggerDisplay("StartTick={StartTick}, EndTick={EndTick}")]
 public class TimeblockDto : IEquatable<TimeblockDto>
 {
+    public int StartTick { get; set; }
+    public int EndTick { get; set; }
     public DateTime StartTime { get; set; }
     public int Duration { get; set; }
     public DateTime EndTime { get; set; } // todo: remove?
-    public int StartTick { get; set; }
-    public int EndTick { get; set; }
     public int WeekNum { get; set; }
+
+    public bool IsValid()
+    {
+        return (Duration == EndTick - StartTick) && EndTick > StartTick && WeekNum > 0;
+    }
+
+    public override string ToString()
+    {
+        return $"StartTick={StartTick}, EndTick={EndTick}.";
+    }
 
     public bool Equals(TimeblockDto? other)
     {

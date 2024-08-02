@@ -119,6 +119,10 @@ namespace HBKPlatform.Helpers
             {
                 me.EndTick = myNeighbours[0].EndTick; // override instance value, may need to create a new instance
             }
+            else if (myNeighbours.Count == 1) // final block, not consecutive
+            {
+                //?
+            }
             else if (me.EndTick == myNeighbours[0].StartTick)
             {
                 me.EndTick = myNeighbours[0].EndTick; // override instance value, may need to create a new instance
