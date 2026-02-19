@@ -18,6 +18,7 @@ using HBKPlatform.Services;
 using HBKPlatform.Services.Implementation;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Rewrite;
+using Npgsql;
 using Vite.AspNetCore;
 
 Log.Logger = new LoggerConfiguration()
@@ -109,7 +110,23 @@ try
     // Add services to the container.
     builder.Services.AddControllersWithViews();
     builder.Services.AddViteServices();
-    
+
+    var connectionStringBuilder = new NpgsqlConnectionStringBuilder( builder.Configuration.GetConnectionString("HbkContext") );
+    connectionStringBuilder.Database = "postgres";
+
+    using var connection = new NpgsqlConnection(connectionStringBuilder.ToString());
+    connection.Open();
+
+    try
+    {
+        using var command = new NpgsqlCommand($"CREATE DATABASE hangfire;", connection);
+        command.ExecuteNonQuery();
+    }
+    catch
+    {
+        // who cares if it already exists, anything more serious will throw again anyway
+    }
+
     // Add Hangfire services. This facilitates background tasks.
     builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
