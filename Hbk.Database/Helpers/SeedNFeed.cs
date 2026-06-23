@@ -1,4 +1,5 @@
 ﻿using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
 using Hbk.Common.Services.Implementation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -11,6 +12,10 @@ namespace Hbk.Database.Helpers
     // Sneed's
     public static class SeedNFeed //Formerly Chuck's
     {
+        private static readonly TimeOnly SeedAvailabilityStart = new(09, 00, 00);
+        private static readonly TimeOnly SeedAvailabilityEnd = new(19, 00, 00);
+        private const int SeedAvailabilityWeeks = 8;
+
         public static async Task Initialise(IServiceProvider provider, IPasswordHasher<User> passwordHasher)
         {
             var tenancySrv = new TenancyService();
@@ -342,50 +347,19 @@ namespace Hbk.Database.Helpers
                     
                     ctx.AddRange(appointments);
 
+                    const string dbStartDate = "2024-01-01";
+                    var currentWeek = DateTimeHelper.CurrentWeekNum(dbStartDate);
+
                     var startDate = new Setting()
                     {
                         Key = "DbStartDate",
-                        Value = "2024-01-01",
+                        Value = dbStartDate,
                         Tenancy = t
                     };
                     ctx.Add(startDate);
 
-                    var ta = new List<TimeslotAvailability>()
-                    {
-                        new()
-                        {
-                            Timeslot = timeslots[100],
-                            Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20,
-                            Tenancy = t,
-                        },
-                        new ()
-                        {
-                            Timeslot = timeslots[101],
-                            Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                        new ()
-                        {
-                            Timeslot = timeslots[102],
-                            Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Unavailable,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                        new ()
-                        {
-                            Timeslot = timeslots[104],
-                            Practitioner = prac1,
-                            Availability = Enums.TimeslotAvailability.Available,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                    };
-                    ctx.AddRange(ta);
+                    ctx.AddRange(BuildPractitionerAvailability(prac1, t, timeslots, currentWeek, 11));
+                    ctx.AddRange(BuildPractitionerAvailability(prac2, t, timeslots, currentWeek, 23));
                     ctx.SaveChanges();
                     
                     // Now add Clinic and rooms for rental
@@ -438,46 +412,8 @@ namespace Hbk.Database.Helpers
                     await ctx.AddAsync(clinic1);
                     await ctx.SaveChangesAsync();
                     
-                    var ta_room = new List<TimeslotAvailability>()
-                    {
-                        new()
-                        {
-                            Timeslot = timeslots[100],
-                            Room = clinic1.Rooms.First(),
-                            Entity = Enums.AvailabilityEntity.Room,
-                            Availability = Enums.TimeslotAvailability.Available,
-                            WeekNum = 20,
-                            Tenancy = t,
-                        },
-                        new ()
-                        {
-                            Timeslot = timeslots[101],
-                            Room = clinic1.Rooms.First(),
-                            Entity = Enums.AvailabilityEntity.Room,
-                            Availability = Enums.TimeslotAvailability.Available,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                        new ()
-                        {
-                            Timeslot = timeslots[102],
-                            Room = clinic1.Rooms.First(),
-                            Entity = Enums.AvailabilityEntity.Room,
-                            Availability = Enums.TimeslotAvailability.Available,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                        new ()
-                        {
-                            Timeslot = timeslots[104],
-                            Room = clinic1.Rooms.First(),
-                            Entity = Enums.AvailabilityEntity.Room,
-                            Availability = Enums.TimeslotAvailability.Available,
-                            WeekNum = 20,
-                            Tenancy = t
-                        },
-                    };
-                    ctx.AddRange(ta_room);
+                    ctx.AddRange(BuildRoomAvailability(clinic1.Rooms.ElementAt(0), clinicTenancy, timeslots, currentWeek, 37));
+                    ctx.AddRange(BuildRoomAvailability(clinic1.Rooms.ElementAt(1), clinicTenancy, timeslots, currentWeek, 41));
                     ctx.SaveChanges();
 
                     // BEGIN T2 PRACTICE
@@ -588,12 +524,97 @@ namespace Hbk.Database.Helpers
                     };
                     
                     await ctx.AddRangeAsync(t2Roles);
+                    ctx.AddRange(BuildPractitionerAvailability(t2Prac, t2, timeslots, currentWeek, 53));
                     await ctx.SaveChangesAsync();
                     
                     // END T2
                 }
             }
         }
+
+        private static List<TimeslotAvailability> BuildPractitionerAvailability(
+            Practitioner practitioner,
+            Tenancy tenancy,
+            List<Timeslot> timeslots,
+            int currentWeek,
+            int seed)
+        {
+            var availability = new List<TimeslotAvailability>();
+
+            availability.AddRange(SelectSeedTimeslots(timeslots, seed, -1)
+                .Select(timeslot => new TimeslotAvailability
+                {
+                    Practitioner = practitioner,
+                    Timeslot = timeslot,
+                    Entity = Enums.AvailabilityEntity.Practitioner,
+                    Availability = Enums.TimeslotAvailability.Available,
+                    IsIndefinite = true,
+                    WeekNum = -1,
+                    Tenancy = tenancy
+                }));
+
+            for (var week = currentWeek; week < currentWeek + SeedAvailabilityWeeks; week++)
+            {
+                availability.AddRange(SelectSeedTimeslots(timeslots, seed, week)
+                    .Select(timeslot => new TimeslotAvailability
+                    {
+                        Practitioner = practitioner,
+                        Timeslot = timeslot,
+                        Entity = Enums.AvailabilityEntity.Practitioner,
+                        Availability = Enums.TimeslotAvailability.Available,
+                        WeekNum = week,
+                        Tenancy = tenancy
+                    }));
+            }
+
+            return availability;
+        }
+
+        private static List<TimeslotAvailability> BuildRoomAvailability(
+            Room room,
+            Tenancy tenancy,
+            List<Timeslot> timeslots,
+            int currentWeek,
+            int seed)
+        {
+            var availability = new List<TimeslotAvailability>();
+
+            availability.AddRange(SelectSeedTimeslots(timeslots, seed, -1)
+                .Select(timeslot => new TimeslotAvailability
+                {
+                    Room = room,
+                    Timeslot = timeslot,
+                    Entity = Enums.AvailabilityEntity.Room,
+                    Availability = Enums.TimeslotAvailability.Available,
+                    IsIndefinite = true,
+                    WeekNum = -1,
+                    Tenancy = tenancy
+                }));
+
+            for (var week = currentWeek; week < currentWeek + SeedAvailabilityWeeks; week++)
+            {
+                availability.AddRange(SelectSeedTimeslots(timeslots, seed, week)
+                    .Select(timeslot => new TimeslotAvailability
+                    {
+                        Room = room,
+                        Timeslot = timeslot,
+                        Entity = Enums.AvailabilityEntity.Room,
+                        Availability = Enums.TimeslotAvailability.Available,
+                        WeekNum = week,
+                        Tenancy = tenancy
+                    }));
+            }
+
+            return availability;
+        }
+
+        private static IEnumerable<Timeslot> SelectSeedTimeslots(IEnumerable<Timeslot> timeslots, int seed, int weekNum)
+        {
+            return timeslots
+                .Where(timeslot => timeslot.Time >= SeedAvailabilityStart && timeslot.Time <= SeedAvailabilityEnd)
+                .Where(timeslot =>
+                    ((timeslot.Id * 31) + ((int)timeslot.Day * 17) + (timeslot.Time.Hour * 7) +
+                     timeslot.Time.Minute + seed + (weekNum * 13)) % 5 is 0 or 2 or 3);
+        }
     }
 }
-
