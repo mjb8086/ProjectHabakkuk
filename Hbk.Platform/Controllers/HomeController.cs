@@ -31,6 +31,29 @@ namespace Hbk.Platform.Controllers
 
         public IActionResult Index()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                if (User.IsInRole("SuperAdmin"))
+                {
+                    return RedirectToAction("Index", "MCP", new { area = "MCP" });
+                }
+
+                if (User.IsInRole("ClinicManager"))
+                {
+                    return RedirectToAction("Index", "Reception", new { area = "Clinic" });
+                }
+
+                if (User.IsInRole("Practitioner"))
+                {
+                    return RedirectToAction("Index", "Reception", new { area = "MyND" });
+                }
+
+                if (User.IsInRole("Client"))
+                {
+                    return RedirectToAction("Index", "Reception", new { area = "Client" });
+                }
+            }
+
             return View();
         }
 
@@ -52,4 +75,3 @@ namespace Hbk.Platform.Controllers
         }
     }
 }
-
