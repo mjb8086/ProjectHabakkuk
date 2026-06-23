@@ -1,10 +1,10 @@
-using HBKPlatform.Globals;
-using HBKPlatform.Models.DTO;
+using Hbk.Platform.Globals;
+using Hbk.Platform.Models.DTO;
 
-namespace HBK.Test.Dto
+namespace Hbk.Test.Dto
 {
     /// <summary>
-    /// HBKPlatform TimeslotDto unit tests.
+    /// Hbk.Platform TimeslotDto unit tests.
     /// 
     /// Author: Mark Brown
     /// Authored: 19/01/2024

@@ -1,0 +1,15 @@
+using Hbk.Platform.Globals;
+
+namespace Hbk.Platform.Models.DTO
+{
+    public class TreatmentDto
+    {
+        public int Id { get; set; }
+        public int PracticeId { get; set; }
+        public Enums.TreatmentRequestability Requestability { get; set; }
+        public double Cost { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string? Img { get; set; }
+    }
+}

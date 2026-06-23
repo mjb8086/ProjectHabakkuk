@@ -1,0 +1,53 @@
+@using Hbk.Platform.Globals
+@model Hbk.Platform.Models.DTO.TreatmentDto
+@{
+    Layout = "_myND";
+    ViewData["Title"] = $"Treatment Management";
+    ViewBag.Css = "mynd-appointments.css";
+    ViewBag.Modules = "treatmentcreate.js";
+    ViewBag.CurrentNav = "Appointment|TreatmentManagement";
+}
+@await Html.PartialAsync("_AppointmentsPartial")
+
+<h1>Create A Treatment</h1>
+
+<form id="treatmentDetails" asp-area="MyND" asp-controller="Appointment" asp-action="DoCreateTreatment" method="post">
+
+<fieldset>
+    <label for="title" class="form-textfield">Title</label>
+    <input type="text" name="title" id="title" value="@Model.Title"/>
+</fieldset>
+  
+<fieldset>
+  <label for="description" class="form-textfield">Description</label>
+  <textarea name="description" id="description">
+@Model.Description
+  </textarea> 
+</fieldset>
+  
+<fieldset>
+  <label for="cost" class="form-textfield">Cost</label>
+  <span>£</span> <input type="number" name="cost" id="cost" step=".01" value="@Model.Cost"/>
+</fieldset>
+
+<fieldset>
+  <details>
+    <summary>Requestability</summary>
+    Select who may request this treatment. Treatments may be booked by Practitioners only or the Client and Practitioner.
+  </details>
+
+  <div>
+    <input type="radio" id="clientAndPractitioner" name="requestability" value="@Convert.ToInt32(Enums.TreatmentRequestability.ClientAndPrac)" @(Model.Requestability == Enums.TreatmentRequestability.ClientAndPrac ? "checked" : "") />
+    <label for="clientAndPractitioner">Client and Practitioner</label>
+  </div>
+
+  <div>
+    <input type="radio" id="pracOnly" name="requestability" value="@Convert.ToInt32(Enums.TreatmentRequestability.PracOnly)" @(Model.Requestability == Enums.TreatmentRequestability.PracOnly ? "checked" : "")/>
+    <label for="pracOnly">Practitioner Only</label>
+  </div>
+</fieldset>
+
+<fieldset>
+  <input type="submit" id="btnSave" value="Save" data-id="@Model.Id"/> <button id="btnGoBack">Go Back</button>
+</fieldset>
+</form>

@@ -1,16 +1,16 @@
-using HBKPlatform.Globals;
-using HBKPlatform.Helpers;
-using HBKPlatform.Models.DTO;
-using HBKPlatform.Repository;
-using HBKPlatform.Services;
-using HBKPlatform.Services.Implementation;
+using Hbk.Platform.Globals;
+using Hbk.Platform.Helpers;
+using Hbk.Platform.Models.DTO;
+using Hbk.Platform.Repository;
+using Hbk.Platform.Services;
+using Hbk.Platform.Services.Implementation;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace HBK.Test
+namespace Hbk.Test
 {
     /// <summary>
-    /// HBKPlatform Booking Service unit tests.
+    /// Hbk.Platform Booking Service unit tests.
     /// 
     /// Author: Mark Brown
     /// Authored: 19/01/2024

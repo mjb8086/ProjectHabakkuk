@@ -1,13 +1,13 @@
-using HBKPlatform.Exceptions;
-using HBKPlatform.Globals;
-using HBKPlatform.Helpers;
-using HBKPlatform.Models.DTO;
+using Hbk.Platform.Exceptions;
+using Hbk.Platform.Globals;
+using Hbk.Platform.Helpers;
+using Hbk.Platform.Models.DTO;
 using Xunit.Abstractions;
 
-namespace HBK.Test
+namespace Hbk.Test
 {
     /// <summary>
-    /// HBKPlatform Date Time helper unit tests.
+    /// Hbk.Platform Date Time helper unit tests.
     /// 
     /// Author: Mark Brown
     /// Authored: 16/01/2024

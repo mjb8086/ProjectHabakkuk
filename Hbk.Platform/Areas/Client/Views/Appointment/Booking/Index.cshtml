@@ -1,0 +1,14 @@
+@model Hbk.Platform.Models.View.ClientTreatmentSelectView;
+@{
+    ViewBag.Title = "Booking wizard";
+    Layout = "_Client";
+    ViewBag.CurrentNav = "Appointments";
+}
+
+<h1>Booking wizard.</h1>
+<p>Select a Treatment -> Select a Time -> Confirm -> Done!</p>
+<h2>Select a treatment from one of the following:</h2>
+@foreach (var treatment in Model.Treatments)
+{
+    <p>@treatment.Title. @treatment.Cost.ToString("C2") <a asp-area="Client" asp-controller="Appointment" asp-action="TimeslotSelect" asp-route-treatmentId="@treatment.Id">Book</a></p>
+}

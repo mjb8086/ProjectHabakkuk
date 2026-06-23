@@ -1,0 +1,16 @@
+using Hbk.Platform.Models.DTO;
+
+namespace Hbk.Platform.Repository
+{
+    public interface IRecordRepository
+    {
+        public Task<FullClientRecordDto> GetRecord(int recordId);
+        public Task<List<ClientRecordLite>> GetClientRecordsLite(int clientId);
+        public Task<List<ClientRecordLite>> GetRecordsLite(bool priorityOnly = false);
+        public Task<FullClientRecordDto> UpdateRecord(FullClientRecordDto recordDto);
+        public Task<FullClientRecordDto> UpdateRecordLite(UpdateRecordLite recordDto);
+        public Task SetRecordPriority(int recordId, bool priority);
+        public Task<FullClientRecordDto> CreateRecord(ClientRecordDto recordDto);
+        public Task DeleteRecord(int recordId);
+    }
+}
