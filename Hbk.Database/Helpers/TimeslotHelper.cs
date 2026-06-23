@@ -4,7 +4,7 @@ namespace Hbk.Database.Helpers
 {
     public static class TimeslotHelper
     {
-        public const int DEFAULT_DURATION_MINUTES = 5;
+        public const int DEFAULT_DURATION_MINUTES = 30; // ideally would be 5m but the ui sucks for that
         public static readonly TimeOnly DEFAULT_START = new (08, 00, 00);
         public static readonly TimeOnly DEFAULT_END = new (19, 00, 00);
     

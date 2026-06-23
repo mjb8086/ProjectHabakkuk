@@ -438,6 +438,49 @@ namespace Hbk.Database.Helpers
                     await ctx.AddAsync(clinic1);
                     await ctx.SaveChangesAsync();
                     
+                    var ta_room = new List<TimeslotAvailability>()
+                    {
+                        new()
+                        {
+                            Timeslot = timeslots[100],
+                            Room = clinic1.Rooms.First(),
+                            Entity = Enums.AvailabilityEntity.Room,
+                            Availability = Enums.TimeslotAvailability.Available,
+                            WeekNum = 20,
+                            Tenancy = t,
+                        },
+                        new ()
+                        {
+                            Timeslot = timeslots[101],
+                            Room = clinic1.Rooms.First(),
+                            Entity = Enums.AvailabilityEntity.Room,
+                            Availability = Enums.TimeslotAvailability.Available,
+                            WeekNum = 20,
+                            Tenancy = t
+                        },
+                        new ()
+                        {
+                            Timeslot = timeslots[102],
+                            Room = clinic1.Rooms.First(),
+                            Entity = Enums.AvailabilityEntity.Room,
+                            Availability = Enums.TimeslotAvailability.Available,
+                            WeekNum = 20,
+                            Tenancy = t
+                        },
+                        new ()
+                        {
+                            Timeslot = timeslots[104],
+                            Room = clinic1.Rooms.First(),
+                            Entity = Enums.AvailabilityEntity.Room,
+                            Availability = Enums.TimeslotAvailability.Available,
+                            WeekNum = 20,
+                            Tenancy = t
+                        },
+                    };
+                    ctx.AddRange((IEnumerable<object>)ta_room);
+                    ctx.SaveChanges();
+
+                    
                     
                     // BEGIN T2 PRACTICE
                     var t2 = new Tenancy()

@@ -7,6 +7,7 @@
 ******************************/
 
 using System.Security.Claims;
+using System.Linq.Expressions;
 using Hbk.Common.Globals;
 using Hbk.Common.Services;
 using Hbk.Database.Helpers;
@@ -53,12 +54,8 @@ namespace Hbk.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Ignore<BaseEntity>();
-        
-            // Set query filter for tenancies, works on interfaces due to some madjik i found online
-            modelBuilder.Entity<BaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
-            modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
         
             // Manual relationships
             // Configure one-to-many relationship between Practice and Practitioner
@@ -73,10 +70,9 @@ namespace Hbk.Database
                 .WithOne()
                 .HasForeignKey<Practice>(c => c.LeadPractitionerId);
 
-            // All models will have the date created ts.
-            modelBuilder.Entity<BaseEntity>()
-                .Property(b => b.DateCreated)
-                .HasDefaultValueSql<DateTime>("CURRENT_TIMESTAMP");
+            ConfigureBaseEntityProperties(modelBuilder);
+
+            modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
 
             // Make Id columns auto increment.
             modelBuilder.UseIdentityAlwaysColumns();
@@ -92,6 +88,27 @@ namespace Hbk.Database
             modelBuilder.Entity<IdentityUserRole<string>>().ToTable("user_roles");
             modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("role_claims");
         }
+
+        private void ConfigureBaseEntityProperties(ModelBuilder modelBuilder)
+        {
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes()
+                         .Where(t => typeof(BaseEntity).IsAssignableFrom(t.ClrType)))
+            {
+                var entity = modelBuilder.Entity(entityType.ClrType);
+
+                entity.Property(nameof(BaseEntity.DateCreated))
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                var parameter = Expression.Parameter(entityType.ClrType, "e");
+                var tenancyId = Expression.Property(parameter, nameof(BaseEntity.TenancyId));
+                var currentTenancyId = Expression.Property(Expression.Constant(this), nameof(CurrentTenancyId));
+                var body = Expression.Equal(tenancyId, currentTenancyId);
+
+                entity.HasQueryFilter(Expression.Lambda(body, parameter));
+            }
+        }
+
+        private int CurrentTenancyId => _tenancySrv.TenancyId;
 
         /// <summary>
         /// Set snake case on all entities.
