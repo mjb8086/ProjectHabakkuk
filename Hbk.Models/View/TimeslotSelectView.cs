@@ -1,0 +1,11 @@
+using Hbk.Models.DTO;
+
+namespace Hbk.Models.View
+{
+    public class TimeslotSelectView
+    {
+        public string TreatmentName { get; set; }
+        public int TreatmentId { get; set; }
+        public List<TimeslotDto> AvailableTimeslots { get; set; }
+    }
+}

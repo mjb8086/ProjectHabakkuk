@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HBKPlatform\HBKPlatform.csproj" />
+    <ProjectReference Include="..\Hbk.Platform\Hbk.Platform.csproj" />
   </ItemGroup>
 
 </Project>

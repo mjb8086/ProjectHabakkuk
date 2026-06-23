@@ -1,13 +1,15 @@
-using HBKPlatform.Exceptions;
-using HBKPlatform.Globals;
-using HBKPlatform.Helpers;
-using HBKPlatform.Models.DTO;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
+using Hbk.Models.DTO;
+using Hbk.Models.Helpers;
+using Hbk.Platform.Helpers;
 using Xunit.Abstractions;
 
-namespace HBK.Test
+namespace Hbk.Test
 {
     /// <summary>
-    /// HBKPlatform Date Time helper unit tests.
+    /// Hbk.Platform Date Time helper unit tests.
     /// 
     /// Author: Mark Brown
     /// Authored: 16/01/2024
@@ -33,7 +35,7 @@ namespace HBK.Test
             };
             var weekNum = 1;
         
-            Assert.Equal(new DateTime(2024,01,01, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2024,01,01, 14,00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
     
         [Fact]
@@ -46,7 +48,7 @@ namespace HBK.Test
             };
             var weekNum = 1;
         
-            Assert.Equal(new DateTime(2024,01,07, 23,59, 59, 99), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2024,01,07, 23,59, 59, 99), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
     
         [Fact]
@@ -59,7 +61,7 @@ namespace HBK.Test
             };
             var weekNum = 2;
         
-            Assert.Equal(new DateTime(2024,01,08, 00,00, 00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2024,01,08, 00,00, 00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
     
         [Fact]
@@ -72,7 +74,7 @@ namespace HBK.Test
             };
             var weekNum = 10;
         
-            Assert.Equal(new DateTime(2024,03,08, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2024,03,08, 14,00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
     
         [Fact]
@@ -85,7 +87,7 @@ namespace HBK.Test
             };
             var weekNum = 53;
         
-            Assert.Equal(new DateTime(2024,12,30, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2024,12,30, 14,00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
     
         [Fact]
@@ -98,7 +100,7 @@ namespace HBK.Test
             };
             var weekNum = 53;
         
-            Assert.Equal(new DateTime(2025,01,01, 14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2025,01,01, 14,00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
 
         [Fact]
@@ -112,7 +114,7 @@ namespace HBK.Test
             };
             var weekNum = 3;
         
-            Assert.Equal(new DateTime(2024,01,18,14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot, weekNum));
+            Assert.Equal(new DateTime(2024,01,18,14,00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot, weekNum));
         }
     
         [Fact]
@@ -125,7 +127,7 @@ namespace HBK.Test
                 WeekNum = 2
             };
         
-            Assert.Equal(new DateTime(2024,01,11,14,00, 00), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot));
+            Assert.Equal(new DateTime(2024,01,11,14,00, 00), DtoHelpers.FromTimeslot(DB_START_DATE, timeslot));
         }
 
         [Fact]
@@ -137,7 +139,7 @@ namespace HBK.Test
                 Time = new TimeOnly(14, 00)
             };
         
-            Assert.Throws<InvalidUserOperationException>(() => DateTimeHelper.FromTimeslot(DB_START_DATE, timeslot));
+            Assert.Throws<InvalidOperationException>(() => DtoHelpers.FromTimeslot(DB_START_DATE, timeslot));
         }
     
         /*

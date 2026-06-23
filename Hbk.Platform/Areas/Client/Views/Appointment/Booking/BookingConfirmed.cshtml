@@ -1,0 +1,12 @@
+@model Hbk.Models.View.BookingConfirm
+@{
+    ViewBag.Title = "Booking wizard";
+    Layout = "_Client";
+    ViewBag.CurrentNav = "Appointments";
+}
+
+<h1>Booking wizard.</h1>
+<h2>Request Confirmed</h2>
+<p>Your booking for @Model.TreatmentTitle on @Model.BookingDate with @Model.PractitionerName has been confirmed.</p>
+<p>You will receive an email confirming the booking.</p>
+<a asp-area="Client" asp-controller="Reception" asp-action="Index">Return to Reception</a> 

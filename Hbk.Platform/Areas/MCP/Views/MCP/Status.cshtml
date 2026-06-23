@@ -1,0 +1,19 @@
+@using Hbk.Common.Globals
+@using Hbk.Platform.Defaults
+@model Hbk.Models.View.MCP.SystemStats
+
+@{
+    ViewData["Title"] = "MCP Status";
+    ViewBag.CurrentNav = "SystemStatus";
+    Layout = "_McpShared";
+}
+
+<h1>System Status</h1>
+<div style="padding: 3px" class="table1Wrap">
+    <div style="margin-bottom: 5px; color:#e5048d; border-bottom: none" class="table1Item"><pre style="margin-left: auto; margin-right: auto;">@Consts.HBK_NAME</pre></div>
+    <div style="margin-bottom: 10px;" class="table1Item"><span style="width: 100%; text-align: center; font-style: italic; font-family: barlow-med; color: blueviolet;">Version @(Consts.VERSION). Release date: @Consts.RELEASE_DATE.</span></div>
+    <div class="table1Item"><b>Database:</b> @Model.Db</div>
+    <div class="table1Item"><b>Database Host:</b> @Model.Host</div>
+    <div class="table1Item"><b>Total users registered:</b> @Model.NumRegistered</div>
+    <div class="table1Item"><b>Total users online:</b> @Model.NumOnline</div>
+</div>

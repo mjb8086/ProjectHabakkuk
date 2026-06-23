@@ -1,0 +1,18 @@
+@model Hbk.Models.ClientMessageConversationModel
+@{
+    Layout = "_Client";
+    ViewData["Title"] = $"Conversation with {Model.Recipient}";
+    ViewData["css"] = "messaging.css";
+    ViewData["scripts"] = "messaging.js";
+    ViewBag.CurrentNav = "Messaging";
+}
+
+@await Html.PartialAsync("Components/_Messaging", Model)
+
+<div id="messageInputWrap">
+    <form id="messageInput" asp-area="Client" asp-controller="Messaging" asp-action="SendMessage" asp-route-pracId="@Model.PractitionerId" method="post">
+        <textarea name="messageBody" id="messageBody"></textarea>
+        <input type="submit" value="Send" id="btnSend" />
+    </form>
+</div>
+

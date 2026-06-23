@@ -1,0 +1,28 @@
+using Hbk.Common.Globals;
+
+namespace Hbk.Database
+{
+    /// <summary>
+    /// Hbk.Platform ClientRecord.
+    /// 
+    /// Author: Mark Brown
+    /// Authored: 03/01/2023
+    /// 
+    /// © 2024 NowDoctor Ltd.
+    /// </summary>
+    public class ClientRecord : BaseEntity
+    {
+        public int PractitionerId { get; set; }
+        public int ClientId { get; set; }
+        public int? AppointmentId { get; set; }
+        public Enums.RecordVisibility RecordVisibility { get; set; }
+        public string Title { get; set; }
+        public string NoteBody { get; set; }
+        public bool IsPriority { get; set; }
+
+        // EF Navigations
+        public virtual Practitioner Practitioner { get; set; }
+        public virtual Client Client { get; set; }
+        public virtual Appointment Appointment { get; set; }
+    }
+}

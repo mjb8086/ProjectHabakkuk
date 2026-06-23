@@ -1,0 +1,99 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NowDoctor @ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/mci-fonts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui.structure.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui.theme.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/inhouse.css" asp-append-version="true" />
+    @if (ViewData["css"] != null)
+        {
+            // FIXME: Work with many stylesheets....
+        <link rel="stylesheet" href="@Url.Content("~/css/" + ViewData["css"])" asp-append-version="true" />
+    }
+    @if (ViewData["scripts"] != null)
+    {
+        // FIXME: Work with many scripts....
+        <script src ="@Url.Content("~/js/" + ViewData["scripts"])" asp-append-version="true" defer></script>
+    }
+    @if (ViewData["modules"] != null)
+    {
+        // FIXME: Work with many scripts....
+        <script type="module" src="@Url.Content("~/js/" + ViewData["modules"])" asp-append-version="true" defer></script>
+    }
+    <script>
+    window.hbkFlasher = @(TempData["Message"] != null ? Html.Raw($"\"{TempData["Message"]}\"") : Html.Raw("\"\""));
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</head>
+<body>
+    <header>
+        <nav id="mciNavBar">
+            <div class="hbk-navbar-left">
+                <a class="navbar-light" id="mciName" href="/">NowDoctor</a>
+            </div>
+			<div class="hbk-navbar-right">
+                <ul class="hbk-navbar-nav">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Account" asp-page="/Logout">Logout</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Account"  asp-page="/Login">Login</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="MCP" asp-controller="MCP" asp-action="Index">MCP</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Practitioner"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="MyND" asp-controller="Reception" asp-action="Index">MyND</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("Client"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Client" asp-controller="Reception" asp-action="Index">Reception</a>
+                            </li>
+                        }
+                        @if (User.IsInRole("ClinicManager"))
+                        {
+                            <li class="nav-item">
+                                <a class="navbar-light" asp-area="Clinic" asp-controller="Reception" asp-action="Index">Clinic Management</a>
+                            </li>
+                        }
+                </ul>
+			</div>
+        </nav>
+    </header>
+    <div id="mainPageBody" class="hbk-container">
+         @RenderBody()
+    </div>
+
+    <footer>
+        <div class="footer-item">
+            &copy; 2024 - NowDoctor Ltd. HBK Platform v1.0-DEV 
+        </div>
+        <div class="footer-item">
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/contrib/jquery-ui.js"></script>
+    <script src="@Url.Content("~/js/site.js")" asp-append-version="true" defer></script>
+</body>
+</html>
+

@@ -1,0 +1,24 @@
+using Hbk.Common.Globals;
+
+namespace Hbk.Database
+{
+    /// <summary>
+    /// Hbk.Platform treatment entity.
+    /// Any billable service will be represented in this table.
+    /// 
+    /// Author: Mark Brown
+    /// Authored: 03/01/2024
+    /// 
+    /// © 2024 NowDoctor Ltd.
+    /// </summary>
+    public class Treatment : BaseEntity
+    {
+        public Enums.TreatmentRequestability TreatmentRequestability { get; set; }
+        public double Cost { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string? Img { get; set; }
+    
+        // EF Navigations
+    }
+}
