@@ -11,7 +11,7 @@ We use 'Areas' to group sections - i.e. There is an admin section called the "Ma
 
 The core application is under `Hbk.Platform`. It's written entirely in CSHTML (Razor) but some progress was made on the replacement Vue UI. It has plenty of bugs, it's far from complete, and it was ultimately scrapped in favour of a clener Vue + .NET API separation that became our launch platform. That version remains closed source.
 
-This version is rough. I repeat, you can't register for the site. The styling was never updated from its static page placeholder style. It violates several good OO design principles - you can hunt for them if you're bored. Consequently it is not I'd develop a .NET application now. But it is functional and self contained - you can build it and run it, it requires only access to PostgreSQL to seed the DB.
+This version is rough. I repeat, you can't register for the site. The styling was never updated from its static page placeholder style. It violates several good OO design principles - you can hunt for them if you're bored. Consequently it is not I'd develop a .NET application now. But it is functional and self contained - you can build it and run it, it by default uses an in-memory db. Should you wish to persist data, it requires access to PostgreSQL.
 
 ## Fixes made since it was scrapped
 I've recently separated the DTOs, models, and DB, and Common into their own projects. The DB is no longer initalised with TPC - this caused id sequence problems.
