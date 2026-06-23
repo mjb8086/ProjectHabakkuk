@@ -1,7 +1,7 @@
 namespace Hbk.Database;
 
 // Join table for rooms and attributes (many to many)
-public class RoomAttribute : HbkBaseEntity
+public class RoomAttribute : BaseEntity
 {
         public int RoomId { get; set; }
         public int AttributeId { get; set; }

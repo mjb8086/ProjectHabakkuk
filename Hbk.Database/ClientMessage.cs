@@ -3,7 +3,7 @@ using Hbk.Common.Globals;
 
 namespace Hbk.Database
 {
-     public class ClientMessage : HbkBaseEntity
+     public class ClientMessage : BaseEntity
      {
           // Rows
           public int? PreviousMessageId { get; set; }

@@ -11,7 +11,7 @@ namespace Hbk.Database
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class Treatment : HbkBaseEntity
+    public class Treatment : BaseEntity
     {
         public Enums.TreatmentRequestability TreatmentRequestability { get; set; }
         public double Cost { get; set; }

@@ -6,7 +6,7 @@ namespace Hbk.Database
     /// Store practice data - the umbrella legal entity under which a practitioner practices
     /// Includes clients, practitioners, and prac address/ contact details
     /// </summary>
-    public class Practice : HbkBaseEntity
+    public class Practice : BaseEntity
     {
         // Columns
         public string Description { get; set; }

@@ -10,7 +10,7 @@ namespace Hbk.Database
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class ClientRecord : HbkBaseEntity
+    public class ClientRecord : BaseEntity
     {
         public int PractitionerId { get; set; }
         public int ClientId { get; set; }

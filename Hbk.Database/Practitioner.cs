@@ -11,7 +11,7 @@ using Hbk.Common.Globals;
 
 namespace Hbk.Database
 {
-    public class Practitioner : HbkBaseEntity
+    public class Practitioner : BaseEntity
     {
         [Required]
         public string Forename { get; set; }

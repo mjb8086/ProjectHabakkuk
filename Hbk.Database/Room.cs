@@ -8,7 +8,7 @@ namespace Hbk.Database;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class Room : HbkBaseEntity
+public class Room : BaseEntity
 {
     // Columns
     public string Title { get; set; }

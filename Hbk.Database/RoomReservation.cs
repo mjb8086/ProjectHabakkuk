@@ -10,7 +10,7 @@ namespace Hbk.Database;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class RoomReservation : HbkBaseEntity
+public class RoomReservation : BaseEntity
 {
     public int RoomId { get; set; }
     public int ClinicId { get; set; }

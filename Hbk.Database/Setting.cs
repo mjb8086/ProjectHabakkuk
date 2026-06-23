@@ -8,7 +8,7 @@ namespace Hbk.Database
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class Setting : HbkBaseEntity
+    public class Setting : BaseEntity
     {
         public string Key { get; set; }
         public string Value { get; set; }

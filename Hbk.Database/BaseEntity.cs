@@ -3,9 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hbk.Database
 {
-    public abstract class HbkBaseEntity
+    public abstract class BaseEntity
     {
-        // sequencing bug needs fixed with pgsql driver (not my problem)
         [Key, Column(Order = 1)]
         public int Id { get; set; } 
         public int TenancyId { get; set; }
@@ -18,4 +17,3 @@ namespace Hbk.Database
         public virtual Tenancy Tenancy { get; set; }
     }
 }
-

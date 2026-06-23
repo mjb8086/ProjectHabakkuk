@@ -11,7 +11,7 @@ namespace Hbk.Database
     /// 
     /// © 2024 NowDoctor Ltd.
     /// </summary>
-    public class TimeslotAvailability: HbkBaseEntity
+    public class TimeslotAvailability: BaseEntity
     {
         public int TimeslotId { get; set; }
         public int? PractitionerId { get; set; }

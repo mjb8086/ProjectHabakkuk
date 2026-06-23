@@ -3,7 +3,7 @@ using Hbk.Common.Globals;
 
 namespace Hbk.Database
 {
-    public class Client : HbkBaseEntity
+    public class Client : BaseEntity
     {
         public Enums.Title Title { get; set; }
         public Enums.Sex Sex { get; set; }

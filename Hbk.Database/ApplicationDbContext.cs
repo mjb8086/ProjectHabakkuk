@@ -33,6 +33,7 @@ namespace Hbk.Database
 
         // Define tables
         public DbSet<Appointment> Appointments { get; set; } = default!;
+        public DbSet<Attribute> Attributes { get; set; } = default!;
         public DbSet<Client> Clients { get; set; } = default!;
         public DbSet<ClientMessage> ClientMessages { get; set; } = default!;
         public DbSet<ClientRecord> ClientRecords { get; set; } = default!;
@@ -45,7 +46,6 @@ namespace Hbk.Database
         public DbSet<Setting> Settings { get; set; } = default!;
         public DbSet<ClientPractitioner> ClientPractitioners { get; set; } = default!;
         public DbSet<Room> Rooms { get; set; } = default!;
-        public DbSet<System.Attribute> Attributes { get; set; } = default!;
         public DbSet<RoomAttribute> RoomAttributes { get; set; } = default!;
         public DbSet<Clinic> Clinics { get; set; } = default!;
         public DbSet<RoomReservation> RoomReservations { get; set; } = default!;
@@ -54,10 +54,10 @@ namespace Hbk.Database
         {
             base.OnModelCreating(modelBuilder);
             
-            modelBuilder.Ignore<HbkBaseEntity>();
+            modelBuilder.Ignore<BaseEntity>();
         
             // Set query filter for tenancies, works on interfaces due to some madjik i found online
-            modelBuilder.Entity<HbkBaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
+            modelBuilder.Entity<BaseEntity>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
             modelBuilder.Entity<ClientPractitioner>().HasQueryFilter(e => e.TenancyId == _tenancySrv.TenancyId);
         
             // Manual relationships
@@ -74,12 +74,12 @@ namespace Hbk.Database
                 .HasForeignKey<Practice>(c => c.LeadPractitionerId);
 
             // All models will have the date created ts.
-            modelBuilder.Entity<HbkBaseEntity>()
+            modelBuilder.Entity<BaseEntity>()
                 .Property(b => b.DateCreated)
                 .HasDefaultValueSql<DateTime>("CURRENT_TIMESTAMP");
 
             // Make Id columns auto increment.
-            // modelBuilder.UseIdentityAlwaysColumns();
+            modelBuilder.UseIdentityAlwaysColumns();
         
             // Name tables in snake case.
             modelBuilder.NameModelEntitiesInSnakeCase();
@@ -123,7 +123,7 @@ namespace Hbk.Database
 
             foreach (var entry in modifiedEntries)
             {
-                if (entry.Entity is HbkBaseEntity entity)
+                if (entry.Entity is BaseEntity entity)
                 {
                     entity.DateModified = DateTime.UtcNow;
                     entity.ModifyActioner =  userId;
@@ -131,7 +131,7 @@ namespace Hbk.Database
             }
             foreach (var entry in createdEntries)
             {
-                if (entry.Entity is HbkBaseEntity entity)
+                if (entry.Entity is BaseEntity entity)
                 {
                     entity.CreateActioner =  userId;
                     entity.TenancyId = _tenancySrv.TenancyId;

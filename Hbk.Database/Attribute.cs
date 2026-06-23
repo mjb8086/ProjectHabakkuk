@@ -9,7 +9,7 @@ namespace Hbk.Database;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class Attribute: HbkBaseEntity
+public class Attribute: BaseEntity
 {
     public string Title { get; set; } 
     public string Description { get; set; }

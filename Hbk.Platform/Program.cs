@@ -47,7 +47,7 @@ try
         })
         .AddRoleManager<RoleManager<IdentityRole>>()
         .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddDefaultUI()
+//        .AddDefaultUI()
         .AddDefaultTokenProviders();
 
     // To ensure custom claims (PracticeId, PracId, etc) are added to new identity when principal is refreshed.

@@ -11,7 +11,7 @@ namespace Hbk.Database;
 /// 
 /// © 2024 NowDoctor Ltd.
 /// </summary>
-public class Clinic : HbkBaseEntity
+public class Clinic : BaseEntity
 {
     [DataType(DataType.MultilineText)]
     public string? StreetAddress { get; set; }
