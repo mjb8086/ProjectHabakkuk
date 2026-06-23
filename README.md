@@ -5,6 +5,7 @@ All-in-one practice management from NowDoctor Ltd. (what was to be). I'm just th
 
 This is an aborted attempt to produce a clinical management system for independent practitioners. It features appointment booking, availability management, instant messaging, record keeping and contact management.
 
+#Sample Users
 The default seed includes sample users:
 
 | Email | Password | Account type |
@@ -20,6 +21,13 @@ The default seed includes sample users:
 
 Only SuperAdmin users can currently register new practitioners and clinics on behalf of users. Practitioners and clinics do not currently self-register directly.
 
+### A brief explanation of roles is in order:
+- **SuperAdmin** Internal ND staff, can add/update new users of Prac and Clinic types. Can do lockout, password reset, cache clearing and view some autiting info.
+- **Practitioner** A medical practitoner. He can book Clients into appointments, book rooms from Clinics, store notes, send and receive Instant Messages from clients, and view all client records.
+- **Client** He can request bookings with his practitoner and send IMs to his practitioner.
+- **ClinicManager** This user role can add rooms and set availability for Practioners to book into them. Also can approve/disapprove booking requests from Practitioners.
+
+#Topology & Architecture
 We use 'Areas' to group sections - i.e. There is an admin section called the "Master Control Panel" or MCP in the Areas/MCP directory. This keeps templates and controllers together.
 
 The core application is under `Hbk.Platform`. It's written entirely in CSHTML (Razor) but some progress was made on the replacement Vue UI. It has plenty of bugs, it's far from complete, and it was ultimately scrapped in favour of a clener Vue + .NET API separation that became our launch platform. That version remains closed source.
