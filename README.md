@@ -5,7 +5,20 @@ All-in-one practice management from NowDoctor Ltd. (what was to be). I'm just th
 
 This is an aborted attempt to produce a clinical management system for independent practitioners. It features appointment booking, availability management, instant messaging, record keeping and contact management.
 
-You can login as each user type - see SeedNFeed.cs for credentials. There is no registration supported.
+The default seed includes sample users:
+
+| Email | Password | Account type |
+|---|---|---|
+| `mjb+sudo1@nowdoctor.co.uk` | `changeme123` | SuperAdmin |
+| `drwallace@lawrencestreetpractice.com` | `trustmeiamadoctor` | Practitioner |
+| `another@hillvalley.com` | `trustmeiamadoctor` | Practitioner |
+| `edward@fsmail.net` | `eddie_metal` | Client |
+| `laura@hotmail.com` | `ihatemanure` | Client |
+| `wolseley@btinternet.com` | `vip_pass_mode` | ClinicManager |
+| `mrg@sphigh.com` | `misterslave` | Client |
+| `les@primusville.com` | `johnthefisherman` | Practitioner |
+
+Only SuperAdmin users can currently register new practitioners and clinics on behalf of users. Practitioners and clinics do not currently self-register directly.
 
 We use 'Areas' to group sections - i.e. There is an admin section called the "Master Control Panel" or MCP in the Areas/MCP directory. This keeps templates and controllers together.
 
