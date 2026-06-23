@@ -17,7 +17,7 @@ namespace Hbk.Database.Helpers
             {
                 if (entity.IsOwned() || entity.ClrType.IsAbstract) continue;
 
-                // 🚨 Skip owned types and abstract base types
+                // Skip owned types and abstract base types
                 if (entity.IsOwned() || entity.ClrType.IsAbstract)
                     continue;
 

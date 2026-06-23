@@ -242,7 +242,7 @@ namespace Hbk.Database.Helpers
                         new () {Client = client2, Practitioner = prac1, Tenancy = t},
                     };
 
-                    ctx.AddRange((IEnumerable<object>)clientPracs);
+                    ctx.AddRange(clientPracs);
                     ctx.SaveChanges();
 
                     
@@ -255,7 +255,7 @@ namespace Hbk.Database.Helpers
                         new () { UserId = superUser.Id, RoleId = superAdminRole.Id }
                     };
                     
-                    ctx.AddRange((IEnumerable<object>)roles);
+                    ctx.AddRange(roles);
 
                     var conversation = new List<ClientMessage>();
                     conversation.Add(new ()
@@ -273,7 +273,7 @@ namespace Hbk.Database.Helpers
                         ClientId = client2.Id, PractitionerId = prac1.Id,  MessageOrigin = Enums.MessageOrigin.Practitioner,
                         MessageBody = "Morning!", Tenancy = t
                     });
-                    ctx.AddRange((IEnumerable<object>)conversation);
+                    ctx.AddRange(conversation);
 
                     var clientRecord1 = new ClientRecord()
                     {
@@ -385,7 +385,7 @@ namespace Hbk.Database.Helpers
                             Tenancy = t
                         },
                     };
-                    ctx.AddRange((IEnumerable<object>)ta);
+                    ctx.AddRange(ta);
                     ctx.SaveChanges();
                     
                     // Now add Clinic and rooms for rental
@@ -477,11 +477,9 @@ namespace Hbk.Database.Helpers
                             Tenancy = t
                         },
                     };
-                    ctx.AddRange((IEnumerable<object>)ta_room);
+                    ctx.AddRange(ta_room);
                     ctx.SaveChanges();
 
-                    
-                    
                     // BEGIN T2 PRACTICE
                     var t2 = new Tenancy()
                     {

@@ -139,7 +139,7 @@ namespace Hbk.Test
                 Time = new TimeOnly(14, 00)
             };
         
-            Assert.Throws<InvalidUserOperationException>(() => DtoHelpers.FromTimeslot(DB_START_DATE, timeslot));
+            Assert.Throws<InvalidOperationException>(() => DtoHelpers.FromTimeslot(DB_START_DATE, timeslot));
         }
     
         /*

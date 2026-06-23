@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.HttpOverrides;
 
 using Serilog;
 using Serilog.Events;
 using Hangfire;
-using Hangfire.PostgreSql;
-using Hbk.Common.Globals;
+//using Hangfire.PostgreSql;
+using Hangfire.InMemory;
+using Npgsql;
+using Vite.AspNetCore;
+
 using Hbk.Common.Helpers;
 using Hbk.Common.Services;
 using Hbk.Common.Services.Implementation;
@@ -13,16 +17,13 @@ using Hbk.Database;
 using Hbk.Database.Helpers;
 using Hbk.Platform.Areas.Account;
 using Hbk.Platform.Defaults;
-using Hbk.Platform.Helpers;
 using Hbk.Platform.Middleware;
 using Hbk.Platform.Repository;
 using Hbk.Platform.Repository.Implementation;
 using Hbk.Platform.Services;
 using Hbk.Platform.Services.Implementation;
-using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Rewrite;
-using Npgsql;
-using Vite.AspNetCore;
+
+
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
@@ -98,11 +99,23 @@ try
     builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
     builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
+    var useInMemoryDatabase = builder.Environment.IsDevelopment() &&
+                              builder.Configuration.GetValue<bool>("Database:UseInMemory");
+
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseNpgsql(
-                builder.Configuration.GetConnectionString("HbkContext") ??
-                throw new InvalidOperationException("Connection string is invalid.") );
+            if (useInMemoryDatabase)
+            {
+                options.UseInMemoryDatabase(
+                    builder.Configuration.GetValue<string>("Database:InMemoryDatabaseName") ?? "HbkInMemory");
+            }
+            else
+            {
+                options.UseNpgsql(
+                    builder.Configuration.GetConnectionString("HbkContext") ??
+                    throw new InvalidOperationException("Connection string is invalid.") );
+            }
+
             if (builder.Environment.IsDevelopment()) { options.EnableSensitiveDataLogging(); }
         }
     );
@@ -114,34 +127,39 @@ try
     builder.Services.AddControllersWithViews();
     builder.Services.AddViteServices();
 
-    var connectionStringBuilder = new NpgsqlConnectionStringBuilder( builder.Configuration.GetConnectionString("HbkContext") );
-    connectionStringBuilder.Database = "postgres";
-
-    using var connection = new NpgsqlConnection(connectionStringBuilder.ToString());
-    connection.Open();
-
-    try
+    if (!useInMemoryDatabase)
     {
-        using var command = new NpgsqlCommand($"CREATE DATABASE hangfire;", connection);
-        command.ExecuteNonQuery();
-    }
-    catch
-    {
-        // who cares if it already exists, anything more serious will throw again anyway
-    }
+        var connectionStringBuilder = new NpgsqlConnectionStringBuilder( builder.Configuration.GetConnectionString("HbkContext") );
+        connectionStringBuilder.Database = "postgres";
 
+        using var connection = new NpgsqlConnection(connectionStringBuilder.ToString());
+        connection.Open();
+
+        try
+        {
+            using var command = new NpgsqlCommand($"CREATE DATABASE hangfire;", connection);
+            command.ExecuteNonQuery();
+        }
+        catch
+        {
+            // who cares if it already exists, anything more serious will throw again anyway
+        }
+
+    }
+    
     // Add Hangfire services. This facilitates background tasks.
     builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
         .UseSimpleAssemblyNameTypeSerializer()
         .UseRecommendedSerializerSettings()
-        .UsePostgreSqlStorage(x =>
+        .UseInMemoryStorage(new InMemoryStorageOptions
         {
-            x.UseNpgsqlConnection(builder.Configuration.GetConnectionString("HangfireConnection"));
+            MaxExpirationTime = TimeSpan.FromHours(3) // Default value, we can also set it to `null` to disable.
         }));
+        // {
+        //     x.UseNpgsqlConnection(builder.Configuration.GetConnectionString("HangfireConnection"));
+        // }));
 
-    // Add the processing server as IHostedService
-    builder.Services.AddHangfireServer();
     
     var mvcBuilder = builder.Services.AddRazorPages();
 
@@ -157,7 +175,15 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        db.Database.Migrate();
+        if (useInMemoryDatabase)
+        {
+            db.Database.EnsureCreated();
+        }
+        else
+        {
+            db.Database.Migrate();
+        }
+
         var services = scope.ServiceProvider;
         await SeedNFeed.Initialise(services, new PasswordHasher<User>());
     }
@@ -226,10 +252,24 @@ try
     
     Log.Information("Hbk.Platform startup complete.");
 
-    app.Run();
-    
     // Register background tasks.
-    RecurringJob.AddOrUpdate<ICentralScrutinizerService>("pruneactive", css => css.PruneActiveUsers(), "1 * * * *");
+    using (var scope = app.Services.CreateScope())
+    {
+        try
+        {
+            // Register background tasks.
+            var recurringJobs = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+            recurringJobs.AddOrUpdate<ICentralScrutinizerService>("prune-users", css => css.PruneActiveUsers(), "1 1 * * *"); // every night at 1am
+        }
+        catch (Exception ex)
+        {
+            Log.Fatal(ex, "job init failed");
+            throw;
+        }
+    }
+
+
+    app.Run();
 
 }
 catch (Exception ex)
