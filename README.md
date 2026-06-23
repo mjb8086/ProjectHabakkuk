@@ -5,7 +5,7 @@ All-in-one practice management from NowDoctor Ltd. (what was to be). I'm just th
 
 This is an aborted attempt to produce a clinical management system for independent practitioners. It features appointment booking, availability management, instant messaging, record keeping and contact management.
 
-#Sample Users
+# Sample Users
 The default seed includes sample users:
 
 | Email | Password | Account type |
@@ -27,12 +27,17 @@ Only SuperAdmin users can currently register new practitioners and clinics on be
 - **Client** He can request bookings with his practitoner and send IMs to his practitioner.
 - **ClinicManager** This user role can add rooms and set availability for Practioners to book into them. Also can approve/disapprove booking requests from Practitioners.
 
-#Topology & Architecture
+# Topology & Architecture
 We use 'Areas' to group sections - i.e. There is an admin section called the "Master Control Panel" or MCP in the Areas/MCP directory. This keeps templates and controllers together.
 
 The core application is under `Hbk.Platform`. It's written entirely in CSHTML (Razor) but some progress was made on the replacement Vue UI. It has plenty of bugs, it's far from complete, and it was ultimately scrapped in favour of a clener Vue + .NET API separation that became our launch platform. That version remains closed source.
 
 This version is rough. I repeat, you can't register for the site. The styling was never updated from its static page placeholder style. It violates several good OO design principles - you can hunt for them if you're bored. Consequently it is not I'd develop a .NET application now. But it is functional and self contained - you can build it and run it, it by default uses an in-memory db. Should you wish to persist data, it requires access to PostgreSQL.
+
+#### A note on the in-memory DB
+It can be toggled on/of from `appsettings.Development.json`. I've left it as TRUE by default just to make this easy to run.
+
+HOWEVER - certain methods, namely those using `ExecuteUpdateAsync` or `ExecuteDeleteAsync`, which are used in the instant messaging and room approval routes - these will throw an exception because these methods aren't supported for in-memory DBs. This is an implemenation problem with Microsoft. If you want to see the IMs, then you'll have to figure out how to set up PSQL.
 
 ## Fixes made since it was scrapped
 I've recently separated the DTOs, models, and DB, and Common into their own projects. The DB is no longer initalised with TPC - this caused id sequence problems.
