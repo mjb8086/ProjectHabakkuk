@@ -7,7 +7,7 @@
 ******************************/
 
 using System.Diagnostics;
-using Hbk.Platform.Models;
+using Hbk.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Hbk.Platform.Controllers

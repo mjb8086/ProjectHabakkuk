@@ -1,11 +1,13 @@
 using System.Collections.Immutable;
 using System.Globalization;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
+using Hbk.Models.DTO;
+using Hbk.Models.Helpers;
+using Hbk.Models.View;
+using Hbk.Models.View.MyND;
 using Hbk.Platform.Helpers;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View;
-using Hbk.Platform.Models.View.MyND;
 using Hbk.Platform.Repository;
 
 namespace Hbk.Platform.Services.Implementation
@@ -143,7 +145,7 @@ namespace Hbk.Platform.Services.Implementation
         
             foreach (var appointment in appointments)
             {
-                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
+                var dateTime = DtoHelpers.FromTimeslot(dbStartDate.Value, appointment.Timeslot, appointment.WeekNum);
                 appointment.PractitionerName = _cacheService.GetPractitionerName(appointment.PractitionerId);
                 appointment.DateString = dateTime.ToShortDateString();
                 appointment.TimeString = dateTime.ToShortTimeString();
@@ -164,7 +166,7 @@ namespace Hbk.Platform.Services.Implementation
             var appointmentsLite = new List<AppointmentLite>();
             foreach (var appointment in appointments)
             {
-                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
+                var dateTime = DtoHelpers.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
                 appointmentsLite.Add(new AppointmentLite()
                 {
                     DateTime = dateTime.ToString("s"),
@@ -191,7 +193,7 @@ namespace Hbk.Platform.Services.Implementation
             
             foreach (var appointment in appts)
             {
-                var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
+                var dateTime = DtoHelpers.FromTimeslot(dbStartDate, appointment.Timeslot, appointment.WeekNum);
                 appointment.DateString = dateTime.ToShortDateString();
                 appointment.TimeString = dateTime.ToShortTimeString();
                 appointment.TreatmentTitle = treatments[appointment.TreatmentId].Title;
@@ -259,7 +261,7 @@ namespace Hbk.Platform.Services.Implementation
             model.ClientId = clientId;
             model.ClientName = clientId.HasValue ? _cacheService.GetClientName(clientId.Value) : "";
             model.TreatmentTitle = treatment.Title;
-            model.BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum));
+            model.BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DtoHelpers.FromTimeslot(dbStartDate, timeslotDto, weekNum));
             return model;
         }
 
@@ -343,7 +345,7 @@ namespace Hbk.Platform.Services.Implementation
                 TreatmentTitle = treatment.Title,
                 RoomReservationDetails = roomDetails?.Title ?? "",
                 RoomReservationId = roomResId,
-                BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslotDto, weekNum))
+                BookingDate = DateTimeHelper.GetFriendlyDateTimeString(DtoHelpers.FromTimeslot(dbStartDate, timeslotDto, weekNum))
             };
         }
 
@@ -377,7 +379,7 @@ namespace Hbk.Platform.Services.Implementation
                 AppointmentId = appointment.Id,
                 PractitionerName = _cacheService.GetPractitionerName(appointment.PractitionerId),
                 ClientName = _cacheService.GetClientName(appointment.ClientId),
-                DateString = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(dbStartDate, timeslot, appointment.WeekNum)),
+                DateString = DateTimeHelper.GetFriendlyDateTimeString(DtoHelpers.FromTimeslot(dbStartDate, timeslot, appointment.WeekNum)),
                 TreatmentTitle = treatments[appointment.TreatmentId].Title
             };
         }

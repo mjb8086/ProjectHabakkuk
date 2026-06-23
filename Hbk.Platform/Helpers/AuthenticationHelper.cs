@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Hbk.Platform.Models.DTO;
+using Hbk.Models.DTO;
 
 namespace Hbk.Platform.Helpers
 {

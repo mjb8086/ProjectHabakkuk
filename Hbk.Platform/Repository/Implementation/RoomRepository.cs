@@ -1,6 +1,6 @@
-using Hbk.Platform.Database;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Models.DTO;
+using Hbk.Common.Exception;
+using Hbk.Database;
+using Hbk.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 
 namespace Hbk.Platform.Repository.Implementation;

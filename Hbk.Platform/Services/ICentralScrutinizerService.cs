@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using Hbk.Platform.Models;
+using Hbk.Models;
 
 namespace Hbk.Platform.Services;
 

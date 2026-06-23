@@ -1,7 +1,7 @@
-using Hbk.Platform.Database;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models.DTO;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Database;
+using Hbk.Models.DTO;
 using Microsoft.EntityFrameworkCore;
 using MissingFieldException = System.MissingFieldException;
 

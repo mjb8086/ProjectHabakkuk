@@ -1,5 +1,5 @@
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models.DTO;
+using Hbk.Common.Globals;
+using Hbk.Models.DTO;
 
 namespace Hbk.Test.Dto
 {

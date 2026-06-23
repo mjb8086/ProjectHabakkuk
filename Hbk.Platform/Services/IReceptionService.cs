@@ -1,4 +1,4 @@
-using Hbk.Platform.Models.API.MyND;
+using Hbk.Models.API.API.MyND;
 
 namespace Hbk.Platform.Services;
 

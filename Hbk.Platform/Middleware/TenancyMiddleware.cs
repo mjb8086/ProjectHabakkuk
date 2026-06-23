@@ -1,4 +1,4 @@
-using Hbk.Platform.Services;
+using Hbk.Common.Services;
 
 namespace Hbk.Platform.Middleware
 {

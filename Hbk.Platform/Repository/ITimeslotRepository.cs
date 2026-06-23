@@ -1,5 +1,5 @@
-using Hbk.Platform.Database;
-using Hbk.Platform.Models.DTO;
+using Hbk.Database;
+using Hbk.Models.DTO;
 
 namespace Hbk.Platform.Repository
 {

@@ -1,6 +1,8 @@
-using Hbk.Platform.Globals;
+using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
+using Hbk.Models.DTO;
+using Hbk.Models.Helpers;
 using Hbk.Platform.Helpers;
-using Hbk.Platform.Models.DTO;
 using Hbk.Platform.Repository;
 using Hbk.Platform.Services;
 using Hbk.Platform.Services.Implementation;
@@ -55,7 +57,7 @@ namespace Hbk.Test
                     {
                         Id = id++, Day = day, Time = time, Duration = duration, WeekNum = weekNum, 
                     };
-                    if(weekNum > 0) newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DateTimeHelper.FromTimeslot(DB_START_DATE, newTs));
+                    if(weekNum > 0) newTs.Description = DateTimeHelper.GetFriendlyDateTimeString(DtoHelpers.FromTimeslot(DB_START_DATE, newTs));
                     timeslots.Add(newTs);
                     time = time.AddMinutes(duration);
                 }
@@ -200,8 +202,8 @@ namespace Hbk.Test
             Assert.Equal(weekNums, actualWeekNums);
             
             // First and last timeslots as expected?
-            Assert.Equal(DateTime.Parse(expectedFirstTs), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslots.First()));
-            Assert.Equal(DateTime.Parse(expectedLastTs), DateTimeHelper.FromTimeslot(DB_START_DATE, timeslots[^1]));
+            Assert.Equal(DateTime.Parse(expectedFirstTs), DtoHelpers.FromTimeslot(DB_START_DATE, timeslots.First()));
+            Assert.Equal(DateTime.Parse(expectedLastTs), DtoHelpers.FromTimeslot(DB_START_DATE, timeslots[^1]));
         }
         
         /// <summary>

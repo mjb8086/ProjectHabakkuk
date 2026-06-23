@@ -1,4 +1,5 @@
-using Hbk.Platform.Database;
+using Hbk.Common.Services;
+using Hbk.Database;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Hbk.Platform.Services.Implementation

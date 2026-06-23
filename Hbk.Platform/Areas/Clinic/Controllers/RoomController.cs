@@ -1,5 +1,5 @@
-using Hbk.Platform.Models;
-using Hbk.Platform.Models.DTO;
+using Hbk.Models;
+using Hbk.Models.DTO;
 using Hbk.Platform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

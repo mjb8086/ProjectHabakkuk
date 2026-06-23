@@ -1,5 +1,5 @@
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models.DTO;
+using Hbk.Common.Globals;
+using Hbk.Models.DTO;
 using Hbk.Platform.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

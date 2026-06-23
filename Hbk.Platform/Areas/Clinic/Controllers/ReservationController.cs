@@ -1,6 +1,4 @@
 using Hbk.Platform.Services;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

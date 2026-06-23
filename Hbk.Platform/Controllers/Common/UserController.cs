@@ -1,5 +1,4 @@
 ﻿using Hbk.Platform.Services;
-using Hbk.Platform.Models.API.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

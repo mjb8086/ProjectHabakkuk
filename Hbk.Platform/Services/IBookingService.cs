@@ -1,7 +1,7 @@
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View;
-using Hbk.Platform.Models.View.MyND;
+using Hbk.Common.Globals;
+using Hbk.Models.DTO;
+using Hbk.Models.View;
+using Hbk.Models.View.MyND;
 
 namespace Hbk.Platform.Services
 {

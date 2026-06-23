@@ -1,6 +1,6 @@
-using Hbk.Platform.Database;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View.MCP;
+using Hbk.Database;
+using Hbk.Models.DTO;
+using Hbk.Models.View.MCP;
 
 namespace Hbk.Platform.Repository
 {

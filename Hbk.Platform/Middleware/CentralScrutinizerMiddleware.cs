@@ -1,4 +1,4 @@
-using Hbk.Platform.Exceptions;
+using Hbk.Common.Exception;
 using Hbk.Platform.Extensions;
 using Hbk.Platform.Services;
 

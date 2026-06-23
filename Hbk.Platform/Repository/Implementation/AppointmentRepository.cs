@@ -1,8 +1,10 @@
-using Hbk.Platform.Database;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
+using Hbk.Database;
+using Hbk.Models.DTO;
+using Hbk.Models.Helpers;
 using Hbk.Platform.Helpers;
-using Hbk.Platform.Models.DTO;
 using Hbk.Platform.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -128,7 +130,7 @@ namespace Hbk.Platform.Repository.Implementation
                 throw new InvalidUserOperationException("Appointment is already cancelled.");
         
             var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-            if (DateTimeHelper.FromTimeslot(dbStartDate, TimeslotDto.FromDbTimeslot(appointment.Timeslot), appointment.WeekNum) < DateTime.UtcNow)
+            if (DtoHelpers.FromTimeslot(dbStartDate, appointment.Timeslot.ToDto(), appointment.WeekNum) < DateTime.UtcNow)
                 throw new InvalidUserOperationException("Cannot cancel appointments in the past.");
 
             // if not, update appointment to be cancelled and append reason

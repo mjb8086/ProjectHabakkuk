@@ -1,9 +1,10 @@
 using System.Security.Claims;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models.API.Common;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View.MCP;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Models.API.API.Common;
+using Hbk.Models.DTO;
+using Hbk.Models.View.MCP;
+using Hbk.Platform.Defaults;
 using Hbk.Platform.Repository;
 
 namespace Hbk.Platform.Services.Implementation

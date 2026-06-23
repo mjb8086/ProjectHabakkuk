@@ -32,6 +32,8 @@
     <AdditionalFiles Include="Views\Home\Privacy.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Exceptions\" />
+    <Folder Include="Globals\" />
     <Folder Include="JsAppRoot\src\client\" />
     <Folder Include="JsAppRoot\src\clinic\" />
     <Folder Include="JsAppRoot\src\common\views\" />
@@ -46,6 +48,7 @@
     <PackageReference Include="Hangfire.PostgreSql" Version="1.20.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
@@ -76,5 +79,10 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Shared\Account\_ViewImports.cshtml" />
     <_ContentIncludedByDefault Remove="App_Code\Helpers.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Hbk.Database\Hbk.Database.csproj" />
+    <ProjectReference Include="..\Hbk.Models\Hbk.Models.csproj" />
+    <ProjectReference Include="..\Hbk.Common\Hbk.Common.csproj" />
   </ItemGroup>
 </Project>

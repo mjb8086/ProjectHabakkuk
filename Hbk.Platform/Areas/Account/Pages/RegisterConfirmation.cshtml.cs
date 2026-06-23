@@ -3,7 +3,7 @@
 #nullable disable
 
 using System.Text;
-using Hbk.Platform.Database;
+using Hbk.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;

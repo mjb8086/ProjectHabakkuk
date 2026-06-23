@@ -1,9 +1,11 @@
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
+using Hbk.Models.DTO;
+using Hbk.Models.Helpers;
+using Hbk.Models.View.Clinic;
+using Hbk.Models.View.MyND.RoomReservation;
 using Hbk.Platform.Helpers;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View.Clinic;
-using Hbk.Platform.Models.View.MyND.RoomReservation;
 using Hbk.Platform.Repository;
 
 namespace Hbk.Platform.Services.Implementation;
@@ -65,7 +67,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     {
         var ts = await _timeslotRepo.GetTimeslot(timeslotId);
         var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
-        var dateTime = DateTimeHelper.FromTimeslot(dbStartDate, ts, weekNum);
+        var dateTime = DtoHelpers.FromTimeslot(dbStartDate, ts, weekNum);
         var room = _cache.GetRoom(roomId);
         
         return new ConfirmReservation()
@@ -180,7 +182,7 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
                 Id = res.Id,
                 RoomTitle = _cache.GetRoom(res.RoomId).Title,
                 When = DateTimeHelper.GetIsoDateTimeString(
-                    DateTimeHelper.FromTimeslot(dbStartDate, ts, res.WeekNum)),
+                    DtoHelpers.FromTimeslot(dbStartDate, ts, res.WeekNum)),
                 Status = res.Status,
                 Whom = _cache.GetPractitionerName(res.PractitionerId)
             });

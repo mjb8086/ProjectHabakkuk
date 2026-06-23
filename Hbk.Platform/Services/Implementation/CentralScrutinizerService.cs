@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 using System.Security.Claims;
-using Hbk.Platform.Models;
+using Hbk.Models;
 
 namespace Hbk.Platform.Services.Implementation;
 

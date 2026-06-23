@@ -4,8 +4,9 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using Hbk.Platform.Database;
-using Hbk.Platform.Globals;
+using Hbk.Common.Globals;
+using Hbk.Database;
+using Hbk.Platform.Defaults;
 using Hbk.Platform.Helpers;
 using Hbk.Platform.Services;
 using Microsoft.AspNetCore.Authentication;

@@ -1,4 +1,4 @@
-using Hbk.Platform.Models.DTO;
+using Hbk.Models.DTO;
 using Hbk.Platform.Repository;
 
 namespace Hbk.Platform.Services.Implementation;

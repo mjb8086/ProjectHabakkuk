@@ -1,8 +1,9 @@
 using System.Data;
-using Hbk.Platform.Database;
-using Hbk.Platform.Exceptions;
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models.DTO;
+using Hbk.Common.Exception;
+using Hbk.Common.Globals;
+using Hbk.Database;
+using Hbk.Models.DTO;
+using Hbk.Platform.Defaults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

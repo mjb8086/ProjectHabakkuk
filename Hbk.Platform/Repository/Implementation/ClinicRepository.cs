@@ -1,4 +1,4 @@
-using Hbk.Platform.Database;
+using Hbk.Database;
 
 namespace Hbk.Platform.Repository.Implementation
 {

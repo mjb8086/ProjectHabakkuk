@@ -5,11 +5,14 @@ using Serilog;
 using Serilog.Events;
 using Hangfire;
 using Hangfire.PostgreSql;
-
+using Hbk.Common.Globals;
+using Hbk.Common.Helpers;
+using Hbk.Common.Services;
+using Hbk.Common.Services.Implementation;
+using Hbk.Database;
+using Hbk.Database.Helpers;
 using Hbk.Platform.Areas.Account;
-using Hbk.Platform.Database;
-using Hbk.Platform.Database.Helpers;
-using Hbk.Platform.Globals;
+using Hbk.Platform.Defaults;
 using Hbk.Platform.Helpers;
 using Hbk.Platform.Middleware;
 using Hbk.Platform.Repository;

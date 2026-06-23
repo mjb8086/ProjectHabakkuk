@@ -1,6 +1,6 @@
-using Hbk.Platform.Globals;
-using Hbk.Platform.Models;
-using Hbk.Platform.Models.DTO;
+using Hbk.Common.Globals;
+using Hbk.Models;
+using Hbk.Models.DTO;
 
 namespace Hbk.Platform.Repository
 {

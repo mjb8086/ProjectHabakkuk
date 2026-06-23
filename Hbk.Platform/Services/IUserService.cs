@@ -1,6 +1,6 @@
-using Hbk.Platform.Models.API.Common;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View.MCP;
+using Hbk.Models.API.API.Common;
+using Hbk.Models.DTO;
+using Hbk.Models.View.MCP;
 
 namespace Hbk.Platform.Services
 {

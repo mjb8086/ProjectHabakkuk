@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hbk.Database", "Hbk.Databas
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hbk.Models", "Hbk.Models\Hbk.Models.csproj", "{AA8F120E-E13B-450E-9400-EAFFA0909178}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hbk.Common", "Hbk.Common\Hbk.Common.csproj", "{802BBA7F-7EE9-40E9-8052-8B9E30A44056}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AA8F120E-E13B-450E-9400-EAFFA0909178}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA8F120E-E13B-450E-9400-EAFFA0909178}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA8F120E-E13B-450E-9400-EAFFA0909178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{802BBA7F-7EE9-40E9-8052-8B9E30A44056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{802BBA7F-7EE9-40E9-8052-8B9E30A44056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{802BBA7F-7EE9-40E9-8052-8B9E30A44056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{802BBA7F-7EE9-40E9-8052-8B9E30A44056}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

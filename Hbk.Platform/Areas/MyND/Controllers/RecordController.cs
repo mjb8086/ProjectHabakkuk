@@ -1,4 +1,4 @@
-using Hbk.Platform.Models.DTO;
+using Hbk.Models.DTO;
 using Hbk.Platform.Repository;
 using Hbk.Platform.Services;
 using Microsoft.AspNetCore.Authorization;

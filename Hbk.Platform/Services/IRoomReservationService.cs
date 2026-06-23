@@ -1,7 +1,6 @@
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Models.View.Clinic;
-using Hbk.Platform.Models.View.MyND.RoomReservation;
-using Hbk.Platform.Globals;
+using Hbk.Models.DTO;
+using Hbk.Models.View.Clinic;
+using Hbk.Models.View.MyND.RoomReservation;
 
 namespace Hbk.Platform.Services;
 

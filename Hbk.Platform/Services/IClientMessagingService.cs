@@ -1,6 +1,5 @@
-using Hbk.Platform.Models;
-using Hbk.Platform.Models.DTO;
-using Hbk.Platform.Database;
+using Hbk.Models;
+using Hbk.Models.DTO;
 
 namespace Hbk.Platform.Services
 {

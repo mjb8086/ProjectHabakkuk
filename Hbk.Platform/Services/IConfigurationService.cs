@@ -1,4 +1,4 @@
-using Hbk.Platform.Models.DTO;
+using Hbk.Models.DTO;
 
 namespace Hbk.Platform.Services
 {
