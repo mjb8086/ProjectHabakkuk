@@ -53,7 +53,7 @@ Some workflows use relational EF Core operations and therefore require PostgreSQ
 ### Run the tests
 
 ```bash
-dotnet test Hbk.Test/HBK.Test.csproj -m:1 --no-restore
+dotnet test Hbk.Test/Hbk.Test.csproj -m:1 --no-restore
 ```
 
 ### Sample users
