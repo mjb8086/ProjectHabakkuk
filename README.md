@@ -1,34 +1,67 @@
-H B K :: P L A T F O R M
-========================
+# Project Habakkuk
 
-All-in-one practice management from NowDoctor Ltd. (what was to be). 
+Clinical practice management application - C# / ASP.NET Core
 
-This is an aborted attempt to produce a clinical management system for independent practitioners. It features appointment booking, availability management, instant messaging, record keeping and contact management.
+Project Habakkuk is an open-source clinical practice management application built with ASP.NET Core.
 
-Most of the work on this codebase was ended in 2024, when we pivoted to focus only on room booking. When we wound down NowDoctor (UbiClinic) in Feb 2026, I did some refactoring and patching of this older code just to throw this up on GH for anyone who wants to play with it.
+It began as an early prototype of a product for independent healthcare practitioners and predates the later UbiClinic marketplace. The project is now used as a demonstration application for modern .NET architecture and development practices.
 
-The launch UbiClinic platform was forked from this in 2024. It remains closed source.
+## Features
 
-# Topology & Architecture
-We use 'Areas' to group sections for each user role type. These comprise Practitoners, Clients, Clinics and SuperAdmins. E.g. The SuperAdmin section is called the "Master Control Panel" or MCP in the Areas/MCP directory. This keeps templates and controllers together.
+- Role-based workflows for practitioners, clients, clinic managers, and platform administrators.
+- Practitioner and client management, including practitioner-client relationships and contact details.
+- Appointment booking, treatment management, practitioner availability, and scheduling.
+- Clinical records, priority items, and client-practitioner messaging.
+- Clinic room management, practitioner room reservations, and approval workflows.
+- ASP.NET Core Identity authentication with role-based authorization.
+- Server-rendered Razor UI, backed by Entity Framework Core and PostgreSQL or an in-memory development database.
+- Experimental Vue 3 and Vite frontend work in `Hbk.Platform/JsAppRoot`.
 
-The core application is under `Hbk.Platform`. It's written entirely in CSHTML (Razor) but some progress was made on the replacement Vue UI. It has plenty of bugs, it's far from complete, and it was ultimately scrapped in favour of a clener Vue + .NET API separation that became our launch platform. That version remains closed source.
+## Current Architecture
 
-This codebase is rough. You can't register for the site, but you can login (see below). The styling was never updated from its static page placeholder style. It violates several good OO design principles - you can hunt for these violations if you're bored. Consequently it is not how I'd develop a .NET application now. But it is functional and self contained - you can build it and run it, it by default uses an in-memory db. Should you wish to persist data, it requires access to PostgreSQL.
+The solution is currently organised into focused projects:
 
-#### A note on the in-memory DB
-It can be toggled on/of from `appsettings.Development.json`. I've left it as TRUE by default just to make this easy to run.
+- `Hbk.Platform` is the ASP.NET Core host, containing Razor views, MVC controllers, role-specific Areas, repositories, and application services.
+- `Hbk.Database` contains the EF Core `ApplicationDbContext`, persistence entities, migrations, and development seed data.
+- `Hbk.Models` contains DTOs and view models shared across the application.
+- `Hbk.Common` contains common helpers and cross-cutting services.
+- `Hbk.Test` contains the unit test suite.
 
-HOWEVER - certain methods, namely those using `ExecuteUpdateAsync` or `ExecuteDeleteAsync`, which are used in the instant messaging and room approval routes - these will throw an exception because these methods aren't supported for in-memory DBs. If you want to see the IMs, then you'll have to figure out how to set up PSQL.
+The application uses ASP.NET Core Identity for authentication and routes signed-in users to the appropriate role-specific area. In Development, it can run against a seeded EF Core in-memory database; PostgreSQL is available when persistent, relational storage is required.
 
-# Fixes made since it was scrapped
-In June 2026, I separated the DTOs, models, and DB, and Common into their own projects. I made a few other minor tweaks to make it slightly more usable. Also, the DB is no longer initalised with TPC - this caused id sequence problems.
+## Run Locally
 
-# Sample Users
-The default seed includes sample users:
+### Prerequisites
+
+- .NET 8 SDK
+- PostgreSQL only when running with the relational provider
+- Node.js 18+ only when working on the experimental Vue frontend
+
+### Start the application
+
+The Development configuration uses the seeded in-memory database by default, so no database setup is required for a first run.
+
+```bash
+dotnet restore
+dotnet run --project Hbk.Platform
+```
+
+The in-memory database is recreated when the application stops. To use PostgreSQL, set `Database:UseInMemory` to `false` in `Hbk.Platform/appsettings.Development.json` and configure `ConnectionStrings:HbkContext`.
+
+Some workflows use relational EF Core operations and therefore require PostgreSQL rather than the in-memory provider.
+
+### Run the tests
+
+```bash
+dotnet test Hbk.Test/HBK.Test.csproj -m:1 --no-restore
+```
+
+### Sample users
+
+The default seed includes the following accounts for local exploration:
 
 | Email | Password | Role |
-|---|---|---|
+| --- | --- | --- |
 | `mjb+sudo1@nowdoctor.co.uk` | `changeme123` | SuperAdmin |
 | `drwallace@lawrencestreetpractice.com` | `trustmeiamadoctor` | Practitioner |
 | `another@hillvalley.com` | `trustmeiamadoctor` | Practitioner |
@@ -38,22 +71,10 @@ The default seed includes sample users:
 | `mrg@sphigh.com` | `misterslave` | Client |
 | `les@primusville.com` | `johnthefisherman` | Practitioner |
 
-Only SuperAdmin users can currently register new practitioners and clinics on behalf of users. Practitioners and clinics do not currently self-register directly.
+Only SuperAdmin users can currently register new practitioners and clinics on behalf of users.
 
-### A brief explanation of the roles is in order:
-- **SuperAdmin** Internal ND staff, can add/update new users of Prac and Clinic types. Can do lockout, password reset, cache clearing and view some autiting info.
-- **Practitioner** A medical practitoner. He can book Clients into appointments, book rooms from Clinics, store notes, send and receive Instant Messages from clients, and view all client records.
-- **Client** He can request bookings with his practitoner and send IMs to his practitioner.
-- **ClinicManager** This user role can add rooms and set availability for Practioners to book into them. Also can approve/disapprove booking requests from Practitioners.
+## Current Status
 
-## Finishing it
-I'd finish the new UI it entirely in Vue. Lots of other steps too. But tbh, I won't ever. Other things occupy my time now.
+The original application was built while exploring the product concept. I have since been modernising it as a public demonstration application, applying the architectural approaches I use in current .NET development.
 
-## Building on Linux or MacOS.
-See [Wiki](http://10.8.0.1/wiki/HBKPlatform#Building) for up to date info (lol)
-
-# Environmnental Assumptions - Deployment
-Weep, for God will not help you here.
-
-## Preparing a production server
-We had one working, but bollocks if I know how to set it up again.
+The application currently follows an anemic domain model. A migration to Clean Architecture is in progress on the `CleanArchMigration` branch.
