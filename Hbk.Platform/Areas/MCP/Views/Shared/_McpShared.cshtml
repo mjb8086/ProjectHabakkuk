@@ -9,7 +9,7 @@
         return ViewBag.CurrentNav.Contains(navPath) ? "active" : "";
     }
 }
-<div id="myNdNav" class="subNav">
+<div id="mcpNav" class="subNav subNav--mcp" role="navigation" aria-label="Administration sections">
     <a asp-area="MCP" asp-controller="MCP" asp-action="Index" class="@GetActiveClass("Index")" >Index</a>
     <a asp-area="MCP" asp-controller="PracticeManagement" asp-action="Index" class="@GetActiveClass("PracticeManagement")">Practice Management</a>
     <a asp-area="MCP" asp-controller="ClinicManagement" asp-action="Index" class="@GetActiveClass("ClinicManagement")">Clinic Management</a>

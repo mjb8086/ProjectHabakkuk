@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NowDoctor @ViewData["Title"]</title>
+    <title>@ViewData["Title"] | Project Habakkuk</title>
     <link rel="stylesheet" href="~/css/mci-fonts.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/jquery-ui.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/jquery-ui.structure.css" asp-append-version="true" />
@@ -16,6 +16,7 @@
             // FIXME: Work with many stylesheets....
         <link rel="stylesheet" href="@Url.Content("~/css/" + ViewData["css"])" asp-append-version="true" />
     }
+    <link rel="stylesheet" href="~/css/hbk-ui.css" asp-append-version="true" />
     @if (ViewData["scripts"] != null)
     {
         // FIXME: Work with many scripts....
@@ -33,13 +34,16 @@
 </head>
 <body>
     <header>
-        <nav id="mciNavBar">
+        <nav id="mciNavBar" aria-label="Primary navigation">
             <div class="hbk-navbar-left">
-                <a class="navbar-light" id="mciName" href="/">NowDoctor</a>
+                <a class="navbar-light" id="mciName" href="/">
+                    <img src="~/img/nd-icon.svg" alt="" width="38" height="38" />
+                    <span>Project Habakkuk</span>
+                </a>
             </div>
 			<div class="hbk-navbar-right">
                 <ul class="hbk-navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
+                        @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item">
                                 <a class="navbar-light" asp-area="Account" asp-page="/Logout">Logout</a>
@@ -79,13 +83,13 @@
 			</div>
         </nav>
     </header>
-    <div id="mainPageBody" class="hbk-container">
+    <main id="mainPageBody" class="hbk-container">
          @RenderBody()
-    </div>
+    </main>
 
     <footer>
         <div class="footer-item">
-            &copy; 2024 - NowDoctor Ltd. HBK Platform v1.0-DEV 
+            &copy; @DateTime.UtcNow.Year Project Habakkuk
         </div>
         <div class="footer-item">
             <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -96,4 +100,3 @@
     <script src="@Url.Content("~/js/site.js")" asp-append-version="true" defer></script>
 </body>
 </html>
-
