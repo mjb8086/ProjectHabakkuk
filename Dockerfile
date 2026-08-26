@@ -1,5 +1,4 @@
-﻿LABEL org.opencontainers.image.source https://github.com/mjb8086/ProjectHabakkuk
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 5000
@@ -21,3 +20,6 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Hbk.Platform.dll"]
+
+
+LABEL org.opencontainers.image.source https://github.com/mjb8086/ProjectHabakkuk
