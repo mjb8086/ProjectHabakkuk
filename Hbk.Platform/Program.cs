@@ -55,7 +55,7 @@ try
     // To ensure custom claims (PracticeId, PracId, etc) are added to new identity when principal is refreshed.
     builder.Services.ConfigureOptions<ConfigureSecurityStampOptions>();
 
-    // Scoped - created once per HTTP request. Use for database because there may be multiple calls in a web service.
+    // Scoped - created once per HTTP request. Use where db is called, as we want only one db context per request
     builder.Services.AddScoped<IPractitionerRepository, PractitionerRepository>();
     builder.Services.AddScoped<IClinicRepository, ClinicRepository>();
     builder.Services.AddScoped<IClientRepository, ClientRepository>();
@@ -67,7 +67,6 @@ try
     builder.Services.AddScoped<ISettingRepository, SettingRepository>();
     builder.Services.AddScoped<IAvailabilityRepository, AvailabilityRepository>();
     builder.Services.AddScoped<IUserRepository, UserRepository>();
-    builder.Services.AddScoped<ITenancyService, TenancyService>();
     builder.Services.AddScoped<IMcpRepository, McpRepository>();
     builder.Services.AddScoped<IRoomRepository, RoomRepository>();
     builder.Services.AddScoped<IRoomReservationRepository, RoomReservationRepository>();
@@ -75,30 +74,32 @@ try
     builder.Services.AddScoped<TenancyMiddleware>();
     builder.Services.AddScoped<CentralScrutinizerMiddleware>();
 
-    // Also use scoped for the cache and user service - both are utilised regularly
-    builder.Services.AddScoped<ICacheService, CacheService>();
     builder.Services.AddScoped<IUserService, UserService>();
-    builder.Services.AddScoped<ISecurityService, SecurityService>();
 
-    // Transient - created each time it is required. Use on web services, because they will typically serve one action
-    // to the controller.
-    builder.Services.AddTransient<IPracticeService, PracticeService>();
-    builder.Services.AddTransient<IClientMessagingService, ClientMessagingService>();
-    builder.Services.AddTransient<IClientRecordService, ClientRecordService>();
-    builder.Services.AddTransient<ITreatmentService, TreatmentService>();
-    builder.Services.AddTransient<IBookingService, BookingService>();
-    builder.Services.AddTransient<IConfigurationService, ConfigurationService>();
-    builder.Services.AddTransient<IClientDetailsService, ClientDetailsService>();
-    builder.Services.AddTransient<IAvailabilityManagementService, AvailabilityManagementService>();
-    builder.Services.AddTransient<IMcpService, McpService>();
-    builder.Services.AddTransient<IRoomService, RoomService>(); // yes, we come with room service. 100% satisfaction guarantee
-    builder.Services.AddTransient<IRoomReservationService, RoomReservationService>();
-    builder.Services.AddTransient<ITimeslotService, TimeslotService>();
-    builder.Services.AddTransient<IReceptionService, ReceptionService>();
+    builder.Services.AddScoped<ITenancyService, TenancyService>();
+    builder.Services.AddScoped<IPracticeService, PracticeService>();
+    builder.Services.AddScoped<IClientMessagingService, ClientMessagingService>();
+    builder.Services.AddScoped<IClientRecordService, ClientRecordService>();
+    builder.Services.AddScoped<ITreatmentService, TreatmentService>();
+    builder.Services.AddScoped<IBookingService, BookingService>();
+    builder.Services.AddScoped<IConfigurationService, ConfigurationService>();
+    builder.Services.AddScoped<IClientDetailsService, ClientDetailsService>();
+    builder.Services.AddScoped<IAvailabilityManagementService, AvailabilityManagementService>();
+    builder.Services.AddScoped<IMcpService, McpService>();
+    builder.Services.AddScoped<IRoomService, RoomService>(); // yes, we come with room service. 100% satisfaction guarantee
+    builder.Services.AddScoped<IRoomReservationService, RoomReservationService>();
+    builder.Services.AddScoped<ITimeslotService, TimeslotService>();
+    builder.Services.AddScoped<IReceptionService, ReceptionService>();
+    
+    // cache like but depending on db ocntext
+    builder.Services.AddScoped<ICacheService, CacheService>();
+    builder.Services.AddScoped<ISecurityService, SecurityService>();
+    
+    // Transient - created each time it is required. 
 
     // Singleton - created once at startup. Use only where immutability or heftiness is likely. i.e. a distributed cache.
-    builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
     builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
+    builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
 
     var databaseProvider = builder.Configuration.GetDatabaseProvider();
     Log.Information("Using Database Provider = {DatabaseProvider}", databaseProvider);
