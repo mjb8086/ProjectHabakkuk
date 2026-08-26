@@ -22,4 +22,4 @@ COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Hbk.Platform.dll"]
 
 
-LABEL org.opencontainers.image.source https://github.com/mjb8086/ProjectHabakkuk
+LABEL org.opencontainers.image.source=https://github.com/mjb8086/ProjectHabakkuk
