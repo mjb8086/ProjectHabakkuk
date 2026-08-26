@@ -3,16 +3,64 @@
     ViewBag.Title = "Reservation wizard: Select a timeslot";
     Layout = "_MyND";
     ViewBag.CurrentNav = "Reservation|RoomReservation";
+    ViewData["scripts"] = "timeslot-select.js";
 }
 @await Html.PartialAsync("_RoomReservationsPartial")
 
-<h1>Timeslot select.</h1>
-<p>Choose the timeslot for when you wish to reserve @Model.RoomTitle.</p>
+<h1>Select a timeslot</h1>
+<p>Choose when you wish to reserve <strong>@Model.RoomTitle</strong>.</p>
 
-<h2>Select a timeslot</h2>
-@foreach (var timeslot in Model.AvailableTimeslots)
+@if (Model.AvailableDates.Count > 0)
 {
-    <p>@timeslot.Description <a asp-area="MyND" asp-controller="RoomReservation" asp-action="ConfirmReservation" asp-route-roomId="@Model.RoomId" asp-route-weekNum="@timeslot.WeekNum" asp-route-timeslotId="@timeslot.Id">book</a></p>
-}
+    <div class="timeslot-picker">
+        <form id="timeslotPickerForm" asp-area="MyND" asp-controller="RoomReservation" asp-action="ConfirmReservation" method="get">
+            <input type="hidden" name="roomId" value="@Model.RoomId" />
+            <input id="selectedTimeslotId" type="hidden" name="timeslotId" />
+            <input id="selectedWeekNum" type="hidden" name="weekNum" />
 
-<p>NB: This is an alpha-quality view. New UI will have better searching and filtering using a calendar-like view.</p>
+            <div class="timeslot-picker__field">
+                <label for="timeslotDate">Date</label>
+                <select id="timeslotDate" required>
+                    <option value="">Select a date</option>
+                    @foreach (var dateGroup in Model.AvailableDates)
+                    {
+                        <option value="@dateGroup.Date.ToString("yyyy-MM-dd")">
+                            @dateGroup.Date.ToString("dddd d MMMM yyyy") (@dateGroup.Timeslots.Count)
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="timeslot-picker__field">
+                <label for="timeslotSelect">Time</label>
+                <select id="timeslotSelect" required disabled>
+                    <option value="">Select a date first</option>
+                </select>
+            </div>
+
+            <button id="reviewTimeslot" type="submit" class="btn btn-primary" disabled>Review reservation</button>
+        </form>
+        <template id="timeslotOptions">
+            @foreach (var dateGroup in Model.AvailableDates)
+            {
+                @foreach (var timeslot in dateGroup.Timeslots)
+                {
+                    <option value="@timeslot.Id"
+                            data-date="@dateGroup.Date.ToString("yyyy-MM-dd")"
+                            data-week-num="@timeslot.WeekNum">
+                        @timeslot.Time.ToString("h:mm tt") (@timeslot.Duration minutes)
+                    </option>
+                }
+            }
+        </template>
+        <p class="timeslot-picker__meta">
+            @Model.AvailableDates.Sum(date => date.Timeslots.Count) timeslots across @Model.AvailableDates.Count dates
+        </p>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="status">
+        No timeslots are currently available for this room.
+    </div>
+}

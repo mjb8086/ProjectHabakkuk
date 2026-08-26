@@ -83,14 +83,24 @@ public class RoomReservationService(IRoomReservationRepository _roomResRepo, IUs
     public async Task<TimeslotSelect> GetTimeslotSelectView(int roomId)
     {
         var room = _cache.GetRoom(roomId);
+        var dbStartDate = (await _config.GetSettingOrDefault("DbStartDate")).Value;
         
         // Get availability for the weeks ahead
         var timeslots = await _tsSrv.GetPopulatedFutureTimeslots();
         var tsList = await FilterOutUnsuitableTimeslots(timeslots, roomId);
+        var availableDates = tsList
+            .GroupBy(timeslot => DateOnly.FromDateTime(DtoHelpers.FromTimeslot(dbStartDate, timeslot)))
+            .OrderBy(group => group.Key)
+            .Select(group => new TimeslotDateGroup
+            {
+                Date = group.Key,
+                Timeslots = group.OrderBy(timeslot => timeslot.Time).ToList()
+            })
+            .ToList();
         
         return new TimeslotSelect()
         {
-            AvailableTimeslots = tsList,
+            AvailableDates = availableDates,
             RoomId = roomId,
             RoomTitle = room.Title
         };

@@ -665,6 +665,39 @@ form#external-account,
     color: #225f3d;
 }
 
+.timeslot-picker {
+    width: 100%;
+    max-width: 720px;
+    margin: 1.25rem 0;
+    padding: 20px 0;
+    border-top: 1px solid var(--hbk-line);
+    border-bottom: 1px solid var(--hbk-line);
+}
+
+.timeslot-picker form {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 12px;
+}
+
+.timeslot-picker__field,
+.timeslot-picker__field select {
+    width: 100%;
+    max-width: none;
+}
+
+.timeslot-picker .btn {
+    margin: 0;
+    white-space: nowrap;
+}
+
+.timeslot-picker__meta {
+    margin: 9px 0 0;
+    color: var(--hbk-muted);
+    font-size: 0.85rem;
+}
+
 .btn-close {
     min-width: 32px;
     min-height: 32px;
@@ -1385,6 +1418,14 @@ div#searchBody {
 
     table.table1 {
         min-width: 560px;
+    }
+
+    .timeslot-picker form {
+        grid-template-columns: 1fr;
+    }
+
+    .timeslot-picker .btn {
+        width: 100%;
     }
 
     form#messageInput {

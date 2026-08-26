@@ -50,6 +50,19 @@ dotnet run --project Hbk.Platform
 
 The default SQLite file is created under the operating system's temporary directory. It is intentionally disposable: the application recreates and seeds it whenever the hosting environment removes it.
 
+### Docker
+Run this to build it in Docker:
+
+```bash
+docker build -t hbk-platform .
+```
+
+Then to run it:
+
+```bash
+docker run -p 8080:5000 -v hbk-data:/app/data -e ConnectionStrings__DefaultConnection="Data Source=/app/data/hbk.db" -e Database__Provider=Sqlite hbk-platform
+```
+
 ### Database providers
 
 Select a provider with `Database:Provider`. In Azure App Service or another hosted environment, use the equivalent `Database__Provider` environment variable.
