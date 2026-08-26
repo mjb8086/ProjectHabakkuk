@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1113 1113" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g transform="matrix(3.58801,0,0,3.58801,77,77.5029)">
+        <path d="M218.966,267L47.167,267C21.225,267 0,245.775 0,219.833L0,48.039C0,22.097 21.225,0.871 47.167,0.871L218.966,0.871C244.908,0.871 266.133,22.097 266.133,48.039L266.133,219.833C266.133,245.775 244.908,267 218.966,267Z" style="fill:url(#_Linear1);"/>
+        <path d="M113.945,35.081L109.335,68.033L104.725,100.984L137.676,100.984C155.875,100.984 172.692,86.232 175.238,68.033L179.848,35.081L113.945,35.081Z" style="fill:white;fill-rule:nonzero;"/>
+        <path d="M38.821,100.984L34.211,133.936L29.601,166.887L62.553,166.887C80.752,166.887 97.568,152.134 100.115,133.936L104.725,100.984L38.821,100.984Z" style="fill:white;fill-rule:nonzero;"/>
+        <path d="M128.455,166.887C110.258,166.887 93.441,181.64 90.895,199.839L86.285,232.79L152.188,232.79L156.798,199.839L161.408,166.887L128.455,166.887Z" style="fill:white;fill-rule:nonzero;"/>
+        <path d="M203.579,100.984C185.381,100.984 168.564,115.737 166.018,133.936L161.408,166.887L227.311,166.887L231.921,133.936L236.531,100.984L203.579,100.984Z" style="fill:white;fill-rule:nonzero;"/>
+    </g>
+    <defs>
+        <linearGradient id="_Linear1" x1="0" y1="0" x2="1" y2="0" gradientUnits="userSpaceOnUse" gradientTransform="matrix(238.42,238.42,-238.42,238.42,13.8563,14.7254)"><stop offset="0" style="stop-color:rgb(0,140,190);stop-opacity:1"/><stop offset="0.2" style="stop-color:rgb(0,140,190);stop-opacity:1"/><stop offset="0.3" style="stop-color:rgb(0,137,186);stop-opacity:1"/><stop offset="1" style="stop-color:rgb(236,0,140);stop-opacity:1"/></linearGradient>
+    </defs>
+</svg>
