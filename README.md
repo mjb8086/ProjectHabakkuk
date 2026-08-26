@@ -16,7 +16,7 @@ It began as an early prototype of a product for independent healthcare practitio
 - Clinical records, priority items, and client-practitioner messaging.
 - Clinic room management, practitioner room reservations, and approval workflows.
 - ASP.NET Core Identity authentication with role-based authorization.
-- Server-rendered Razor UI, backed by Entity Framework Core and PostgreSQL or an in-memory development database.
+- Server-rendered Razor UI backed by Entity Framework Core, with SQLite, PostgreSQL, and in-memory database options.
 - Experimental Vue 3 and Vite frontend work in `Hbk.Platform/JsAppRoot`.
 
 ## Current Architecture
@@ -29,28 +29,51 @@ The solution is currently organised into focused projects:
 - `Hbk.Common` contains common helpers and cross-cutting services.
 - `Hbk.Test` contains the unit test suite.
 
-The application uses ASP.NET Core Identity for authentication and routes signed-in users to the appropriate role-specific area. In Development, it can run against a seeded EF Core in-memory database; PostgreSQL is available when persistent, relational storage is required.
+The application uses ASP.NET Core Identity for authentication and routes signed-in users to the appropriate role-specific area. Development uses a seeded, disposable SQLite database by default, while PostgreSQL and EF Core's in-memory provider remain configurable alternatives.
 
 ## Run Locally
 
 ### Prerequisites
 
 - .NET 8 SDK
-- PostgreSQL only when running with the relational provider
+- PostgreSQL only when using the PostgreSQL provider
 - Node.js 18+ only when working on the experimental Vue frontend
 
 ### Start the application
 
-The Development configuration uses the seeded in-memory database by default, so no database setup is required for a first run.
+The Development configuration uses a seeded SQLite database by default, so no external database setup is required for a first run.
 
 ```bash
 dotnet restore
 dotnet run --project Hbk.Platform
 ```
 
-The in-memory database is recreated when the application stops. To use PostgreSQL, set `Database:UseInMemory` to `false` in `Hbk.Platform/appsettings.Development.json` and configure `ConnectionStrings:HbkContext`.
+The default SQLite file is created under the operating system's temporary directory. It is intentionally disposable: the application recreates and seeds it whenever the hosting environment removes it.
 
-Some workflows use relational EF Core operations and therefore require PostgreSQL rather than the in-memory provider.
+### Database providers
+
+Select a provider with `Database:Provider`. In Azure App Service or another hosted environment, use the equivalent `Database__Provider` environment variable.
+
+| Provider | Configuration value | Intended use |
+| --- | --- | --- |
+| SQLite | `Sqlite` | Default local and public-demo option. Supports relational EF Core operations without an external database. |
+| PostgreSQL | `PostgreSql` | Persistent relational deployment. Requires `ConnectionStrings:HbkContext`, or `ConnectionStrings__HbkContext` as an environment variable. PostgreSQL migrations are applied at startup. |
+| In-memory | `InMemory` | Lightweight fallback for development and tests. Data is lost when the process stops, and relational-only operations such as `ExecuteUpdateAsync` are unavailable. |
+
+SQLite uses `ConnectionStrings:HbkSqlite` when configured (`ConnectionStrings__HbkSqlite` in Azure). If it is omitted, the application creates `hbk-demo.db` in its temporary directory. For example:
+
+```json
+{
+  "Database": {
+    "Provider": "Sqlite"
+  },
+  "ConnectionStrings": {
+    "HbkSqlite": "Data Source=/tmp/project-habakkuk.db"
+  }
+}
+```
+
+To use the in-memory fallback locally, set `Database:Provider` to `InMemory`. Its optional `Database:InMemoryDatabaseName` setting defaults to `HbkInMemory`.
 
 ### Run the tests
 

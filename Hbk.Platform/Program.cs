@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using Serilog.Events;
 using Hangfire;
-//using Hangfire.PostgreSql;
 using Hangfire.InMemory;
 using Npgsql;
 using Vite.AspNetCore;
@@ -16,6 +15,7 @@ using Hbk.Common.Services.Implementation;
 using Hbk.Database;
 using Hbk.Database.Helpers;
 using Hbk.Platform.Areas.Account;
+using Hbk.Platform.Configuration;
 using Hbk.Platform.Defaults;
 using Hbk.Platform.Middleware;
 using Hbk.Platform.Repository;
@@ -40,6 +40,7 @@ try
         .Enrich.FromLogContext());
 
     Console.WriteLine($"NowDoctor Ltd. Presents:\n{Consts.HBK_NAME}\nVersion {Consts.VERSION}. Starting up...");
+    Log.Information("Environment = {Environment}", builder.Environment.EnvironmentName);
     
     builder.Services.AddIdentity<User, IdentityRole>(options =>
         {
@@ -99,21 +100,27 @@ try
     builder.Services.AddSingleton<IDateTimeWrapper, DateTimeWrapper>();
     builder.Services.AddSingleton<ICentralScrutinizerService, CentralScrutinizerService>();
 
-    var useInMemoryDatabase = builder.Environment.IsDevelopment() &&
-                              builder.Configuration.GetValue<bool>("Database:UseInMemory");
-
+    var databaseProvider = builder.Configuration.GetDatabaseProvider();
+    Log.Information("Using Database Provider = {DatabaseProvider}", databaseProvider);
+    
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
         {
-            if (useInMemoryDatabase)
+            switch (databaseProvider)
             {
-                options.UseInMemoryDatabase(
-                    builder.Configuration.GetValue<string>("Database:InMemoryDatabaseName") ?? "HbkInMemory");
-            }
-            else
-            {
-                options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("HbkContext") ??
-                    throw new InvalidOperationException("Connection string is invalid.") );
+                case DatabaseProvider.Sqlite:
+                    options.UseSqlite(builder.Configuration.GetSqliteConnectionString());
+                    break;
+                case DatabaseProvider.InMemory:
+                    options.UseInMemoryDatabase(
+                        builder.Configuration.GetValue<string>("Database:InMemoryDatabaseName") ?? "HbkInMemory");
+                    break;
+                case DatabaseProvider.PostgreSql:
+                    options.UseNpgsql(
+                        builder.Configuration.GetConnectionString("HbkContext") ??
+                        throw new InvalidOperationException("ConnectionStrings:HbkContext is required for PostgreSQL."));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(databaseProvider), databaseProvider, null);
             }
 
             if (builder.Environment.IsDevelopment()) { options.EnableSensitiveDataLogging(); }
@@ -127,7 +134,7 @@ try
     builder.Services.AddControllersWithViews();
     builder.Services.AddViteServices();
 
-    if (!useInMemoryDatabase)
+    if (databaseProvider == DatabaseProvider.PostgreSql)
     {
         var connectionStringBuilder = new NpgsqlConnectionStringBuilder( builder.Configuration.GetConnectionString("HbkContext") );
         connectionStringBuilder.Database = "postgres";
@@ -175,13 +182,13 @@ try
     using (var scope = app.Services.CreateScope())
     {
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        if (useInMemoryDatabase)
+        if (databaseProvider == DatabaseProvider.PostgreSql)
         {
-            db.Database.EnsureCreated();
+            db.Database.Migrate();
         }
         else
         {
-            db.Database.Migrate();
+            db.Database.EnsureCreated();
         }
 
         var services = scope.ServiceProvider;

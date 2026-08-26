@@ -1,13 +1,17 @@
-using System.Text.RegularExpressions;
+using Hbk.Database;
 using Hbk.Models.DTO;
 using Hbk.Models.View.MCP;
 using Hbk.Platform.Repository;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace Hbk.Platform.Services.Implementation
 {
-    public class McpService(IMcpRepository _mcpRepo, ICentralScrutinizerService _css, [FromServices] IConfiguration config ): IMcpService
+    public class McpService(
+        IMcpRepository _mcpRepo,
+        ICentralScrutinizerService _css,
+        [FromServices] ApplicationDbContext dbContext) : IMcpService
     {
     
         /* MCP Methods */
@@ -71,24 +75,14 @@ namespace Hbk.Platform.Services.Implementation
 
         public async Task<SystemStats> GetStatsView()
         {
-            var dbString = config.GetSection("ConnectionStrings").GetSection("HbkContext")?.Value ??
-                           "HbkContext not defined?";
-            string pattern = @"(Database=([^;]+);)|(Host=([^;]+);)";
-            MatchCollection matches = Regex.Matches(dbString, pattern);
+            var database = dbContext.Database.ProviderName ?? "Unknown provider";
+            var host = "Process memory";
 
-            string host = "";
-            string database = "";
-
-            foreach (Match match in matches)
+            if (dbContext.Database.IsRelational())
             {
-                if (match.Groups[4].Success)
-                {
-                    host = match.Groups[4].Value;
-                }
-                else if (match.Groups[2].Success)
-                {
-                    database = match.Groups[2].Value;
-                }
+                var connection = dbContext.Database.GetDbConnection();
+                database = string.IsNullOrWhiteSpace(connection.Database) ? database : connection.Database;
+                host = connection.DataSource;
             }
             
             return new SystemStats()
