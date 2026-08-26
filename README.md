@@ -8,6 +8,8 @@ Project Habakkuk is an open-source clinical practice management application buil
 
 It began as an early prototype of a product for independent healthcare practitioners and predates the later UbiClinic marketplace. The project is now used as a demonstration application for modern .NET architecture and development practices.
 
+![screenshot](./assets/reception.png)
+
 ## Features
 
 - Role-based workflows for practitioners, clients, clinic managers, and platform administrators.
