@@ -80,3 +80,8 @@ Only SuperAdmin users can currently register new practitioners and clinics on be
 The original application was built while exploring the product concept. I have since been modernising it as a public demonstration application, applying the architectural approaches I use in current .NET development.
 
 The application currently follows an anemic domain model. A migration to Clean Architecture is in progress on the `CleanArchMigration` branch.
+
+## History
+Development of this platform took place from 2023-2025, when the room booking aspect was forked to become UbiClinic.
+
+The platform was open-sourced in February 2026, given a facelift and presented to the world.
