@@ -22,6 +22,7 @@ namespace Hbk.Models.DTO
         public int Id { get; set; }
         public string ClientName { get; set; }
         public string PractitionerName { get; set; }
+        public string DisplayDateCreated { get; set; } = string.Empty;
     
         public DateTime? DateUpdated { get; set; }
         public DateTime DateCreated { get; set; }

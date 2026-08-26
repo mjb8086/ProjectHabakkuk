@@ -150,6 +150,10 @@ namespace Hbk.Database
             {
                 if (entry.Entity is BaseEntity entity)
                 {
+                    if (entity.DateCreated == default)
+                    {
+                        entity.DateCreated = DateTime.UtcNow;
+                    }
                     entity.CreateActioner =  userId;
                     entity.TenancyId = _tenancySrv.TenancyId;
                 }

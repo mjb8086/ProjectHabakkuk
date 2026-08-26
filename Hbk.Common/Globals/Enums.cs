@@ -20,7 +20,12 @@ namespace Hbk.Common.Globals
 
           public enum RecordVisibility
           {
-               ClientAndPrac, PracOnly, None
+               [Display(Name = "Client and practitioner")]
+               ClientAndPrac,
+               [Display(Name = "Practitioner only")]
+               PracOnly,
+               [Display(Name = "Not visible")]
+               None
           }
      
           public enum TreatmentRequestability

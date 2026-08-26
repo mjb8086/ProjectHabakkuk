@@ -1,4 +1,5 @@
 @model Hbk.Models.View.MyND.ClientRecords
+@using Hbk.Common.Helpers
 @{
     ViewBag.Title = $"{Model.ClientName}'s Records";
     ViewBag.Modules = "clientrecords.js";
@@ -12,7 +13,12 @@
 @if(Model.ClientRecordList.Count > 0) {
     @foreach (var record in Model.ClientRecordList)
     {
-        <div class="clientRecordItem"><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a> <span>@record.Date @record.Visibility</span> <span>@(record.IsPriority ? "Priority" : "" )</span></div>
+        <div class="clientRecordItem">
+            <a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@record.Id">@record.Title</a>
+            <span><strong>Created</strong><br /><time datetime="@record.Date.ToString("s")">@record.DisplayDate</time></span>
+            <span><strong>Visibility</strong><br />@record.Visibility.GetDisplayName()</span>
+            <span>@(record.IsPriority ? "Priority" : "")</span>
+        </div>
     }
 }
 else

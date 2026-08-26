@@ -26,21 +26,24 @@ namespace Hbk.Platform.Services.Implementation
         }
         public async Task<ClientRecords> GetClientRecords(int clientId)
         {
+            var records = await _recordRepo.GetClientRecordsLite(clientId);
+            PopulateDisplayDates(records);
+
             return new ClientRecords
             {
                 ClientName = _cache.GetClientName(clientId),
                 ClientId = clientId,
-                ClientRecordList = await _recordRepo.GetClientRecordsLite(clientId)
+                ClientRecordList = records
             };
         }
 
         public async Task<List<ClientRecordLite>> GetPopulatedLiteRecords(bool isPriority)
         {
             var liteRecords = await _recordRepo.GetRecordsLite(isPriority);
+            PopulateDisplayDates(liteRecords);
             foreach (var record in liteRecords)
             {
                 record.ClientName = _cache.GetClientName(record.ClientId);
-                record.DisplayDate = DateTimeHelper.GetFriendlyDateTimeString(record.Date);
             }
             return liteRecords;
         }
@@ -51,6 +54,7 @@ namespace Hbk.Platform.Services.Implementation
             {
                 var clientRecord = await _recordRepo.GetRecord(recordId.Value);
                 clientRecord.ClientName = _cache.GetClientName(clientRecord.ClientId);
+                PopulateDisplayDate(clientRecord);
                 return clientRecord;
             }
             if (clientId.HasValue)// is create mode, return blank model.
@@ -68,12 +72,32 @@ namespace Hbk.Platform.Services.Implementation
         public async Task<FullClientRecordDto> CreateRecord(ClientRecordDto recordDto)
         {
             recordDto.PractitionerId = _userService.GetClaimFromCookie("PractitionerId");
-            return await _recordRepo.CreateRecord(recordDto);
+            var record = await _recordRepo.CreateRecord(recordDto);
+            PopulateDisplayDate(record);
+            return record;
         }
 
         public async Task<FullClientRecordDto> UpdateRecord(UpdateRecordLite recordDto)
         {
-            return await _recordRepo.UpdateRecordLite(recordDto);
+            var record = await _recordRepo.UpdateRecordLite(recordDto);
+            PopulateDisplayDate(record);
+            return record;
+        }
+
+        private static void PopulateDisplayDates(IEnumerable<ClientRecordLite> records)
+        {
+            foreach (var record in records)
+            {
+                record.DisplayDate = DateTimeHelper.GetFriendlyDateTimeString(record.Date);
+            }
+        }
+
+        private static void PopulateDisplayDate(FullClientRecordDto record)
+        {
+            if (record.DateCreated != default)
+            {
+                record.DisplayDateCreated = DateTimeHelper.GetFriendlyDateTimeString(record.DateCreated);
+            }
         }
     }
 }

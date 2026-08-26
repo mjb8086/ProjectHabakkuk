@@ -1,6 +1,9 @@
 @model Hbk.Models.DTO.FullClientRecordDto
+@using Hbk.Common.Helpers
 @{
-    ViewBag.Title = $"{Model.ClientName}'s Record, {Model.DateCreated}";
+    ViewBag.Title = Model.Id > 0
+        ? $"{Model.ClientName}'s record, {Model.DisplayDateCreated}"
+        : $"New record for {Model.ClientName}";
     ViewBag.Modules = "clientrecord.js";
     ViewBag.CurrentNav = "ClientRecord";
     ViewBag.css = "clientrecord.css";
@@ -11,8 +14,17 @@
 <div id="clientRecordWrap" class="clientRecordView">
     <div class="clientRecordItem">
         <input type="text" id="noteTitle" name="noteTitle" value="@Model.Title" placeholder="Title"/>
-        <span>Date<br/>@(Model.Id > 0 ? Model.DateCreated : DateTime.Now.ToShortDateString())</span>
-        <span>Visibility<br/>@Model.Visibility</span>
+        <span><strong>Created</strong><br />
+            @if (Model.Id > 0)
+            {
+                <time datetime="@Model.DateCreated.ToString("s")">@Model.DisplayDateCreated</time>
+            }
+            else
+            {
+                <text>Not saved yet</text>
+            }
+        </span>
+        <span><strong>Visibility</strong><br />@Model.Visibility.GetDisplayName()</span>
         <span>@(Model.IsPriority ? "Priority" : "")
             @if (Model.Id > 0)
             {
