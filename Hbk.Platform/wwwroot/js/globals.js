@@ -1,5 +1,5 @@
 const Globals = {
-    BaseUrl : "https://localhost:7251",
+    BaseUrl : window.location.origin,
     TreatmentRequestability : {ClientAndPrac : 2, PracOnly : 1, None : 0},
     HBKFlasher: function (message, status) {
         // Create flasher, flash it.

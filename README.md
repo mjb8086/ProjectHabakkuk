@@ -60,7 +60,7 @@ docker build -t hbk-platform .
 Then to run it:
 
 ```bash
-docker run -p 8080:5000 -v hbk-data:/app/data -e ConnectionStrings__DefaultConnection="Data Source=/app/data/hbk.db" -e Database__Provider=Sqlite hbk-platform
+docker run -p 8080:8080 -v hbk-data:/app/data -e ConnectionStrings__DefaultConnection="Data Source=/app/data/hbk.db" -e Database__Provider=Sqlite hbk-platform
 ```
 
 ### Database providers

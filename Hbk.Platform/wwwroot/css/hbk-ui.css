@@ -711,7 +711,7 @@ form#external-account,
 /* Work surfaces and data lists */
 div.action-section {
     width: 100%;
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 0 18px;
     padding: 14px 16px;
     border: 1px solid #e5c58d;
