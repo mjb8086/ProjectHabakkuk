@@ -1,13 +1,36 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Clinical practice management";
 }
 
-<div id="homeContainer" class="">
-    <h1 class="no-margins mci-body-font">Welcome</h1>
-    <p style=""><i>Hbk.Platform from NowDoctor is a comprehensive clinical management platform.</i></p>
-    <div id="searchBody">
-        <p>N.b. registration is currently not available to end-users. Please contact an admin to be registered into the system.</p>
-        <p>Practitioners, clients or clinical managers please --&gt; <a asp-area="Account" asp-page="/Login">login</a>.</p>
+<div id="homeContainer" class="home-overview">
+    <div class="home-overview__intro">
+        <h1 class="no-margins mci-body-font">HBK.Platform</h1>
+        <p class="home-overview__lead">An open-source clinical practice management platform for independent practitioners, clients, and clinics.</p>
     </div>
-</div>
 
+    <section class="home-overview__section" aria-labelledby="platform-features">
+        <div class="home-overview__section-heading">
+            <h2 id="platform-features">Built for day-to-day practice operations</h2>
+        </div>
+        <div class="home-overview__grid">
+            <article class="home-overview__feature">
+                <h3>Client and practitioner management</h3>
+                <p>Role-based workspaces for client details, practitioner records, and clinic administration.</p>
+            </article>
+            <article class="home-overview__feature">
+                <h3>Appointments and availability</h3>
+                <p>Treatment scheduling, booking confirmation, cancellations, and weekly availability management.</p>
+            </article>
+            <article class="home-overview__feature">
+                <h3>Clinic room workflow</h3>
+                <p>Room configuration, availability, reservations, and the supporting clinic management flows.</p>
+            </article>
+        </div>
+    </section>
+
+    <aside id="searchBody" class="home-overview__access" aria-label="Access to the demonstration">
+        <h2>Access to the demonstration</h2>
+        <p><strong>Registration is currently not available to end users.</strong> Please contact an administrator to be registered into the system.</p>
+        <p>Practitioners, clients, and clinic managers can <a asp-area="Account" asp-page="/Login">sign in</a> with an existing account.</p>
+    </aside>
+</div>

@@ -1,5 +1,7 @@
 # Project Habakkuk
 
+![Hbk Logo](./assets/HbkLogo1.png)
+
 Clinical practice management application - C# / ASP.NET Core
 
 Project Habakkuk is an open-source clinical practice management application built with ASP.NET Core.
