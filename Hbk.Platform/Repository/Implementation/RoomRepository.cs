@@ -2,6 +2,7 @@ using Hbk.Common.Exception;
 using Hbk.Database;
 using Hbk.Models.DTO;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Hbk.Platform.Repository.Implementation;
 
@@ -46,7 +47,7 @@ public class RoomRepository (ApplicationDbContext _db): IRoomRepository
     
     public async Task<RoomDto> GetRoom(int roomId)
     {
-        return await _db.Rooms.Where(x => x.Id == roomId).Select(x => SelectDto(x)).FirstOrDefaultAsync() ?? 
+        return await _db.Rooms.Where(x => x.Id == roomId).Select(RoomDtoProjection).FirstOrDefaultAsync() ??
                throw new IdxNotFoundException($"RoomId {roomId} does not exist.");
     }
     
@@ -57,22 +58,21 @@ public class RoomRepository (ApplicationDbContext _db): IRoomRepository
 
     public async Task<List<RoomDto>> GetRoomsAvailableForBooking()
     {
-        return await _db.Rooms.IgnoreQueryFilters().Select(x => SelectDto(x)).ToListAsync();
+        return await _db.Rooms.IgnoreQueryFilters().Select(RoomDtoProjection).ToListAsync();
     }
 
     ////////////////////////////////////////////////////////////////////////////////
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////
-    private static RoomDto SelectDto(Room x)
-    {
-        return new RoomDto()
+    private static readonly Expression<Func<Room, RoomDto>> RoomDtoProjection = room =>
+        new()
         {
-            Id = x.Id,
-            Title = x.Title,
-            PricePerUse = x.PricePerUse,
-            Description = x.Description,
-            Img = x.Img
+            Id = room.Id,
+            ClinicId = room.ClinicId,
+            ClinicName = room.Clinic.Tenancy.OrgName,
+            Title = room.Title,
+            PricePerUse = room.PricePerUse,
+            Description = room.Description,
+            Img = room.Img
         };
-    }
-    
 }
