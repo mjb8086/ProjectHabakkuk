@@ -687,6 +687,67 @@ div.action-section {
     background: var(--hbk-accent-soft);
 }
 
+.reception-message-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+}
+
+.reception-message-summary span {
+    color: #704614;
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.reception-section {
+    max-width: 960px;
+    margin-top: 32px;
+}
+
+.reception-section__heading {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px 20px;
+}
+
+.reception-section__heading h2 {
+    margin: 0;
+}
+
+.reception-section__heading > a {
+    flex: 0 0 auto;
+    font-size: 0.88rem;
+    font-weight: 650;
+}
+
+.reception-empty-state {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--hbk-line);
+    border-left: 4px solid var(--hbk-line-strong);
+    border-radius: var(--hbk-radius);
+    background: var(--hbk-surface);
+    color: var(--hbk-muted);
+}
+
+.reception-statistics {
+    max-width: 560px;
+}
+
+.reception-statistics table.table1 {
+    min-width: 360px;
+}
+
+.reception-statistics td:last-child,
+.reception-statistics th:last-child {
+    width: 100px;
+    text-align: right;
+}
+
 div#table1Wrap,
 div.table1Wrap,
 div.table1OuterWrap {
@@ -1314,6 +1375,12 @@ div#searchBody {
     div.clientRecordItem {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .reception-section__heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
     }
 
     table.table1 {

@@ -1,23 +1,141 @@
 @model Hbk.Models.View.MyND.ReceptionModel
+@using Hbk.Common.Globals
+@functions {
+    private static string FormatAppointmentDate(string value)
+    {
+        return DateTime.TryParse(value, out var dateTime)
+            ? dateTime.ToString("ddd d MMM yyyy, HH:mm")
+            : value;
+    }
+
+    private static string FormatCancellationSource(Enums.AppointmentStatus status)
+    {
+        return status == Enums.AppointmentStatus.CancelledByClient
+            ? "Client"
+            : "Practitioner";
+    }
+}
 @{
     ViewBag.Title = "Reception";
     ViewBag.CurrentNav = "Reception";
     Layout = "_MyND";
 }
 
-<h2>MyND: Reception</h2>
-<p><a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Messaging</a> (@Model.NumUnreadMessages unread)</p>
+<h1>Practitioner reception</h1>
+<p>Review recent practice activity and items requiring attention.</p>
+<div class="action-section reception-message-summary">
+    <a asp-area="MyND" asp-controller="Messaging" asp-action="Index">Open messaging</a>
+    <span>@Model.NumUnreadMessages unread @(Model.NumUnreadMessages == 1 ? "message" : "messages")</span>
+</div>
 
-<p>Upcoming appointments this week: </p>
+<section class="reception-section" aria-labelledby="recent-bookings-heading">
+    <div class="reception-section__heading">
+        <h2 id="recent-bookings-heading">Recent Bookings</h2>
+        <a asp-area="MyND" asp-controller="Appointment" asp-action="Index">View all appointments</a>
+    </div>
+    @if (Model.RecentBookings.Count > 0)
+    {
+        <div class="table1OuterWrap">
+            <table class="table1">
+                <thead>
+                    <tr><th>When</th><th>Client</th><th>Treatment</th><th>Room</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var booking in Model.RecentBookings)
+                {
+                    <tr>
+                        <td><time datetime="@booking.DateTime">@FormatAppointmentDate(booking.DateTime)</time></td>
+                        <td>@booking.ClientName</td>
+                        <td>@booking.TreatmentTitle</td>
+                        <td>@(booking.RoomDetails ?? "Not assigned")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="reception-empty-state">There are no upcoming bookings.</p>
+    }
+</section>
 
-<h2>Recent Bookings</h2>
-<p>Todo.</p>
+<section class="reception-section" aria-labelledby="recent-cancellations-heading">
+    <div class="reception-section__heading">
+        <h2 id="recent-cancellations-heading">Recent Cancellations</h2>
+        <a asp-area="MyND" asp-controller="Appointment" asp-action="Index">View appointment history</a>
+    </div>
+    @if (Model.RecentCancellations.Count > 0)
+    {
+        <div class="table1OuterWrap">
+            <table class="table1">
+                <thead>
+                    <tr><th>When</th><th>Client</th><th>Treatment</th><th>Cancelled by</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var cancellation in Model.RecentCancellations)
+                {
+                    <tr>
+                        <td><time datetime="@cancellation.DateTime">@FormatAppointmentDate(cancellation.DateTime)</time></td>
+                        <td>@cancellation.ClientName</td>
+                        <td>@cancellation.TreatmentTitle</td>
+                        <td>@FormatCancellationSource(cancellation.Status)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="reception-empty-state">There are no recent cancellations.</p>
+    }
+</section>
 
-<h2>Recent Cancellations</h2>
-<p>Todo.</p>
+<section class="reception-section" aria-labelledby="priority-items-heading">
+    <div class="reception-section__heading">
+        <h2 id="priority-items-heading">Priority Items</h2>
+        <a asp-area="MyND" asp-controller="Record" asp-action="Index">Open client records</a>
+    </div>
+    @if (Model.PriorityItems.Count > 0)
+    {
+        <div class="table1OuterWrap">
+            <table class="table1">
+                <thead>
+                    <tr><th>Client</th><th>Priority note</th><th>Created</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.PriorityItems)
+                {
+                    <tr>
+                        <td>@item.ClientName</td>
+                        <td>@item.Title</td>
+                        <td><time datetime="@item.Date.ToString("s")">@item.DisplayDate</time></td>
+                        <td><a asp-area="MyND" asp-controller="Record" asp-action="ClientRecord" asp-route-recordId="@item.Id">Review note</a></td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="reception-empty-state">No client notes are currently flagged as priority.</p>
+    }
+</section>
 
-<h2>Priority Items</h2>
-<p>Todo.</p>
-
-<h2>Statistics</h2>
-<p>$x Clients, $x appointments completed</p>
+<section class="reception-section" aria-labelledby="statistics-heading">
+    <h2 id="statistics-heading">Statistics</h2>
+    <div class="table1OuterWrap reception-statistics">
+        <table class="table1">
+            <thead>
+                <tr><th>Measure</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Registered clients</td><td>@Model.NumClientsRegistered</td></tr>
+                <tr><td>Completed appointments</td><td>@Model.NumAppointmentsCompleted</td></tr>
+                <tr><td>Unread messages</td><td>@Model.NumUnreadMessages</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>

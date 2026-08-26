@@ -46,17 +46,5 @@ namespace Hbk.Platform.Services.Implementation
             return data;
         }
 
-        public async Task<ReceptionModel> GetPractitionerReceptionModel()
-        {
-            var practitionerId = _userSrv.GetClaimFromCookie("PractitionerId");
-            var data = new ReceptionModel();
-            {
-                data.NumUnreadMessages = await _messageRepo.GetUnreadMessagesAsPractitioner(practitionerId);
-            }
-
-            return data;
-        }
-
-
     }
 }
