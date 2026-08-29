@@ -46,6 +46,23 @@ namespace Hbk.Platform.Services.Implementation
             return practiceName;
         }
 
+        public string GetClinicName(int clinicId)
+        {
+            string key = $"ClinicName-t{TenancyId}-c{clinicId}";
+            if (_memoryCache.TryGetValue(key, out string? clinicName))
+                return clinicName ?? throw new IdxNotFoundException();
+
+            clinicName = _db.Clinics
+                .Where(x => x.Id == clinicId)
+                .Select(x => x.Tenancy.OrgName)
+                .FirstOrDefault();
+            if (clinicName == null)
+                throw new IdxNotFoundException($"No clinic of id {clinicId} exists");
+
+            _memoryCache.Set(key, clinicName, CacheEntryOptions);
+            return clinicName;
+        }
+
         public string GetClientName(int clientId)
         {
             return GetClientDetailsLite(clientId).Name;

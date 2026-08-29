@@ -6,6 +6,7 @@ namespace Hbk.Platform.Services
     {
         public string GetPractitionerName(int practitionerId);
         public string GetPracticeName(int practiceId);
+        public string GetClinicName(int clinicId);
         public string GetClientName(int clientId);
         public int GetLeadPractitionerId(int practiceId);
         public PractitionerDetailsLite GetPractitionerDetailsLite(int pracId);

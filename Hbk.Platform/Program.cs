@@ -93,6 +93,7 @@ try
     builder.Services.AddScoped<IRoomReservationService, RoomReservationService>();
     builder.Services.AddScoped<ITimeslotService, TimeslotService>();
     builder.Services.AddScoped<IReceptionService, ReceptionService>();
+    builder.Services.AddScoped<IClinicReceptionService, ClinicReceptionService>();
     
     // cache like but depending on db ocntext
     builder.Services.AddScoped<ICacheService, CacheService>();

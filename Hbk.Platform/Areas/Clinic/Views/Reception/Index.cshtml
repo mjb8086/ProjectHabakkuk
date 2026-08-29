@@ -1,10 +1,27 @@
+@model Hbk.Models.View.Clinic.ReceptionModel
 @{
     ViewBag.Title = "Clinic Reception";
     ViewBag.CurrentNav = "Reception";
     Layout = "_Clinic";
 }
 
-<h2>Welcome to the Clinic Reception.</h2>
+<h2>Welcome to the Clinic Reception (@Model.ClinicName).</h2>
 <h3>Quick actions:</h3>
 <p><a asp-area="Clinic" asp-controller="Room" asp-action="List">Add or update room data.</a></p>
 <p><a asp-area="Clinic" asp-controller="Reservation" asp-action="Index">Approve reservations.</a></p>
+
+<section aria-labelledby="statistics-heading">
+    <h2 id="statistics-heading">Statistics</h2>
+    <div class="table1OuterWrap">
+        <table class="table1">
+            <thead>
+                <tr><th>Measure</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Registered rooms</td><td>@Model.NumRoomsRegistered</td></tr>
+                <tr><td>Pending reservation requests</td><td>@Model.NumReservationRequests</td></tr>
+                <tr><td>Approved upcoming reservations</td><td>@Model.NumApprovedReservations</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
