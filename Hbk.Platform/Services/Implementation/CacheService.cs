@@ -29,6 +29,23 @@ namespace Hbk.Platform.Services.Implementation
             return GetPractitionerDetailsLite(practitionerId).Name;
         }
 
+        public string GetPracticeName(int practiceId)
+        {
+            string key = $"PracticeName-t{TenancyId}-p{practiceId}";
+            if (_memoryCache.TryGetValue(key, out string? practiceName))
+                return practiceName ?? throw new IdxNotFoundException();
+
+            practiceName = _db.Practices
+                .Where(x => x.Id == practiceId)
+                .Select(x => x.Tenancy.OrgName)
+                .FirstOrDefault();
+            if (practiceName == null)
+                throw new IdxNotFoundException($"No practice of id {practiceId} exists");
+
+            _memoryCache.Set(key, practiceName, CacheEntryOptions);
+            return practiceName;
+        }
+
         public string GetClientName(int clientId)
         {
             return GetClientDetailsLite(clientId).Name;

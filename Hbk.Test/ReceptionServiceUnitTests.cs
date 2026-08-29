@@ -10,6 +10,7 @@ namespace Hbk.Test;
 public class ReceptionServiceUnitTests
 {
     private const int PractitionerId = 42;
+    private const int PracticeId = 7;
     private const string DbStartDate = "2024-01-01";
 
     [Fact]
@@ -44,6 +45,10 @@ public class ReceptionServiceUnitTests
 
         var userService = new Mock<IUserService>();
         userService.Setup(x => x.GetClaimFromCookie("PractitionerId")).Returns(PractitionerId);
+        userService.Setup(x => x.GetClaimFromCookie("PracticeId")).Returns(PracticeId);
+
+        var cacheService = new Mock<ICacheService>();
+        cacheService.Setup(x => x.GetPracticeName(PracticeId)).Returns("Alice Health");
 
         var configurationService = new Mock<IConfigurationService>();
         configurationService
@@ -80,7 +85,8 @@ public class ReceptionServiceUnitTests
             recordService.Object,
             clientRepository.Object,
             roomReservationService.Object,
-            messagingService.Object);
+            messagingService.Object,
+            cacheService.Object);
 
         var model = await service.GetReceptionModel();
         var summary = await service.GetReceptionSummaryData();
@@ -88,6 +94,7 @@ public class ReceptionServiceUnitTests
         Assert.Equal(ReceptionService.ReceptionItemLimit, model.RecentBookings.Count);
         Assert.Equal(ReceptionService.ReceptionItemLimit, model.RecentCancellations.Count);
         Assert.Equal(ReceptionService.ReceptionItemLimit, model.PriorityItems.Count);
+        Assert.Equal("Alice Health", model.PracticeName);
         Assert.Equal("Priority 7", model.PriorityItems[0].Title);
         Assert.Equal(5, model.NumUnreadMessages);
         Assert.Equal(16, model.NumClientsRegistered);

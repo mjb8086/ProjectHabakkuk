@@ -5,6 +5,7 @@ namespace Hbk.Platform.Services
     public interface ICacheService
     {
         public string GetPractitionerName(int practitionerId);
+        public string GetPracticeName(int practiceId);
         public string GetClientName(int clientId);
         public int GetLeadPractitionerId(int practiceId);
         public PractitionerDetailsLite GetPractitionerDetailsLite(int pracId);

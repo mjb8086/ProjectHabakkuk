@@ -19,7 +19,7 @@ namespace Hbk.Platform.Services.Implementation;
 
 public class ReceptionService(IBookingService _bookingService, IUserService _userService, IConfigurationService _config, 
     IAppointmentRepository _appointmentRepo, IClientRecordService _recordService, IClientRepository _clientRepo, 
-    IRoomReservationService _roomResService, IClientMessagingService _clientMessagingSrv) : IReceptionService
+    IRoomReservationService _roomResService, IClientMessagingService _clientMessagingSrv, ICacheService _cache) : IReceptionService
 {
     public const int ReceptionItemLimit = 5;
 
@@ -34,6 +34,7 @@ public class ReceptionService(IBookingService _bookingService, IUserService _use
 
         return new ReceptionModel
         {
+            PracticeName = _cache.GetPracticeName(_userService.GetClaimFromCookie("PracticeId")),
             NumUnreadMessages = summary.UnreadMessageDetails.Sum(x => x.UnreadMessageCount),
             NumClientsRegistered = summary.NumClientsRegistered,
             NumAppointmentsCompleted = summary.NumAppointmentsCompleted,
