@@ -77,6 +77,7 @@ try
 
     builder.Services.AddScoped<IUserService, UserService>();
     builder.Services.AddScoped<IPractitionerRegistrationService, PractitionerRegistrationService>();
+    builder.Services.AddScoped<IClinicRegistrationService, ClinicRegistrationService>();
 
     builder.Services.AddScoped<ITenancyService, TenancyService>();
     builder.Services.AddScoped<IPracticeService, PracticeService>();
@@ -139,6 +140,15 @@ try
     builder.Services.AddRateLimiter(options =>
     {
         options.AddPolicy("practitioner-registration", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(10),
+                    QueueLimit = 0
+                }));
+        options.AddPolicy("clinic-registration", context =>
             RateLimitPartition.GetFixedWindowLimiter(
                 context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
                 _ => new FixedWindowRateLimiterOptions

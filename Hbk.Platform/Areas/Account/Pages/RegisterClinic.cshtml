@@ -1,0 +1,76 @@
+﻿@page
+@using Hbk.Common.Globals
+@model Hbk.Platform.Areas.Account.Pages.RegisterClinicModel
+@{
+    ViewData["Title"] = "Clinic registration";
+}
+
+<h1>@ViewData["Title"]</h1>
+<div class="row">
+    <div class="col-md-7">
+        <form id="registerClinicForm" method="post">
+            <p>Create a clinic manager account and register a new clinic. New clinics begin with a trial licence.</p>
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <h2>Your details</h2>
+            <div class="form-floating mb-3">
+                <select asp-for="Input.ManagerTitle" asp-items="Html.GetEnumSelectList<Enums.Title>()" class="form-select"></select>
+                <label asp-for="Input.ManagerTitle"></label>
+                <span asp-validation-for="Input.ManagerTitle" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ManagerForename" class="form-control" autocomplete="given-name" placeholder="Forename" />
+                <label asp-for="Input.ManagerForename"></label>
+                <span asp-validation-for="Input.ManagerForename" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ManagerSurname" class="form-control" autocomplete="family-name" placeholder="Surname" />
+                <label asp-for="Input.ManagerSurname"></label>
+                <span asp-validation-for="Input.ManagerSurname" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ManagerEmail" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                <label asp-for="Input.ManagerEmail"></label>
+                <span asp-validation-for="Input.ManagerEmail" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Password" />
+                <label asp-for="Input.Password"></label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Confirm password" />
+                <label asp-for="Input.ConfirmPassword"></label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <h2>Clinic details</h2>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ClinicName" class="form-control" autocomplete="organization" placeholder="Clinic name" />
+                <label asp-for="Input.ClinicName"></label>
+                <span asp-validation-for="Input.ClinicName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ClinicEmail" class="form-control" autocomplete="email" placeholder="clinic@example.com" />
+                <label asp-for="Input.ClinicEmail"></label>
+                <span asp-validation-for="Input.ClinicEmail" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Telephone" class="form-control" autocomplete="tel" placeholder="Telephone" />
+                <label asp-for="Input.Telephone"></label>
+                <span asp-validation-for="Input.Telephone" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea asp-for="Input.StreetAddress" class="form-control" autocomplete="street-address" placeholder="Clinic address"></textarea>
+                <label asp-for="Input.StreetAddress"></label>
+                <span asp-validation-for="Input.StreetAddress" class="text-danger"></span>
+            </div>
+
+            <button id="registerClinicSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Create clinic account</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
