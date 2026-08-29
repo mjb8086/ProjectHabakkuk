@@ -111,7 +111,7 @@ The default seed includes the following accounts for local exploration:
 | `mrg@sphigh.com` | `misterslave` | Client |
 | `les@primusville.com` | `johnthefisherman` | Practitioner |
 
-Only SuperAdmin users can currently register new practitioners and clinics on behalf of users.
+Independent practitioners and clinic managers may self-register for the platform. Practitioner registration creates a new trial practice, while clinic registration creates a new trial clinic.
 
 ## Current Status
 
