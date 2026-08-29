@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Threading.RateLimiting;
 
 using Serilog;
 using Serilog.Events;
@@ -75,6 +76,7 @@ try
     builder.Services.AddScoped<CentralScrutinizerMiddleware>();
 
     builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddScoped<IPractitionerRegistrationService, PractitionerRegistrationService>();
 
     builder.Services.AddScoped<ITenancyService, TenancyService>();
     builder.Services.AddScoped<IPracticeService, PracticeService>();
@@ -134,6 +136,19 @@ try
     // Add services to the container.
     builder.Services.AddControllersWithViews();
     builder.Services.AddViteServices();
+    builder.Services.AddRateLimiter(options =>
+    {
+        options.AddPolicy("practitioner-registration", context =>
+            RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(10),
+                    QueueLimit = 0
+                }));
+        options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    });
 
     if (databaseProvider == DatabaseProvider.PostgreSql)
     {
@@ -199,6 +214,7 @@ try
     app.UseStaticFiles();
     app.UseSerilogRequestLogging();
     app.UseRouting();
+    app.UseRateLimiter();
 
     if (builder.Environment.IsDevelopment())
     {

@@ -1,64 +1,83 @@
 ﻿@page
+@using Hbk.Common.Globals
 @model Hbk.Platform.Areas.Account.Pages.RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Practitioner registration";
 }
 
 <h1>@ViewData["Title"]</h1>
-
 <div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
+    <div class="col-md-7">
+        <form id="registerForm" method="post">
+            <p>Create a practitioner account and start a new practice. New practices begin with a trial licence.</p>
             <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+            <h2>Your details</h2>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
+                <select asp-for="Input.Title" asp-items="Html.GetEnumSelectList<Enums.Title>()" class="form-select"></select>
+                <label asp-for="Input.Title"></label>
+                <span asp-validation-for="Input.Title" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Forename" class="form-control" autocomplete="given-name" placeholder="Forename" />
+                <label asp-for="Input.Forename"></label>
+                <span asp-validation-for="Input.Forename" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Surname" class="form-control" autocomplete="family-name" placeholder="Surname" />
+                <label asp-for="Input.Surname"></label>
+                <span asp-validation-for="Input.Surname" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.DateOfBirth" class="form-control" autocomplete="bday" />
+                <label asp-for="Input.DateOfBirth"></label>
+                <span asp-validation-for="Input.DateOfBirth" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+                <label asp-for="Input.Email"></label>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" placeholder="Password" />
+                <label asp-for="Input.Password"></label>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
             <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" placeholder="Confirm password" />
+                <label asp-for="Input.ConfirmPassword"></label>
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
             </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+            <h2>Practice details</h2>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PracticeName" class="form-control" autocomplete="organization" placeholder="Practice name" />
+                <label asp-for="Input.PracticeName"></label>
+                <span asp-validation-for="Input.PracticeName" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PracticeEmail" class="form-control" autocomplete="email" placeholder="practice@example.com" />
+                <label asp-for="Input.PracticeEmail"></label>
+                <span asp-validation-for="Input.PracticeEmail" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Telephone" class="form-control" autocomplete="tel" placeholder="Telephone" />
+                <label asp-for="Input.Telephone"></label>
+                <span asp-validation-for="Input.Telephone" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <textarea asp-for="Input.StreetAddress" class="form-control" autocomplete="street-address" placeholder="Practice address"></textarea>
+                <label asp-for="Input.StreetAddress"></label>
+                <span asp-validation-for="Input.StreetAddress" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PracticeTagline" class="form-control" placeholder="Practice tagline" />
+                <label asp-for="Input.PracticeTagline"></label>
+                <span asp-validation-for="Input.PracticeTagline" class="text-danger"></span>
+            </div>
+
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Create practitioner account</button>
         </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
-                    </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
-                        </div>
-                    </form>
-                }
-            }
-        </section>
     </div>
 </div>
 
