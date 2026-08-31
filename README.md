@@ -37,7 +37,7 @@ The application uses ASP.NET Core Identity for authentication and routes signed-
 
 ### Prerequisites
 
-- .NET 8 SDK
+- .NET 10 SDK
 - PostgreSQL only when using the PostgreSQL provider
 - Node.js 18+ only when working on the experimental Vue frontend
 
